@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Notifications\Webapp\PasswordResetRequest;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use App\User as RecordModel ;
 use App\Http\Controllers\CrudController;
 
@@ -293,7 +294,7 @@ class UserController extends Controller
                 return response()->json([
                     'ok' => false ,
                     'message' => 'អ៊ីមែលនេះមិនទាន់ក្នុងប្រព័ន្ធឡើយ !'
-                ], 404);
+                ], 201);
             }
         }
         return response()->json([
