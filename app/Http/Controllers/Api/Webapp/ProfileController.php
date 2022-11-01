@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 
-use App\User;
+use App\Models\User;
 
 class ProfileController extends Controller
 {

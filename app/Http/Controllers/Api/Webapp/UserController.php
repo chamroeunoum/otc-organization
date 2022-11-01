@@ -112,7 +112,7 @@ class UserController extends Controller
      * Create an account
      */
     public function store(Request $request){
-        $user = \App\User::where('email',$request->email)->first() ;
+        $user = \App\Models\User::where('email',$request->email)->first() ;
         if( $user ){
             // អ្នកប្រើប្រាស់បានចុះឈ្មោះរួចរាល់ហើយ
             return response([
@@ -123,7 +123,7 @@ class UserController extends Controller
             );
         }else{
             // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
-            $user = new \App\User([
+            $user = new \App\Models\User([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
                 'email' => $request->email,
@@ -134,7 +134,7 @@ class UserController extends Controller
             if( $user ){
                 
                 return response()->json([
-                    'user' => \App\User::find( $user->id ) ,
+                    'user' => \App\Models\User::find( $user->id ) ,
                     'message' => 'គណនីបង្កើតបានជោគជ័យ !'
                 ], 200);
 
@@ -150,8 +150,8 @@ class UserController extends Controller
      * Create an account
      */
     public function update(Request $request){
-        $user = isset( $request->id ) && $request->id > 0 ? \App\User::find($request->id) : (
-            isset( $request->email ) && $request->email != "" ? \App\User::where('email',$request->email)->first() : null
+        $user = isset( $request->id ) && $request->id > 0 ? \App\Models\User::find($request->id) : (
+            isset( $request->email ) && $request->email != "" ? \App\Models\User::where('email',$request->email)->first() : null
         );
         if( $user ){
             // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
@@ -178,7 +178,7 @@ class UserController extends Controller
      * Active function of the account
      */
     public function active(Request $request){
-        $user = \App\User::find($request->id) ;
+        $user = \App\Models\User::find($request->id) ;
         if( $user ){
             $user->active = $request->active ;
             $user->save();
@@ -205,7 +205,7 @@ class UserController extends Controller
      * Unactive function of the account
      */
     public function unactive(Request $request){
-        $user = \App\User::find($request->id) ;
+        $user = \App\Models\User::find($request->id) ;
         if( $user ){
             $user->active = 0 ;
             $user->save();
@@ -231,7 +231,7 @@ class UserController extends Controller
      * Function delete an account
      */
     public function destroy(Request $request){
-        $user = \App\User::find($request->id) ;
+        $user = \App\Models\User::find($request->id) ;
         if( $user ){
             $user->active = 0 ;
             $user->deleted_at = \Carbon\Carbon::now() ;
@@ -259,7 +259,7 @@ class UserController extends Controller
      * Function Restore an account from SoftDeletes
      */
     public function restore(Request $request){
-        if( $user = \App\User::restore($request->id) ){
+        if( $user = \App\Models\User::restore($request->id) ){
             return response([
                 'user' => $user ,
                 'ok' => true ,
@@ -277,9 +277,9 @@ class UserController extends Controller
 
     public function forgotPassword(Request $request){
         if( $request->email != "" ){
-            $user = \App\User::where('email',$request->email )->first();
+            $user = \App\Models\User::where('email',$request->email )->first();
             if ($user) {
-                $user -> forgot_password_token = str_random(32) ;
+                $user -> forgot_password_token = Str::random(32) ;
                 $user -> update();
                 
                 $user->notify( new PasswordResetRequest() );
@@ -303,7 +303,7 @@ class UserController extends Controller
     }
     public function checkConfirmationCode(Request $request){
         if( $request->email != "" && $request->code != "" ){
-            $user = \App\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
+            $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
             if ($user) {
                 $user -> forgot_password_token = '' ;
                 $user -> update();
@@ -326,7 +326,7 @@ class UserController extends Controller
     }
     public function passwordReset(Request $request){
         
-        $record = \App\User::where('email',$request->email)->first();
+        $record = \App\Models\User::where('email',$request->email)->first();
         if( $record ){
             $record->password = Hash::make($request->password);
             $record->update();
@@ -345,7 +345,7 @@ class UserController extends Controller
         // 'password' => bcrypt($request->password),
     }
     public function passwordChange(Request $request){
-        $record = \App\User::find($request->id);
+        $record = \App\Models\User::find($request->id);
         if( $record ){
             $record->password = Hash::make($request->password);
             $record->update();

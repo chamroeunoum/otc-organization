@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use App\User;
+use App\Models\User;
 use App\Notifications\Webapp\SignupActivate;
+use Illuminate\Support\Str;
 use Avatar;
 use Storage;
 
@@ -41,7 +42,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'active' => 1 , // Unactive user
             'password' => bcrypt($request->password),
-            'activation_token' => str_random(32)
+            'activation_token' => Str::random(32)
         ]);
 
         $user->save();
@@ -81,12 +82,12 @@ class AuthController extends Controller
         $credentials['deleted_at'] = null;
 
         if(!Auth::attempt($credentials)){
-            if( \App\User::where('email', $request->email)->first() != null ){
+            if( \App\Models\User::where('email', $request->email)->first() != null ){
                 /**
                  * Account does exist but the password might miss type
                  */
                 return response()->json([
-                    'user' => \App\User::where('email', $request->email)->first() ,
+                    'user' => \App\Models\User::where('email', $request->email)->first() ,
                     'message' => 'សូមពិនិត្យពាក្យសម្ងាត់របស់អ្នក !'
                 ], 401);
             }else{
@@ -108,8 +109,8 @@ class AuthController extends Controller
 
         $user = Auth::user();
         if( $user ){
-            $user->avatar_url = null ;
-            if( Storage::disk('public')->exists( $user->avatar_url ) ){
+            // $user->avatar_url = null ;
+            if( $user->avatar_url !== null && Storage::disk('public')->exists( $user->avatar_url ) ){
                 $user->avatar_url = Storage::disk("public")->url( $user->avatar_url  );
             }
         }

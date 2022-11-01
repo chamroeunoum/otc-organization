@@ -1,1 +1,0 @@
-<vcb-sidebar></vcb-sidebar>

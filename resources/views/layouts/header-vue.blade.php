@@ -1,1 +1,0 @@
-<vcb-header></vcb-header>

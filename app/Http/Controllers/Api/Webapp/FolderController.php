@@ -35,12 +35,12 @@ class FolderController extends Controller
 
         $queryString = [
             "where" => [
-                // 'default' => [
+                'default' => [
                     [
                         'field' => 'user_id' ,
                         'value' => $user->id
                     ]
-                // ],
+                ],
                 // 'in' => [
                 //     [
                 //         'field' => 'document_type' ,
@@ -118,6 +118,7 @@ class FolderController extends Controller
         $responseData = $crud->pagination(true, $builder);
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
+        $responseData['user'] = $user ;
         return response()->json($responseData, 200);
     }
     /**

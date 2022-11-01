@@ -148,25 +148,31 @@
   // },
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Webapp\SearchController;
+use App\Http\Controllers\Api\Webapp\AuthController;
+use App\Http\Controllers\Api\Webapp\UserController;
+use App\Http\Controllers\Api\Webapp\ProfileController;
+use App\Http\Controllers\Api\Webapp\RegulatorController;
+use App\Http\Controllers\Api\Webapp\TypeController;
+use App\Http\Controllers\Api\Webapp\FolderController;
+use App\Http\Controllers\Api\Webapp\MinistryController;
 
 Route::group([
   'prefix' => 'webapp' ,
-  'namespace' => 'Api\Webapp' ,
   'api'
 ],function(){
   /** SIGNING SECTION */
   Route::group([
     'prefix' => 'authentication'
   ], function () {
-    Route::post('login', 'AuthController@login');
-    Route::post('signup', 'AuthController@signup');
-    Route::put('signup/activate', 'AuthController@signupActivate');
-
+    Route::post('login', [AuthController::class,'login']);
+    Route::post('signup', [AuthController::class,'signup']);
+    Route::put('signup/activate', [AuthController::class,'signupActivate']);
     Route::group([
       'middleware' => 'auth'
     ], function() {
-        Route::post('logout', 'AuthController@logout');
-        Route::get('user', 'AuthController@user');
+        Route::post('logout', [AuthController::class,'logout']);
+        Route::get('user', [AuthController::class,'user']);
     });
   });
 
@@ -178,13 +184,13 @@ Route::group([
       /**
        * Api for cin
        */
-      Route::get('','UserController@index');
-      Route::post('','UserController@create');
-      Route::put('','UserController@update');
-      Route::get('{id}','UserController@read');
-      Route::delete('','UserController@destroy');
-      Route::put('activate','UserController@active');
-      Route::put('password/change','UserController@passwordChange');
+      Route::get('',[UserController::class,'index']);
+      Route::post('',[UserController::class,'index']);
+      Route::put('',[UserController::class,'update']);
+      Route::get('{id}',[UserController::class,'read']);
+      Route::delete('',[UserController::class,'destroy']);
+      Route::put('activate',[UserController::class,'active']);
+      Route::put('password/change',[UserController::class,'logout']);
   });
 
   Route::group([
@@ -194,35 +200,38 @@ Route::group([
       /**
        * Api for profile
        */
-          Route::get('','ProfileController@getAuthUser');
-          Route::put('','ProfileController@updateAuthUser');
-          Route::put('password','ProfileController@updateAuthUserPassword');
-          Route::post('picture/upload','ProfileController@upload');
+          Route::get('',[ProfileController::class,'getAuthUser']);
+          Route::put('',[ProfileController::class,'updateAuthUser']);
+          Route::put('password',[ProfileController::class,'updateAuthUserPassword']);
+          Route::post('picture/upload',[ProfileController::class,'upload']);
   });
 
   
   /** RESET PASSWORD */
-  Route::put('password/forgot','UserController@forgotPassword');
-  Route::put('password/forgot/confirm','UserController@checkConfirmationCode');
-  Route::put('password/reset','UserController@passwordReset');
+  Route::put('password/forgot',[UserController::class,'forgotPassword']);
+  Route::put('password/forgot/confirm',[UserController::class,'checkConfirmationCode']);
+  Route::put('password/reset',[UserController::class,'passwordReset']);
 
   /** SEARCH SECTION */
   Route::group([
     'prefix' => 'regulators' ,
     ], function() {
-        Route::get('','SearchController@index');
-        Route::get('pdf','SearchController@pdf');
-        Route::get('get/document/years','SearchController@getYears');
+        Route::get('',[ SearchController::class , 'index']);
+        // Route::get('',function(){
+        //   return 'I am "regulators->SearchController"';
+        // });
+        Route::get('pdf',[ SearchController::class , 'pdf']);
+        Route::get('get/document/years',[ SearchController::class , 'getYears']);
         Route::group([
             'prefix' => 'types' ,
             ], function() {
-                Route::get('compact', "TypeController@compactList");
+                Route::get('compact', [ TypeController::class , 'index']);
         });
-        Route::get('types/compact', "TypeController@compactList");
-        Route::get('{id}','RegulatorController@read');
-        Route::post('','RegulatorController@create');
-        Route::put('','RegulatorController@update');
-        Route::delete('','RegulatorController@destroy');
+        Route::get('types/compact', [ TypeController::class , 'compactList']);
+        Route::get('{id}',[ RegulatorController::class , 'read']);
+        Route::post('',[ RegulatorController::class , 'create']);
+        Route::put('',[ RegulatorController::class , 'update']);
+        Route::delete('',[ RegulatorController::class , 'destroy']);
 
   });
   /** FOLDER SECTION */
@@ -230,25 +239,23 @@ Route::group([
     'prefix' => 'folders' ,
     'middleware' => 'auth:api'
     ], function() {
-        Route::get('','FolderController@index');
-        Route::post('','FolderController@create');
-        Route::get('{id}/read','FolderController@read');
-        Route::put('','FolderController@update');
-        Route::delete('','FolderController@delete');
-        
-        Route::get('regulators','FolderController@regulators');
-        Route::put('regulators/add','FolderController@addDocumentToFolder');
-        Route::put('regulators/remove','FolderController@removeDocumentToFolder');
-        Route::put('regulators/check','FolderController@checkDocument');
-        
-        Route::get('user','FolderController@user');
+        Route::get('',[ FolderController::class , 'index']);
+        Route::post('',[ FolderController::class , 'create']);
+        Route::get('{id}/read',[ FolderController::class , 'read']);
+        Route::put('',[ FolderController::class , 'update']);
+        Route::delete('',[ FolderController::class , 'delete']);
+        Route::get('regulators',[ FolderController::class , 'regulators']);
+        Route::put('regulators/add',[ FolderController::class , 'addDocumentToFolder']);
+        Route::put('regulators/remove',[ FolderController::class , 'removeDocumentToFolder']);
+        Route::put('regulators/check',[ FolderController::class , 'checkDocument']);
+        Route::get('user',[ FolderController::class , 'user']);
   });
   /** SECTION OF DOCUMENT TYPE */
   Route::group([
     'prefix' => 'types' ,
     'middleware' => 'auth'
     ], function() {
-        Route::get('','TypeController@index');
+        Route::get('',[TypeController::class,'index']);
   });
 
   /** SECTION OF MINISTRY */
@@ -256,15 +263,7 @@ Route::group([
     'prefix' => 'ministries' ,
     'middleware' => 'auth'
     ], function() {
-        Route::get('','MinistryController@index');
-  });
-
-  /** PROFILE SECTION */
-  Route::group([
-    'prefix' => 'profile',
-    'middleware' => 'auth'
-  ], function() {
-    
+        Route::get('',[MinistryController::class,'@index']);
   });
 
 });
