@@ -239,6 +239,7 @@ Route::group([
     'prefix' => 'folders' ,
     'middleware' => 'auth:api'
     ], function() {
+
         Route::get('',[ FolderController::class , 'index']);
         Route::post('',[ FolderController::class , 'create']);
         Route::get('{id}/read',[ FolderController::class , 'read']);
@@ -246,9 +247,11 @@ Route::group([
         Route::delete('',[ FolderController::class , 'delete']);
         Route::get('regulators',[ FolderController::class , 'regulators']);
         Route::put('regulators/add',[ FolderController::class , 'addDocumentToFolder']);
-        Route::put('regulators/remove',[ FolderController::class , 'removeDocumentToFolder']);
+        Route::put('regulators/remove',[ FolderController::class , 'removeDocumentFromFolder']);
         Route::put('regulators/check',[ FolderController::class , 'checkDocument']);
         Route::get('user',[ FolderController::class , 'user']);
+        Route::get('list/document/validation',[ FolderController::class , 'listFolderWithDocumentValidation']);
+        
   });
   /** SECTION OF DOCUMENT TYPE */
   Route::group([

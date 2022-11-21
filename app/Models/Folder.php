@@ -18,6 +18,11 @@ class Folder extends Model
 	// protected $hidden = ['id'];
 	protected $fillable = ['name', 'user_id'];
 	public $timestamps = true;
+	protected $dates = ['created_at' , 'updated' ,'deleted_at'];
+	protected $casts = [
+		'created_at' => 'datetime',
+		'updated' => 'datetime'
+	];
 
 	/*
 	|--------------------------------------------------------------------------
@@ -40,7 +45,7 @@ class Folder extends Model
 			return $this->belongsToMany('\App\Models\Document','document_folders','folder_id','document_id');
 	}
 	public function user(){
-    return $this->belongsTo('\App\User','user_id','id');
+    return $this->belongsTo('\App\Models\User','user_id','id');
   }
 	/*
 	|--------------------------------------------------------------------------
@@ -59,4 +64,5 @@ class Folder extends Model
 	| MUTATORS
 	|--------------------------------------------------------------------------
 	*/
+	
 }
