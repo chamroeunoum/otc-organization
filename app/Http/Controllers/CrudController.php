@@ -169,16 +169,32 @@ class CrudController extends Controller {
                         $fieldIndex > 0
                             ? $query->orWhere(function($query) use ($field, $searchWords) {
                                     foreach( $searchWords AS $wordIndex => $word ){
-                                        $wordIndex > 0
-                                        ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
-                                        : $query->where($field, 'LIKE', "%" . $word . "%");
+                                        if(strlen($word)<=0)continue;
+                                        /**
+                                         * Use to get all records that contains one or more of string search
+                                         */
+                                        // $wordIndex > 0 
+                                        // ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
+                                        // : $query->where($field, 'LIKE', "%" . $word . "%");
+                                        /**
+                                         * Use to get all records that matched all conditions
+                                         */
+                                        $query->where($field, 'LIKE', "%" . $word . "%");
                                     }
                                 })
                             : $query->where(function($query) use ($field, $searchWords) {
                                 foreach( $searchWords AS $wordIndex => $word ){
-                                    $wordIndex > 0
-                                    ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
-                                    : $query->where($field, 'LIKE', "%" . $word . "%");
+                                    if(strlen($word)<=0)continue;
+                                        /**
+                                         * Use to get all records that contains one or more of string search
+                                         */
+                                        // $wordIndex > 0 
+                                        // ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
+                                        // : $query->where($field, 'LIKE', "%" . $word . "%");
+                                        /**
+                                         * Use to get all records that matched all conditions
+                                         */
+                                        $query->where($field, 'LIKE', "%" . $word . "%");
                                 }
                             });
                     }
@@ -200,16 +216,30 @@ class CrudController extends Controller {
                                         $fieldIndex > 0
                                         ? $pivotQuery->orWhere(function ($query) use ($field, $searchWords) {
                                             foreach ($searchWords as $wordIndex => $word) {
-                                                $wordIndex > 0
-                                                ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
-                                                : $query->where($field, 'LIKE', "%" . $word . "%");
+                                                /**
+                                                 * Use to get all records that contains one or more of string search
+                                                 */
+                                                // $wordIndex > 0 
+                                                // ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
+                                                // : $query->where($field, 'LIKE', "%" . $word . "%");
+                                                /**
+                                                 * Use to get all records that matched all conditions
+                                                 */
+                                                $query->where($field, 'LIKE', "%" . $word . "%");
                                             }
                                         })
                                         : $pivotQuery->where(function ($query) use ($field, $searchWords) {
                                             foreach ($searchWords as $wordIndex => $word) {
-                                                $wordIndex > 0
-                                                ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
-                                                : $query->where($field, 'LIKE', "%" . $word . "%");
+                                                /**
+                                                 * Use to get all records that contains one or more of string search
+                                                 */
+                                                // $wordIndex > 0 
+                                                // ? $query->orWhere($field, 'LIKE', "%" . $word . "%")
+                                                // : $query->where($field, 'LIKE', "%" . $word . "%");
+                                                /**
+                                                 * Use to get all records that matched all conditions
+                                                 */
+                                                $query->where($field, 'LIKE', "%" . $word . "%");
                                             }
                                         });
                                     }
