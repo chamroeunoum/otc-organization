@@ -126,8 +126,10 @@ class SearchController extends Controller
             [
                 'field' => 'pdf' ,
                 'callback'=> function($pdf){
-                    $pdf = ( $pdf !== "" && \Storage::disk('public')->exists( $pdf ) )
-                    ? \Storage::disk('public')->url( $pdf ) : null ;
+                    $pdf = ( $pdf !== "" && \Storage::disk('document')->exists( $pdf ) )
+                    ? true
+                    // \Storage::disk('document')->url( $pdf ) 
+                    : false ;
                     return $pdf ;
                 }
             ]

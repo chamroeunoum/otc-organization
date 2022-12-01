@@ -45,7 +45,9 @@ return [
         ],
         'document' => [
             'driver' => 'local',
-            'root' => storage_path('data')
+            'root' => storage_path('data') ,
+            'url' => env('APP_URL').'/storage',
+            'throw' => false,
         ],
 
         's3' => [
