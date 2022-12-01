@@ -202,8 +202,8 @@ class SearchController extends Controller
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
             
             /**   Log the access of the user */
-            if( Auth::user() !== null ){
-                $user_id= Auth::user()->id;
+            if( \Auth::user() !== null ){
+                $user_id= \Auth::user()->id;
                 $current_date = date('Y-m-d H:i:s');
                 DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
             }
