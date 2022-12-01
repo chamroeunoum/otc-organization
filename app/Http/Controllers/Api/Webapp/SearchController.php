@@ -195,7 +195,7 @@ class SearchController extends Controller
      */
     public function pdf(Request $request)
     {
-        $document = Document::findOrFail($request->id);
+        $document = RecordModel::findOrFail($request->id);
         if($document) {
             $path = storage_path('data') . '/' . $document->pdf;
             $ext = pathinfo($path);
