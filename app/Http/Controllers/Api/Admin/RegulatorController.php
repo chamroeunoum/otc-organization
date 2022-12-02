@@ -244,6 +244,7 @@ class RegulatorController extends Controller
             'document_year' => $request->year ,
             'document_type' => $request->type_id ,
             'publish' => $request->publish
+        ]);
         /**
          * Upload pdf document(s) of the regulator
          */

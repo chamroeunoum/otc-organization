@@ -30,3 +30,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 require('api/webapp.php');
+require('api/admin.php');
