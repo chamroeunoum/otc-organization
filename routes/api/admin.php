@@ -61,10 +61,15 @@ Route::group([
         'middleware' => 'api'
         ], function() {;
             Route::get('',[RegulatorController::class,'index']);
+            Route::get('child',[RegulatorController::class,'child']);
             Route::get('read',[RegulatorController::class,'read']);
             Route::post('',[RegulatorController::class,'create']);
             Route::put('',[RegulatorController::class,'update']);
             Route::delete('',[RegulatorController::class,'destroy']);
+            /**
+             * Add child document to another document
+             */
+            Route::put('child',[RegulatorController::class,'childDocument']);
 
             // Route::get('get/document/years','RegulatorController@getYears');
             // Route::get('pdf','RegulatorController@pdf');
@@ -75,7 +80,12 @@ Route::group([
                     Route::get('compact', [TypeController::class,'compactList']);
             });
             
-            
+            Route::group([
+                'prefix' => 'oknha'
+                ], function(){
+                    Route::get('', [RegulatorController::class,'oknha'] );
+                }
+            );
 
     });
     /** FOLDER SECTION */

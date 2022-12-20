@@ -86,5 +86,11 @@ class Document extends Model
     public function unitTeamworkType(){
         return \App\Models\UnitTeamworkType::get();
     }
+    public function childDocument(){
+        return $this->hasOne('\App\Models\DocumentParent','parent_id','id');
+    }
+    public function getChildDocuments(){
+        
+    }
     
 }

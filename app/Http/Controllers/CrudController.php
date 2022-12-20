@@ -331,48 +331,48 @@ class CrudController extends Controller {
         });
     }
     public function formatRecord($record, $fieldsWithCallback = false){
-        if (isset($record->photos) && is_array($record->photos) ){
-            $photos = [];
-            foreach ($record->photos as $index => $photo) {
-                if ($photo != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($photo)) {
-                    $photos[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($photo);
-                }
-            }
-            $record->photos = $photos;
-        }
-        else{
-            if( isset($record->photos ) ) $record->photos = [] ;
-        }
-        $pdfs = [];
-        if (isset($record->pdfs) && is_array($record->pdfs)) {
-            foreach ($record->pdfs as $index => $pdf) {
-                if ($pdf != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($pdf)) {
-                    $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($pdf);
-                }
-            }
-        } else if( isset($record->pdfs) && !is_array($record->pdfs) ) {
-            if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->pdfs)) {
-                $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->pdfs);
-            }else{
-                $pdfs=[];
-            }
-        }
-        $record->pdfs = $pdfs;
-        /** In case, record has field avatar_url */
-        if (isset($record->avatar_url ) && $record->avatar_url !== "" ) {
-            if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->avatar_url)) {
-                $record->avatar_url = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->avatar_url);
-            } else {
-                $record->avatar_url = null;
-            }
-        } else {
-            if (isset($record->avatar_url)) $record->avatar_url = null ;
-        }
+        // if (isset($record->photos) && is_array($record->photos) ){
+        //     $photos = [];
+        //     foreach ($record->photos as $index => $photo) {
+        //         if ($photo != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($photo)) {
+        //             $photos[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($photo);
+        //         }
+        //     }
+        //     $record->photos = $photos;
+        // }
+        // else{
+        //     if( isset($record->photos ) ) $record->photos = [] ;
+        // }
+        // $pdfs = [];
+        // if (isset($record->pdfs) && is_array($record->pdfs)) {
+        //     foreach ($record->pdfs as $index => $pdf) {
+        //         if ($pdf != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($pdf)) {
+        //             $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($pdf);
+        //         }
+        //     }
+        // } else if( isset($record->pdfs) && !is_array($record->pdfs) ) {
+        //     if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->pdfs)) {
+        //         $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->pdfs);
+        //     }else{
+        //         $pdfs=[];
+        //     }
+        // }
+        // $record->pdfs = $pdfs;
+        // /** In case, record has field avatar_url */
+        // if (isset($record->avatar_url ) && $record->avatar_url !== "" ) {
+        //     if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->avatar_url)) {
+        //         $record->avatar_url = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->avatar_url);
+        //     } else {
+        //         $record->avatar_url = null;
+        //     }
+        // } else {
+        //     if (isset($record->avatar_url)) $record->avatar_url = null ;
+        // }
         /** Construct format of the record */
         $customRecord = [];
         if (isset( $record ) && !empty($this->fields)) {
             foreach ($this->fields as $key => $field){
-                $customRecord[$field] = $fieldsWithCallback !== false && $fieldsWithCallback['field'] == $field ? $fieldsWithCallback['callback']($record->$field) : $record->$field ;
+                $customRecord[$field] = $fieldsWithCallback !== false && is_array( $fieldsWithCallback ) && !empty( $fieldsWithCallback ) && array_key_exists( $field , $fieldsWithCallback ) ? $fieldsWithCallback[$field]($record->$field) : $record->$field ;
             }
         }
         /** Call the relationship functions */

@@ -122,13 +122,16 @@ class RegulatorController extends Controller
 
         $builder = $crud->getListBuilder();
 
-        $responseData = $crud->pagination(true, $builder,
-            [
-                'field' => 'pdf' ,
-                'callback'=> function($pdf){
-                    $pdf = ( $pdf !== "" && \Storage::disk('public')->exists( $pdf ) )
-                    ? \Storage::disk('public')->url( $pdf ) : null ;
-                    return $pdf ;
+        $responseData = $crud->pagination(true, $builder,[
+            'pdf' => function($pdf){
+                $pdf = ( $pdf !== "" && \Storage::disk('document')->exists( $pdf ) )
+                ? true
+                // \Storage::disk('document')->url( $pdf ) 
+                : false ;
+                return $pdf ;
+            },
+           'objective' => function($objective){
+                    return html_entity_decode( strip_tags( $objective ) );
                 }
             ]
         );

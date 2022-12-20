@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Admin\RegulatorController;
+use App\Http\Controllers\Api\Admin\YPReaderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/oknha', [RegulatorController::class,'oknha'] );
+
+Route::get('yp/categories', [YPReaderController::class,'byCategories'] );
+Route::get('yp/categories/items', [YPReaderController::class,'byCategoriesItems'] );
