@@ -49,8 +49,8 @@
   //   $xpath = new DOMXPath($doc);
 
   //   // // We start from the root element
-  //   // $query = "//div[@class='col-lg-6 col-md-8 col-12 p-md-0 p-3 listing']";
-  //   $query = "//div[@class='row pb-2']/div[@class='col-md-6 col-12']/a[@class='section-b']";
+  //   // $query = "//div[@class='p-3 col-lg-6 col-md-8 col-12 p-md-0 listing']";
+  //   $query = "//div[@class='pb-2 row']/div[@class='col-md-6 col-12']/a[@class='section-b']";
   //   $dls = $xpath->query($query);
   //   foreach($dls as $dlsIndex => $dl ) {
   //     $categoriesCounter++;
