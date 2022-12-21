@@ -40,5 +40,7 @@ class DatabaseSeeder extends Seeder
         $this->call(OfficerRanksTableSeeder::class);
         $this->call(DocumentOwnMinistriesTableSeeder::class);
         $this->call(PopmessageTableSeeder::class);
+        $this->call(YpCategoriesTableSeeder::class);
+        $this->call(YpProductsTableSeeder::class);
     }
 }
