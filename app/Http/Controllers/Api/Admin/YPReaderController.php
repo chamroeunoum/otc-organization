@@ -88,6 +88,43 @@ class YPReaderController extends Controller
         $doc->loadHTML($data);
         $xpath = new \DOMXPath($doc);
         return $xpath->query($query);
+      }
 
+      public static function savingDistrictToDatabase(){
+
+        foreach( \App\Models\YPProvince::whereraw('LENGTH(code)=4')->get() AS $index => $district ){
+            // dd( str_replace([' '],"",( strtolower( $province->name_en ) ) ) );
+            
+            // \App\Models\YPProduct::whereRaw("address LIKE \"%". str_replace([' '],"",( strtolower( $district->name_en ) ) ) ."%\" ")
+            // ->update([ 'province' => $district->id ]);
+
+            \App\Models\YPProduct::whereRaw("address LIKE \"%". str_replace([' '],"",( strtolower( 'TakhmaoCity' ) ) ) ."%\" ")
+            ->update([ 'district' => 8323 ]);
+
+        }
+        echo "Done";
+      }
+      public static function businessesByCategoryOfProvince(Request $request){
+        $tableBody = $tableHead = [] ;
+        // Get businesses in each category of each province
+        $businessesByCategoryInEachProvince = [] ;
+        $htmlHead[] = "No" ;
+        $htmlHead[] = "Province" ;
+        \App\Models\YPProvince::whereRaw('length(code) = 2')->get()->map(function($p) use( &$businessesByCategoryInEachProvince , &$tableBody, &$tableHead ) {
+            $tableHead[$p->name][] = $p->name_en ;
+            dd( $tableHead );
+            $indexControlCategory = 0 ;
+            $businessesByCategoryInEachProvince[$p->name_en] = $p->productOfProvince()->select('category', \DB::raw('count(*) as total ') )->groupby('category')->get()->map(function($product) use( $indexControlCategory, &$tableBody, &$tableHead ) {
+                $indexControlCategory++;
+                if( $indexControlCategory == 1 ) $tableHead[] = \App\Models\YPCategory::find($product->category)->name;
+                $tableBody[$product->name_en][] = $product->total ;
+                return [
+                    'id' => $product->category ,
+                    'name' => \App\Models\YPCategory::find($product->category)->name ,
+                    'total' => $product->total
+                ] ;
+            });
+        });
+        return view('yp_businesses_by_category_of_province',[ 'tableHeader' => $tableHead , 'tableBody' => $tableBody ]);
       }
 }

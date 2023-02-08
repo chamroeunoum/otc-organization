@@ -2,7 +2,8 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-use App\Console\Commands\YPReader;
+use App\Console\Commands\YPReadBusinessByProvince;
+use App\Console\Commands\YPReadBusinessByCategory;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,12 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Artisan::command('ypreader:run', function () {
-    $this->info('Start reading YP records...');
+Artisan::command('ypreadbusiness', function ( YPReadBusinessByCategory $byCategory ) {
+    $this->info('Start reading YP Business by categories ...');
+    $byCategory->handle();
+});
+
+Artisan::command('ypreadprovince', function ( YPReadBusinessByProvince $byProvince ) {
+    $this->info('Start reading YP Business by provinces ...');
+    $byProvince->handle();
 });

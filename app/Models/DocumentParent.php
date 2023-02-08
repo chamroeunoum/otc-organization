@@ -17,7 +17,7 @@ class DocumentParent extends Model
     protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['parent_id','document_id','amend','created_at','updated_at'];
+    protected $fillable = ['parent_id','document_parent_id', 'document_id','amend','created_at','updated_at','desc','name','image'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -36,7 +36,10 @@ class DocumentParent extends Model
         return $this->belongsTo('App\Models\Document','document_id','id');
     }
     public function parentDocument(){
-        return $this->belongsTo('App\Models\Document','parent_id','id');
+        return $this->belongsTo('App\Models\Document','document_parent_id','id');
+    }
+    public function parentRecord(){
+        return $this->belongsTo('App\Models\DocumentParent','parent_id','id');
     }
     /*
     |--------------------------------------------------------------------------

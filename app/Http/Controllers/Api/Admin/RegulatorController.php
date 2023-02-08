@@ -18,7 +18,8 @@ class RegulatorController extends Controller
         'document_year' ,
         'pdf' ,
         'document_type' ,
-        'publish'
+        'publish' ,
+        'active'
     ];
     /**
      * Listing function
@@ -148,6 +149,11 @@ class RegulatorController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+
+        /**
+         * Get the id of the regulator and its parents to exclude them from searching
+         */
+        $regulator = isset( $request->parent_id ) && $request->parent_id > 0 ? \App\Models\Document::find( $request->parent_id ) : false ;
 
         $queryString = [
             "where" => [
@@ -397,6 +403,7 @@ class RegulatorController extends Controller
             'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
         ],201);
     }
+
     public function destroy(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
             return response()->json([
@@ -430,43 +437,6 @@ class RegulatorController extends Controller
             'message' => 'មានបញ្ហាក្នុងការលុបទិន្ន័យ។'
         ],201);
     }
-    public function childDocument(Request $request){
-        /**
-         * Check whether the provided parent has already created.
-         * If then, we will just update the child
-         */
-        // In this case, we ignore and fire a message back to client
-        $parentDocument = null ;
-        /**
-         * In case, a match of parent and child does not exist
-         */
-        if( \App\Models\DocumentParent::where('parent_id',$request->parent_id)->first() !== null ){
-            if( \App\Models\DocumentParent::where('parent_id',$request->parent_id)->where('document_id',$request->document_id)->first() == null ){
-                /**
-                 * Create new record
-                 */
-                $parentDocument = \App\Models\DocumentParent::create([
-                    'document_id' => $request->document_id ,
-                    'parent_id' => $request->parent_id ,
-                    'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
-                    'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
-                ]);   
-            }
-            else{
-
-            }
-        }else if( ( $parentDocument = \App\Models\DocumentParent::where('parent_id',$request->parent_id)->first() ) ) {
-            
-        }
-        
-        $parentDocument->document;
-        $parentDocument->parentDocument;
-        return response()->json([
-            'record' => $parentDocument ,
-            'ok' => true ,
-            'message' => 'រក្សារទុកបានជោគជ័យ'
-        ],200);
-    }
     public function oknha(Request $request){
         $records = \App\Models\Document::select(['id','fid','objective','document_year'])->where('objective','LIKE','%ឧកញ៉ា%')
         // ->orWhere('fid','LIKE','%អ្នកឧកញ៉ា%')
@@ -477,5 +447,47 @@ class RegulatorController extends Controller
             return $r;
         });
         return view( 'oknha' , ['data' => $records] );
+    }
+    public function activate(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $record->with('ministries')->with('signatures')->with('ministries')->with('type');
+        return response()->json([
+            'record' => $record ,
+            'ok' => $record->update(['active'=>1]) ,
+            'message' => 'បានបើកឯកសាររួចរាល់។'
+        ],200);
+    }
+    public function deactivate(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $record->with('ministries')->with('signatures')->with('ministries')->with('type');
+        return response()->json([
+            'record' => $record ,
+            'ok' => $record->update(['active'=>0]) ,
+            'message' => 'បានបើកឯកសាររួចរាល់។'
+        ],200);
     }
 }

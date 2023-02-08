@@ -31,12 +31,12 @@ class SearchController extends Controller
 
         $queryString = [
             "where" => [
-                // 'default' => [
-                //     [
-                //         'field' => 'publish' ,
-                //         'value' => 0
-                //     ]
-                // ],
+                'default' => [
+                    [
+                        'field' => 'active' ,
+                        'value' => 1
+                    ]
+                ],
                 // 'in' => [
                 //     [
                 //         'field' => 'document_type' ,

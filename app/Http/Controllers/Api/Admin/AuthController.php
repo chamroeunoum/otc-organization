@@ -87,14 +87,14 @@ class AuthController extends Controller
                  */
                 return response()->json([
                     'message' => 'សូមពិនិត្យពាក្យសម្ងាត់របស់អ្នក !'
-                ], 401);
+                ], 403);
             }else{
                 /**
                  * Account does exist but the password might miss type
                  */
                 return response()->json([
                     'message' => 'អ៊ីមែលរបស់អ្នកមិនមានក្នុងប្រព័ន្ធឡើយ !'
-                ], 401);
+                ], 403);
             }
         }
             

@@ -5,21 +5,21 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Http\Controllers\Api\Admin\YPReaderController;
 
-class YPReader extends Command
+class YPReadBusinessByCategory extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'ypreader:read';
+    protected $signature = 'ypreadbusiness';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Read all the registered businesses in YPKhmer.';
 
     /**
      * Execute the console command.
@@ -77,4 +77,5 @@ class YPReader extends Command
         echo 'Finish reading' . PHP_EOL ;
         return Command::SUCCESS;
     }
+
 }

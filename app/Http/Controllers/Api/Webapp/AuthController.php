@@ -44,11 +44,27 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
             'activation_token' => Str::random(32)
         ]);
-
         $user->save();
 
         $avatar = Avatar::create($user->name)->getImageObject()->encode('png');
         Storage::put('avatars/'.$user->id.'/avatar.png', (string) $avatar);
+        $user->avatar_url = 'avatars/'.$user->id.'/avatar.png' ;
+        $user->save();
+
+        /**
+         * Create detail information of the owner of the account
+         */
+        $person = \App\Models\People::create([
+            'firstname' => $user->firstname , 
+            'lastname' => $user->lastname , 
+            'gender' => $user->gender , 
+            'dob' => $user->dob , 
+            'mobile_phone' => $user->mobile_phone , 
+            'email' => $user->email , 
+            'image' => $user->avatar_url , 
+        ]);
+        $user->people_id = $person->id ;
+        $user->save();
 
         $user->notify(new SignupActivate($user));
 

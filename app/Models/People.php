@@ -61,13 +61,13 @@ class People extends Model
   public function setImageAttribute($value)
   {
       $attribute_name = "image";
-      $disk = "uploads";
+      $disk = "public";
       $destination_path = "profiles";
 
       // if the image was erased
       if ($value==null) {
           // delete the image from disk
-          \Storage::disk($disk)->delete($this->image);
+          if( $this->image !== "" && $this->image !== null ) \Storage::disk($disk)->delete($this->image);
 
           // set null in the database column
           $this->attributes[$attribute_name] = null;
@@ -112,7 +112,7 @@ class People extends Model
   {
       parent::boot();
       static::deleting(function($obj) {
-          \Storage::disk('uploads')->delete($obj->image);
+        if( $obj->image !== "" && $obj->image !== null ) \Storage::disk('public')->delete($obj->image);
       });
   }
 }

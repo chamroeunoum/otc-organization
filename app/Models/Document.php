@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Document extends Model
 {
     use SoftDeletes;
-     /*
+    /*
     |--------------------------------------------------------------------------
     | GLOBAL VARIABLES
     |--------------------------------------------------------------------------
@@ -16,7 +16,7 @@ class Document extends Model
     //protected $primaryKey = 'id';
     public $timestamps = true;
     protected $guarded = ['id'];
-    protected $fillable = ['fid','title','objective', 'document_year','document_type','pdf','created_by','updated_by','publish'];
+    protected $fillable = ['fid','title','objective', 'document_year','document_type','pdf','created_by','updated_by','publish', 'active'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -92,5 +92,11 @@ class Document extends Model
     public function getChildDocuments(){
         
     }
+    /**
+     * Function
+     */
+    /**
+     * Get parent document id(s)
+     */
     
 }

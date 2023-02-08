@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\MobilePasswordResetRequest;
 use Illuminate\Support\Facades\Mail;
-use App\User as RecordModel ;
+use App\Models\User as RecordModel ;
 use App\Http\Controllers\CrudController;
 
 
@@ -113,7 +113,7 @@ class UserController extends Controller
      * Create an account
      */
     public function store(Request $request){
-        $user = \App\User::where('email',$request->email)->first() ;
+        $user = \App\Models\User::where('email',$request->email)->first() ;
         if( $user ){
             // អ្នកប្រើប្រាស់បានចុះឈ្មោះរួចរាល់ហើយ
             return response([
@@ -124,7 +124,7 @@ class UserController extends Controller
             );
         }else{
             // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
-            $user = new \App\User([
+            $user = new \App\Models\User([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
                 'email' => $request->email,
@@ -135,7 +135,7 @@ class UserController extends Controller
             if( $user ){
                 
                 return response()->json([
-                    'user' => \App\User::find( $user->id ) ,
+                    'user' => \App\Models\User::find( $user->id ) ,
                     'message' => 'គណនីបង្កើតបានជោគជ័យ !'
                 ], 200);
 
@@ -151,16 +151,16 @@ class UserController extends Controller
      * Create an account
      */
     public function update(Request $request){
-        $user = isset( $request->id ) && $request->id > 0 ? \App\User::find($request->id) : (
-            isset( $request->email ) && $request->email != "" ? \App\User::where('email',$request->email)->first() : null
+        $user = isset( $request->id ) && $request->id > 0 ? \App\Models\User::find($request->id) : (
+            isset( $request->email ) && $request->email != "" ? \App\Models\User::where('email',$request->email)->first() : null
         );
-        if( $user ){
-            // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
-            $user->firstname = $request->firstname ;
-            $user->lastname = $request->lastname;
-            $user->email = $request->email ;
-            $user->active = $request->active == true || $request->active == 1 ? 1 : 0 ;
-            $user->save();    
+        if( $user && $user->update([
+            'firstname' => $request->firstname ,
+            'lastname' => $request->lastname ,
+            'email' => $request->email ,
+            'username' => $request->username ,
+            'phone' => $request->phone
+        ]) == true ){;
             return response()->json([
                 'user' => $user ,
                 'message' => 'កែប្រែព័ត៌មានរួចរាល់ !' ,
@@ -172,14 +172,14 @@ class UserController extends Controller
                 'user' => null ,
                 'message' => 'គណនីដែលអ្នកចង់កែប្រែព័ត៌មាន មិនមានឡើយ។' ,
                 'ok' => false
-                ], 201);
+            ], 403);
         }
     }
     /**
      * Active function of the account
      */
     public function active(Request $request){
-        $user = \App\User::find($request->id) ;
+        $user = \App\Models\User::find($request->id) ;
         if( $user ){
             $user->active = $request->active ;
             $user->save();
@@ -206,7 +206,7 @@ class UserController extends Controller
      * Unactive function of the account
      */
     public function unactive(Request $request){
-        $user = \App\User::find($request->id) ;
+        $user = \App\Models\User::find($request->id) ;
         if( $user ){
             $user->active = 0 ;
             $user->save();
@@ -232,7 +232,7 @@ class UserController extends Controller
      * Function delete an account
      */
     public function destroy(Request $request){
-        $user = \App\User::find($request->id) ;
+        $user = \App\Models\User::find($request->id) ;
         if( $user ){
             $user->active = 0 ;
             $user->deleted_at = \Carbon\Carbon::now() ;
@@ -260,7 +260,7 @@ class UserController extends Controller
      * Function Restore an account from SoftDeletes
      */
     public function restore(Request $request){
-        if( $user = \App\User::restore($request->id) ){
+        if( $user = \App\Models\User::restore($request->id) ){
             return response([
                 'user' => $user ,
                 'ok' => true ,
@@ -278,7 +278,7 @@ class UserController extends Controller
 
     public function forgotPassword(Request $request){
         if( $request->email != "" ){
-            $user = \App\User::where('email',$request->email )->first();
+            $user = \App\Models\User::where('email',$request->email )->first();
             if ($user) {
                 $user -> forgot_password_token = Str::random(60) ;
                 $user -> update();
@@ -305,7 +305,7 @@ class UserController extends Controller
     }
     public function checkConfirmationCode(Request $request){
         if( $request->email != "" && $request->code != "" ){
-            $user = \App\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
+            $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
             return $user ;
             if ($user) {
                 $user -> forgot_password_token = '' ;
@@ -329,7 +329,7 @@ class UserController extends Controller
     }
     public function passwordReset(Request $request){
         
-        $record = \App\User::where('email',$request->email)->first();
+        $record = \App\Models\User::where('email',$request->email)->first();
         if( $record ){
             $record->password = Hash::make($request->password);
             $record->update();
@@ -348,7 +348,7 @@ class UserController extends Controller
         // 'password' => bcrypt($request->password),
     }
     public function passwordChange(Request $request){
-        $record = \App\User::find($request->id);
+        $record = \App\Models\User::find($request->id);
         if( $record ){
             $record->password = Hash::make($request->password);
             $record->update();
@@ -364,5 +364,51 @@ class UserController extends Controller
                 'message' => 'មានបញ្ហា គណនីដែលអ្នកចង់ប្ដូរពាក្យសម្ងាត់មិនមានឡើយ !'
             ],201);
         }
+    }
+    public function read(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់គណនី។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ស្វែងរកគណនីមិនឃើញឡើយ។'
+            ],403);
+        }
+
+        if( $record->people_id <= 0 || $record->people_id == null ){
+            /**
+             * Create owner of the account, in case the account does not has the owner.
+             */
+            $person = \App\Models\People::create([
+                'firstname' => $record->firstname , 
+                'lastname' => $record->lastname , 
+                'gender' => $record->gender , 
+                'dob' => $record->dob , 
+                'mobile_phone' => $record->phone , 
+                'email' => $record->email , 
+                'image' => $record->avatar_url , 
+            ]);
+            $record->people_id = $person->id ;
+            $record->save();
+        }
+
+        if( $record->avatar_url !== null && Storage::disk('public')->exists( $record->avatar_url ) ){
+            $record->avatar_url = Storage::disk("public")->url( $record->avatar_url  );
+        }else{
+            $record->avatar_url = null ;
+        }
+    
+        $record->person ;
+
+        return response()->json([
+            'record' => $record ,
+            'ok' => true ,
+            'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+        ],200);
     }
 }

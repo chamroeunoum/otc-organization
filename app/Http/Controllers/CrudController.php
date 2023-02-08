@@ -11,13 +11,17 @@ use Illuminate\Database\Eloquent\Collection;
 class CrudController extends Controller {
     private $model = null ;
     private $fields = ['id', 'created_at', 'updated_at'];
+    private $renameFields = [];
+    private $fieldsWithCallback = [] ;
     private $request = null ;
     private $relationshipFunctions = [] ;
 
-    public function __construct($model=false,$request=false,$fields=false){
+    public function __construct($model=false,$request=false,$fields=false,$fieldsWithCallback=false,$renameFields=false){
         $model ? $this->setModel($model) : false ;
         $request ? $this->setRequest($request) : false ;
-        $fields ? $this->setFields($fields) : false ;
+        is_array( $fields ) && !empty( $fields ) ? $this->setFields($fields) : false ;
+        is_array( $renameFields ) && !empty( $renameFields ) ? $this->setRenameFields($renameFields) : false ;
+        is_array( $fieldsWithCallback ) && !empty( $fieldsWithCallback ) ? $this->setFieldsWithCallback($fieldsWithCallback) : false ;
     }
     public function setModel($model){
         if (!is_object($model)) throw new Exception("Error execute function : " . __FUNCTION__ . " on class " . __CLASS__, 1);
@@ -34,6 +38,12 @@ class CrudController extends Controller {
     }
     public function setFields($fields){
         $this->fields = $fields !== false && is_array($fields) && !empty($fields) ? $fields : $this->fields;
+    }
+    public function setRenameFields($fields){
+        $this->renameFields = $fields !== false && is_array($fields) && !empty($fields) ? $fields : $this->renameFields;
+    }
+    public function setFieldsWithCallback($fields){
+        $this->fieldsWithCallback = $fields !== false && is_array($fields) && !empty($fields) ? $fields : $this->fieldsWithCallback;
     }
     public function getFields(){
         return $this->fields;
@@ -259,7 +269,7 @@ class CrudController extends Controller {
             : $this->getListBuilder()->get() ;
     }
 
-    public function pagination($formatRecord = false, $query_builder = false, $fieldsWithCallback = false){
+    public function pagination($formatRecord = false, $query_builder = false){
         // $query_builder = $query_builder !== false ? $query_builder : $this->getListBuilder() ;
         $query_builder = $query_builder !== false ? $query_builder : $this->getListBuilder();
         /** Get the page variable for pagination */
@@ -318,19 +328,19 @@ class CrudController extends Controller {
         return [
             'pagination' => $pagination ,
             'records' => $formatRecord
-                ? $this->formatRecords($query_builder->get(), $fieldsWithCallback )
+                ? $this->formatRecords($query_builder->get())
                 : $query_builder->get()
         ];
     }
 
     /** Map Photo */
-    public function formatRecords(Collection $collection, $fieldsWithCallback=false)
+    public function formatRecords(Collection $collection)
     {
-        return $collection->map(function ($record) use ($fieldsWithCallback) {
-            return $this->formatRecord($record,$fieldsWithCallback);
+        return $collection->map(function ($record) {
+            return $this->formatRecord($record);
         });
     }
-    public function formatRecord($record, $fieldsWithCallback = false){
+    public function formatRecord($record){
         // if (isset($record->photos) && is_array($record->photos) ){
         //     $photos = [];
         //     foreach ($record->photos as $index => $photo) {
@@ -372,7 +382,11 @@ class CrudController extends Controller {
         $customRecord = [];
         if (isset( $record ) && !empty($this->fields)) {
             foreach ($this->fields as $key => $field){
-                $customRecord[$field] = $fieldsWithCallback !== false && is_array( $fieldsWithCallback ) && !empty( $fieldsWithCallback ) && array_key_exists( $field , $fieldsWithCallback ) ? $fieldsWithCallback[$field]($record->$field) : $record->$field ;
+                $customRecord[ $field ] = $this->fieldsWithCallback !== false && is_array( $this->fieldsWithCallback ) && !empty( $this->fieldsWithCallback ) && array_key_exists( $field , $this->fieldsWithCallback ) ? $this->fieldsWithCallback[$field]($record->$field) : $record->$field ;
+                if( is_array( $this->renameFields ) && !empty( $this->renameFields ) && array_key_exists( $field , $this->renameFields ) ){
+                    $customRecord[ $this->renameFields[$field] ] = $customRecord[ $field ] ;
+                    unset( $customRecord[ $field ] );
+                }
             }
         }
         /** Call the relationship functions */

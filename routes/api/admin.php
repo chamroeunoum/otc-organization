@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\RegulatorController;
+use App\Http\Controllers\Api\Admin\DocumentParentController;
 use App\Http\Controllers\Api\Admin\TypeController;
 
 
@@ -65,11 +66,9 @@ Route::group([
             Route::get('read',[RegulatorController::class,'read']);
             Route::post('',[RegulatorController::class,'create']);
             Route::put('',[RegulatorController::class,'update']);
+            Route::put('{id}/activate',[RegulatorController::class,'activate']);
+            Route::put('{id}/deactivate',[RegulatorController::class,'deactivate']);
             Route::delete('',[RegulatorController::class,'destroy']);
-            /**
-             * Add child document to another document
-             */
-            Route::put('child',[RegulatorController::class,'childDocument']);
 
             // Route::get('get/document/years','RegulatorController@getYears');
             // Route::get('pdf','RegulatorController@pdf');
@@ -88,6 +87,21 @@ Route::group([
             );
 
     });
+
+    Route::group([
+        'prefix' => 'orgchart' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'api'
+        ], function() {;
+            Route::get('',[DocumentParentController::class,'index']);
+            Route::get('child',[DocumentParentController::class,'child']);
+            Route::get('read',[DocumentParentController::class,'read']);
+            Route::post('',[DocumentParentController::class,'create']);
+            Route::put('',[DocumentParentController::class,'update']);
+            Route::put('linkdocument',[DocumentParentController::class,'linkDocument']);
+            Route::delete('',[DocumentParentController::class,'destroy']);
+    });
+
     /** FOLDER SECTION */
     // Route::group([
     //     'prefix' => 'folders' ,

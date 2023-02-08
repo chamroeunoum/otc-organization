@@ -22,6 +22,7 @@ class CreateDocumentsTable extends Migration {
 			$table->string('document_year', 50);
 			$table->integer('document_type');
 			$table->integer('publish')->nullable()->default(0);
+			$table->integer('active')->nullable()->default(0);
 			$table->integer('approved_by')->nullable()->default(0);
 			$table->integer('created_by')->nullable()->default(0);
 			$table->integer('updated_by')->nullable();

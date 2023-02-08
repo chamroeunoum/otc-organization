@@ -14,7 +14,7 @@ class YPProduct extends Model
 
 	protected $table = 'yp_products';
 	
-	protected $fillable = ['name', 'category','phone', 'address'];
+	protected $fillable = ['name', 'category','phone', 'address','province','district','commune','village'];
 	public $timestamps = true;
 
 	/*
