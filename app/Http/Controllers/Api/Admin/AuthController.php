@@ -47,8 +47,25 @@ class AuthController extends Controller
         $user->save();
 
         $avatar = Avatar::create($user->name)->getImageObject()->encode('png');
-        Storage::put('avatars/'.$user->id.'/avatar.png', (string) $avatar);
+        $uniqeName = Storage::putFile( 'avatars/'.$user->id , new File( (string) $avatar ) );
+        $user->avatar_url = $uniqeName ;
+        $user->save();
 
+        /**
+         * Create detail information of the owner of the account
+         */
+        $person = \App\Models\People::create([
+            'firstname' => $user->firstname , 
+            'lastname' => $user->lastname , 
+            'gender' => $user->gender , 
+            'dob' => $user->dob , 
+            'mobile_phone' => $user->mobile_phone , 
+            'email' => $user->email , 
+            'image' => $user->avatar_url , 
+        ]);
+        $user->people_id = $person->id ;
+        $user->save();
+        
         $user->notify(new SignupActivate($user));
 
         return response()->json([
@@ -77,7 +94,6 @@ class AuthController extends Controller
         ]);
 
         $credentials = request(['email', 'password']);
-        $credentials['active'] = 1;
         $credentials['deleted_at'] = null;
 
         if(!Auth::attempt($credentials)){
@@ -97,8 +113,40 @@ class AuthController extends Controller
                 ], 403);
             }
         }
-            
+
+        /**
+         * Retrieve account
+         */
         $user = $request->user();
+
+        /**
+         * Check disability
+         */
+        if( $user->active <= 0 ) {
+             /**
+             * Account has been disabled
+             */
+            return response()->json([
+                'message' => 'គណនីនេះត្រូវបានបិទជាបណ្ដោះអាសន្ន។'
+            ], 403);
+        }
+        /**
+         * Check roles
+         */
+        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core')->pluck('id')->toArray() ) ) ){
+            /**
+             * User seem does not have any right to login into backend / core service
+             */
+            return response()->json([
+                'message' => "គណនីនេះមិនមានសិទ្ធិគ្រប់គ្រាន់។"
+            ],403);
+        }
+
+        /**
+         * Check user role
+         */
+
+        
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
         if ($request->remember_me)

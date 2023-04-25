@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Document as RecordModel;
 use App\Http\Controllers\CrudController;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 
 class RegulatorController extends Controller
@@ -114,7 +116,22 @@ class RegulatorController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields,[
+            /**
+             * custom the value of the field
+             */
+            'pdf' => function($pdf){
+                $pdf = ( $pdf !== "" && $pdf !== null && \Storage::disk('document')->exists( $pdf ) )
+                ? true
+                // \Storage::disk('document')->url( $pdf ) 
+                : false ;
+                return $pdf ;
+            },
+           'objective' => function($objective){
+                    return html_entity_decode( strip_tags( $objective ) );
+                }
+            ]
+        );
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "type" => ['id', 'name', 'format', 'color', 'index'] ,
@@ -124,19 +141,7 @@ class RegulatorController extends Controller
 
         $builder = $crud->getListBuilder();
 
-        $responseData = $crud->pagination(true, $builder,[
-                'pdf' => function($pdf){
-                    $pdf = ( $pdf !== "" && \Storage::disk('document')->exists( $pdf ) )
-                    ? true
-                    // \Storage::disk('document')->url( $pdf ) 
-                    : false ;
-                    return $pdf ;
-                },
-                'objective' => function($objective){
-                    return html_entity_decode( strip_tags( $objective ) );
-                }
-            ]
-        );
+        $responseData = $crud->pagination(true, $builder);
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
@@ -325,7 +330,7 @@ class RegulatorController extends Controller
      */
     public function pdf(Request $request)
     {
-        $document = Document::findOrFail($request->id);
+        $document = RecordModel::findOrFail($request->id);
         if($document) {
             $path = storage_path('data') . '/' . $document->pdf;
             $ext = pathinfo($path);
@@ -351,6 +356,37 @@ class RegulatorController extends Controller
             }
         }
     }
+    public function upload(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            if( ( $document = \App\Models\Document::find($request->id) ) !== null ){
+                list($year,$month,$day) = explode('-',$document->document_year);
+                $uniqeName = Storage::disk('document')->putFile( 'documents' , new File( $_FILES['files']['tmp_name'] ) );
+                $document->pdf = $uniqeName ;
+                $document->save();
+                if( Storage::disk('document')->exists( $document->pdf ) ){
+                    $document->pdf = Storage::disk("document")->url( $document->pdf  );
+                    return response([
+                        'record' => $document ,
+                        'message' => 'ជោគជ័យក្នុងការបញ្ចូលឯកសារយោង។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $document ,
+                        'message' => 'មិនមានឯកសារយោងដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់ឯកសារយោង។'
+                ],403);
+            }
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
     /** Get the year(s) that there is/are documents published base on ministry_id and document_type_id */
     public function getDocumentsAsMinistryTypeYearMonth(Request $request){
         $ministries = \App\Models\Ministry()->selectRaw('id, name')->orderby('name','asc')->get();
@@ -367,20 +403,59 @@ class RegulatorController extends Controller
          * Save information of the regulator and its related information
          */
         
-        RecordModel::create([
+        $record = RecordModel::create([
             'fid' => $request->number ,
             'title' => $request->title ,
             'objective' => $request->objective ,
             'document_year' => $request->year ,
             'document_type' => $request->type_id ,
-            'publish' => $request->publish
+            'publish' => 1 , // $request->publish
+            'active' => $request->active > 0 ? 1 : 0
         ]);
         /**
-         * Upload pdf document(s) of the regulator
+         * Create detail information of the owner of the account
          */
+        $person = \App\Models\People::create([
+            'firstname' => $record->firstname , 
+            'lastname' => $record->lastname , 
+            'mobile_phone' => $record->phone , 
+            'email' => $record->email
+        ]);
+        $record->people_id = $person->id ;
+        $record->save();
+
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        $responseData['record'] = $record ;
+        return response()->json($responseData, 200);
     }
     public function update(Request $request){
-
+        if( isset( $request->id ) && $request->id > 0 && ( $record = RecordModel::find($request->id) ) !== null ){
+            /**
+             * Save information of the regulator and its related information
+             */
+            if( $record->update([
+                'fid' => $request->number ,
+                'title' => $request->title ,
+                'objective' => $request->objective ,
+                'document_year' => $request->year ,
+                'document_type' => $request->type_id ,
+                'active' => $request->active > 0 ? 1 : 0
+            ]) ){
+                $responseData['message'] = __("crud.read.success");
+                $responseData['ok'] = true ;
+                $responseData['record'] = $record ;
+                return response()->json($responseData, 200);
+            }else{
+                return response()->json([
+                    'message' => 'មានបញ្ហាក្នុងការរក្សារព័ត៌មានឯកសារ។'
+                ], 403);    
+            }
+        }else{
+            return response()->json([
+                'message' => 'សូមបញ្ជាក់លេខសម្គាល់ឯកសារ។'
+            ], 403);
+        }
     }
     public function read(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
@@ -424,7 +499,9 @@ class RegulatorController extends Controller
             /**
              * Delete all the related documents own by this regulator
              */
-            
+            if( $tempRecord->pdf !== null && $tempRecord->pdf !=="" && Storage::disk('document')->exists( $tempRecord->pdf ) ){
+                Storage::disk("document")->delete( $tempRecord->pdf  );
+            }
             return response()->json([
                 'record' => $tempRecord ,
                 'ok' => true ,

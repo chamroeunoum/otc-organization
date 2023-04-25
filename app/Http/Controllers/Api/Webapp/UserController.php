@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Hash;
 use App\Notifications\Webapp\PasswordResetRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\User as RecordModel ;
+use App\Models\User as RecordModel ;
 use App\Http\Controllers\CrudController;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 
 class UserController extends Controller
@@ -361,6 +363,138 @@ class UserController extends Controller
                 'ok' => false ,
                 'message' => 'មានបញ្ហា គណនីដែលអ្នកចង់ប្ដូរពាក្យសម្ងាត់មិនមានឡើយ !'
             ],201);
+        }
+    }
+    /**
+     * Check the username
+     */
+    public function checkUsername(Request $request){
+        if( isset( $request->username ) && $request->username != "" ){
+            if( ($user = \App\Models\User::where('username',$request->username)->first() ) !== null ){
+                // Username does exists
+                return response([
+                    'user' => $user ,
+                    'ok' => true ,
+                    'message' => 'ឈ្មោះនេះ មានរួចហើយ។' 
+                    ],
+                    200
+                );
+            }else{
+                // User does not exists
+                return response([
+                    'user' => null ,
+                    'ok' => false ,
+                    'message' => 'ឈ្មោះនេះ មិនទានមានទេ។' 
+                    ],
+                    200
+                );
+            }
+        }else{
+            return response([
+                'user' => null ,
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់ឈ្មោះប្រើប្រាស់ username។' 
+                ],
+                403
+            );
+        }
+    }
+    /**
+     * Check the phone
+     */
+    public function checkPhone(Request $request){
+        if( isset( $request->phone ) && $request->phone != "" ){
+            if( ($user = \App\Models\User::where('phone',$request->phone)->first() ) !== null ){
+                // Username does exists
+                return response([
+                    'user' => $user ,
+                    'ok' => true ,
+                    'message' => 'លេខទូរស័ព្ទនេះ មានរួចហើយ។' 
+                    ],
+                    200
+                );
+            }else{
+                // User does not exists
+                return response([
+                    'user' => null ,
+                    'ok' => false ,
+                    'message' => 'លេខទូរស័ព្ទនេះ មិនទានមានទេ។' 
+                    ],
+                    200
+                );
+            }
+        }else{
+            return response([
+                'user' => null ,
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់លេខទូរស័ព្ទ។' 
+                ],
+                403
+            );
+        }
+    }
+    /**
+     * Check the email
+     */
+    public function checkEmail(Request $request){
+        if( isset( $request->email ) && $request->email != "" ){
+            if( ($user = \App\Models\User::where('email',$request->email)->first() ) !== null ){
+                // Username does exists
+                return response([
+                    'user' => $user ,
+                    'ok' => true ,
+                    'message' => 'អ៊ីមែលនេះ មានរួចហើយ។' 
+                    ],
+                    200
+                );
+            }else{
+                // User does not exists
+                return response([
+                    'user' => null ,
+                    'ok' => false ,
+                    'message' => 'អ៊ីមែលនេះ មិនទានមានទេ។' 
+                    ],
+                    200
+                );
+            }
+        }else{
+            return response([
+                'user' => null ,
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អ៊ីមែល។' 
+                ],
+                403
+            );
+        }
+    }
+    public function upload(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            if( ( $user = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('public')->putFile( 'avatars/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
+                $user->avatar_url = $uniqeName ;
+                $user->save();
+                if( Storage::disk('public')->exists( $user->avatar_url ) ){
+                    $user->avatar_url = Storage::disk('public')->url( $user->avatar_url  );
+                    return response([
+                        'record' => $user ,
+                        'message' => 'ជោគជ័យក្នុងការបញ្ចូលរូបថត។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $user ,
+                        'message' => 'គណនីនេះមិនមានរូបថតឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់គណនី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
         }
     }
 }

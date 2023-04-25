@@ -179,7 +179,7 @@ Route::group([
   /** USER/ACCOUNT SECTION */
   Route::group([
     'prefix' => 'users' ,
-    'middleware' => 'auth'
+    'middleware' => 'auth:api'
     ], function() {
       /**
        * Api for cin
@@ -191,6 +191,7 @@ Route::group([
       Route::delete('',[UserController::class,'destroy']);
       Route::put('activate',[UserController::class,'active']);
       Route::put('password/change',[UserController::class,'logout']);
+      Route::post('upload',[UserController::class,'upload']);
   });
 
   Route::group([
@@ -229,9 +230,6 @@ Route::group([
         });
         Route::get('types/compact', [ TypeController::class , 'compactList']);
         Route::get('{id}',[ RegulatorController::class , 'read']);
-        Route::post('',[ RegulatorController::class , 'create']);
-        Route::put('',[ RegulatorController::class , 'update']);
-        Route::delete('',[ RegulatorController::class , 'destroy']);
 
   });
   /** FOLDER SECTION */

@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
 
-use Backpack\CRUD\CrudTrait;
-use Spatie\Permission\Models\Role as OriginalRole;
-
-class Role extends OriginalRole
+class Role extends Model
 {
-    use CrudTrait;
 
-    protected $fillable = ['name', 'updated_at', 'created_at','title'];
+    protected $fillable = ['name', 'updated_at', 'created_at','guard_name'];
+
+    public function users(){
+        return $this->belongsToMany(\App\Models\User::class,'user_role','role_id','user_id');
+    }
+
 }

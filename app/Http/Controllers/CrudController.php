@@ -213,18 +213,15 @@ class CrudController extends Controller {
                         foreach( $this->request->pivots AS $pivot){
                             if (
                                 isset($pivot['relationship']) &&
-                                isset($pivot['where']['like']['fields']) &&
-                                !empty($pivot['where']['like']['fields']) &&
-                                isset($pivot['where']['like']['value']) &&
-                                $pivot['where']['like']['value'] != ""
+                                isset($pivot['where']['like']) && !empty($pivot['where']['like'])
                             ) {
                                 $query = $query->orWhereHas($pivot['relationship'], function ($pivotQuery) use($pivot) {
                                     /** Construct the filter with like condition */
                                     /** Start searching */
-                                    foreach ($pivot['where']['like']['fields'] as $fieldIndex => $field) {
-                                        $searchWords = explode(" ", $pivot['where']['like']['value']);
-                                        $fieldIndex > 0
-                                        ? $pivotQuery->orWhere(function ($query) use ($field, $searchWords) {
+                                    foreach ($pivot['where']['like'] as $pivotConditionIndex => $pivotCondition ) {
+                                        $searchWords = explode(" ", $pivotCondition['value']);
+                                        $pivotConditionIndex > 0
+                                        ? $pivotQuery->orWhere(function ($query) use ($pivotCondition, $searchWords) {
                                             foreach ($searchWords as $wordIndex => $word) {
                                                 /**
                                                  * Use to get all records that contains one or more of string search
@@ -235,10 +232,10 @@ class CrudController extends Controller {
                                                 /**
                                                  * Use to get all records that matched all conditions
                                                  */
-                                                $query->where($field, 'LIKE', "%" . $word . "%");
+                                                $query->where($pivotCondition['field'], 'LIKE', "%" . $word . "%");
                                             }
                                         })
-                                        : $pivotQuery->where(function ($query) use ($field, $searchWords) {
+                                        : $pivotQuery->where(function ($query) use ($pivotCondition, $searchWords) {
                                             foreach ($searchWords as $wordIndex => $word) {
                                                 /**
                                                  * Use to get all records that contains one or more of string search
@@ -249,7 +246,7 @@ class CrudController extends Controller {
                                                 /**
                                                  * Use to get all records that matched all conditions
                                                  */
-                                                $query->where($field, 'LIKE', "%" . $word . "%");
+                                                $query->where($pivotCondition['field'], 'LIKE', "%" . $word . "%");
                                             }
                                         });
                                     }
@@ -382,7 +379,13 @@ class CrudController extends Controller {
         $customRecord = [];
         if (isset( $record ) && !empty($this->fields)) {
             foreach ($this->fields as $key => $field){
-                $customRecord[ $field ] = $this->fieldsWithCallback !== false && is_array( $this->fieldsWithCallback ) && !empty( $this->fieldsWithCallback ) && array_key_exists( $field , $this->fieldsWithCallback ) ? $this->fieldsWithCallback[$field]($record->$field) : $record->$field ;
+                $customRecord[ $field ] = 
+                    $this->fieldsWithCallback !== false && 
+                    is_array( $this->fieldsWithCallback ) && 
+                    !empty( $this->fieldsWithCallback ) && 
+                    array_key_exists( $field , $this->fieldsWithCallback ) ? 
+                        $this->fieldsWithCallback[$field]($record->$field) : 
+                        $record->$field ;
                 if( is_array( $this->renameFields ) && !empty( $this->renameFields ) && array_key_exists( $field , $this->renameFields ) ){
                     $customRecord[ $this->renameFields[$field] ] = $customRecord[ $field ] ;
                     unset( $customRecord[ $field ] );
@@ -633,3 +636,4 @@ class CrudController extends Controller {
         return false ;
     }
 }
+                

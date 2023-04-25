@@ -113,18 +113,12 @@ class SearchController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
-        $crud->setRelationshipFunctions([
-            /** relationship name => [ array of fields name to be selected ] */
-            "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name']
-        ]);
-
-        $builder = $crud->getListBuilder();
-
-        $responseData = $crud->pagination(true, $builder,[
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields,[
+            /**
+             * custom the value of the field
+             */
             'pdf' => function($pdf){
-                $pdf = ( $pdf !== "" && \Storage::disk('document')->exists( $pdf ) )
+                $pdf = ( $pdf !== "" && $pdf !== null && \Storage::disk('document')->exists( $pdf ) )
                 ? true
                 // \Storage::disk('document')->url( $pdf ) 
                 : false ;
@@ -133,8 +127,16 @@ class SearchController extends Controller
            'objective' => function($objective){
                     return html_entity_decode( strip_tags( $objective ) );
                 }
-            ]
-        );
+            ]);
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            "type" => ['id', 'name', 'format', 'color', 'index'] ,
+            "ministries" => ['id', 'name']
+        ]);
+
+        $builder = $crud->getListBuilder();
+
+        $responseData = $crud->pagination(true, $builder);
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);

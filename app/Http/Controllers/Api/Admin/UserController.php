@@ -129,7 +129,9 @@ class UserController extends Controller
                 'lastname' => $request->lastname,
                 'email' => $request->email,
                 'active' => $request->active == true || $request->active == 1 ? 1 : 0 ,
-                'password' => bcrypt($request->password)
+                'password' => bcrypt($request->password) ,
+                'phone' => $request->phone ,
+                'username' => $request->username
             ]);
             $user->save();
             if( $user ){
@@ -391,7 +393,7 @@ class UserController extends Controller
                 'dob' => $record->dob , 
                 'mobile_phone' => $record->phone , 
                 'email' => $record->email , 
-                'image' => $record->avatar_url , 
+                'image' => $record->avatar_url 
             ]);
             $record->people_id = $person->id ;
             $record->save();
@@ -410,5 +412,107 @@ class UserController extends Controller
             'ok' => true ,
             'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
         ],200);
+    }
+    /**
+     * Check the username
+     */
+    public function checkUsername(Request $request){
+        if( isset( $request->username ) && $request->username != "" ){
+            if( ($user = \App\Models\User::where('username',$request->username)->first() ) !== null ){
+                // Username does exists
+                return response([
+                    'user' => $user ,
+                    'ok' => true ,
+                    'message' => 'ឈ្មោះនេះ មានរួចហើយ។' 
+                    ],
+                    200
+                );
+            }else{
+                // User does not exists
+                return response([
+                    'user' => null ,
+                    'ok' => false ,
+                    'message' => 'ឈ្មោះនេះ មិនទានមានទេ។' 
+                    ],
+                    200
+                );
+            }
+        }else{
+            return response([
+                'user' => null ,
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់ឈ្មោះប្រើប្រាស់ username។' 
+                ],
+                403
+            );
+        }
+    }
+    /**
+     * Check the phone
+     */
+    public function checkPhone(Request $request){
+        if( isset( $request->phone ) && $request->phone != "" ){
+            if( ($user = \App\Models\User::where('phone',$request->phone)->first() ) !== null ){
+                // Username does exists
+                return response([
+                    'user' => $user ,
+                    'ok' => true ,
+                    'message' => 'លេខទូរស័ព្ទនេះ មានរួចហើយ។' 
+                    ],
+                    200
+                );
+            }else{
+                // User does not exists
+                return response([
+                    'user' => null ,
+                    'ok' => false ,
+                    'message' => 'លេខទូរស័ព្ទនេះ មិនទានមានទេ។' 
+                    ],
+                    200
+                );
+            }
+        }else{
+            return response([
+                'user' => null ,
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់លេខទូរស័ព្ទ។' 
+                ],
+                403
+            );
+        }
+    }
+    /**
+     * Check the email
+     */
+    public function checkEmail(Request $request){
+        if( isset( $request->email ) && $request->email != "" ){
+            if( ($user = \App\Models\User::where('email',$request->email)->first() ) !== null ){
+                // Username does exists
+                return response([
+                    'user' => $user ,
+                    'ok' => true ,
+                    'message' => 'អ៊ីមែលនេះ មានរួចហើយ។' 
+                    ],
+                    200
+                );
+            }else{
+                // User does not exists
+                return response([
+                    'user' => null ,
+                    'ok' => false ,
+                    'message' => 'អ៊ីមែលនេះ មិនទានមានទេ។' 
+                    ],
+                    200
+                );
+            }
+        }else{
+            return response([
+                'user' => null ,
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អ៊ីមែល។' 
+                ],
+                403
+            );
+        }
     }
 }

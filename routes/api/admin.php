@@ -51,6 +51,12 @@ Route::group([
             Route::delete('{id}/delete',[UserController::class,'destroy']);
             Route::put('activate',[UserController::class,'active']);
             Route::put('password/change',[UserController::class,'passwordChange']);
+            /**
+             * Check the unique user information
+             */
+            Route::get('username/exist',[UserController::class,'checkUsername']);
+            Route::get('phone/exist',[UserController::class,'checkPhone']);
+            Route::get('email/exist',[UserController::class,'checkEmail']);
     });
 
     // I am here , please continue to the below lines
@@ -59,7 +65,7 @@ Route::group([
     Route::group([
         'prefix' => 'regulators' ,
         'namespace' => 'Api' ,
-        'middleware' => 'api'
+        'middleware' => 'auth:api'
         ], function() {;
             Route::get('',[RegulatorController::class,'index']);
             Route::get('child',[RegulatorController::class,'child']);
@@ -69,9 +75,10 @@ Route::group([
             Route::put('{id}/activate',[RegulatorController::class,'activate']);
             Route::put('{id}/deactivate',[RegulatorController::class,'deactivate']);
             Route::delete('',[RegulatorController::class,'destroy']);
+            Route::post('upload',[RegulatorController::class,'upload']);
 
             // Route::get('get/document/years','RegulatorController@getYears');
-            // Route::get('pdf','RegulatorController@pdf');
+            Route::get('pdf',[RegulatorController::class,'pdf']);
             // Route::get('types/compact', "TypeController@compactList");
             Route::group([
                 'prefix' => 'types' ,
