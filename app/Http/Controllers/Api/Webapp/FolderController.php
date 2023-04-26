@@ -211,6 +211,7 @@ class FolderController extends Controller
             $folder->name = $request->name ;
             $folder->user_id = Auth::user()->id ;
             $folder->pid = 0 ;
+            $folder->active = 1 ;
             $folder->save() ;
             $folder->user ;
             $folder->regulators ;
