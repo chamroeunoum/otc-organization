@@ -47,10 +47,10 @@ class AuthController extends Controller
         ]);
         $user->save();
 
-        $avatar = Avatar::create($user->name)->getImageObject()->encode('png');
-        $uniqeName = Storage::putFile( 'avatars/'.$user->id , new File( (string) $avatar ) );
-        $user->avatar_url = $uniqeName ;
-        $user->save();
+        // $avatar = Avatar::create($user->name)->getImageObject()->encode('png');
+        // $uniqeName = Storage::putFile( 'avatars/'.$user->id , new File( (string) $avatar ) );
+        // $user->avatar_url = $uniqeName ;
+        // $user->save();
 
         /**
          * Create detail information of the owner of the account
