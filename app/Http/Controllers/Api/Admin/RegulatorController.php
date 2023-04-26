@@ -21,7 +21,9 @@ class RegulatorController extends Controller
         'pdf' ,
         'document_type' ,
         'publish' ,
-        'active'
+        'active' ,
+        'created_by' ,
+        'updated_by'
     ];
     /**
      * Listing function
@@ -136,7 +138,9 @@ class RegulatorController extends Controller
             /** relationship name => [ array of fields name to be selected ] */
             "type" => ['id', 'name', 'format', 'color', 'index'] ,
             "ministries" => ['id', 'name'] ,
-            'parentDocument' => [ 'id' ,'parent_id','amend' ]
+            'parentDocument' => [ 'id' ,'parent_id','amend' ] ,
+            'createdBy' => [ 'id', 'firstname' , 'lastname' ] ,
+            'updatedBy' => [ 'id', 'firstname' , 'lastname' ]
         ]);
 
         $builder = $crud->getListBuilder();
@@ -410,18 +414,21 @@ class RegulatorController extends Controller
             'document_year' => $request->year ,
             'document_type' => $request->type_id ,
             'publish' => 1 , // $request->publish
-            'active' => $request->active > 0 ? 1 : 0
+            'active' => $request->active > 0 ? 1 : 0 ,
+            'created_by' => \Auth::user()->id ,
+            'updated_by' => \Auth::user()->id
         ]);
         /**
          * Create detail information of the owner of the account
          */
-        $person = \App\Models\People::create([
-            'firstname' => $record->firstname , 
-            'lastname' => $record->lastname , 
-            'mobile_phone' => $record->phone , 
-            'email' => $record->email
-        ]);
-        $record->people_id = $person->id ;
+        $record->created_by = \Auth::user()->id ;
+        // $person = \App\Models\People::create([
+        //     'firstname' => $record->firstname , 
+        //     'lastname' => $record->lastname , 
+        //     'mobile_phone' => $record->phone , 
+        //     'email' => $record->email
+        // ]);
+        // $record->people_id = $person->id ;
         $record->save();
 
         $responseData['message'] = __("crud.read.success");
@@ -440,7 +447,8 @@ class RegulatorController extends Controller
                 'objective' => $request->objective ,
                 'document_year' => $request->year ,
                 'document_type' => $request->type_id ,
-                'active' => $request->active > 0 ? 1 : 0
+                'active' => $request->active > 0 ? 1 : 0 ,
+                'updated_by' => \Auth::user()->id
             ]) ){
                 $responseData['message'] = __("crud.read.success");
                 $responseData['ok'] = true ;

@@ -215,7 +215,7 @@ Route::group([
 
   /** SEARCH SECTION */
   Route::group([
-    'prefix' => 'regulators' ,
+    'prefix' => 'search_regulators' ,
     ], function() {
         Route::get('',[ SearchController::class , 'index']);
         // Route::get('',function(){
@@ -232,6 +232,30 @@ Route::group([
         Route::get('{id}',[ RegulatorController::class , 'read']);
 
   });
+
+  /** SEARCH SECTION */
+  Route::group([
+    'prefix' => 'regulators' ,
+    'namespace' => 'Api' ,
+    'middleware' => 'auth:api'
+    ], function() {;
+        Route::get('',[RegulatorController::class,'index']);
+        Route::post('',[RegulatorController::class,'create']);
+        Route::put('',[RegulatorController::class,'update']);
+        Route::put('{id}/activate',[RegulatorController::class,'activate']);
+        Route::put('{id}/deactivate',[RegulatorController::class,'deactivate']);
+        Route::delete('',[RegulatorController::class,'destroy']);
+        Route::post('upload',[RegulatorController::class,'upload']);
+
+        Route::get('pdf',[RegulatorController::class,'pdf']);
+        Route::group([
+            'prefix' => 'types' ,
+            ], function() {
+                Route::get('compact', [TypeController::class,'compactList']);
+        });
+
+});
+
   /** FOLDER SECTION */
   Route::group([
     'prefix' => 'folders' ,

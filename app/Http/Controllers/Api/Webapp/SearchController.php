@@ -18,7 +18,8 @@ class SearchController extends Controller
         'document_year' ,
         'pdf' ,
         'document_type' ,
-        'publish'
+        'publish' ,
+        'created_by'
     ];
     /**
      * Listing function
@@ -131,7 +132,8 @@ class SearchController extends Controller
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name']
+            "ministries" => ['id', 'name'] ,
+            'createdBy' => [ 'id' , 'firstname' , 'lastname' ]
         ]);
 
         $builder = $crud->getListBuilder();

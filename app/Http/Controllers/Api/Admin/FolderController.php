@@ -5,134 +5,166 @@ namespace App\Http\Controllers\Api\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
-use App\Models\Folder;
+use App\Models\Folder AS RecordModel;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\CrudController;
 
 class FolderController extends Controller
 {
+    private $selectFields = [
+        'id',
+        'name' ,
+        'user_id' ,
+        'active' ,
+        'pid'
+    ];
     /**
      * Listing function
      */
     public function index(Request $request){
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
 
-        
-        // Create Query Builder 
-        $queryBuilder = new Document();
-        
-        // dd( $queryBuilder );
+        $queryString = [
+            // "where" => [
+            //     'default' => [
+            //         [
+            //             'field' => 'type_id' ,
+            //             'value' => $type === false ? "" : $type
+            //         ]
+            //     ],
+            //     'in' => [] ,
+            //     'not' => [] ,
+            //     'like' => [
+            //         [
+            //             'field' => 'number' ,
+            //             'value' => $number === false ? "" : $number
+            //         ],
+            //         [
+            //             'field' => 'year' ,
+            //             'value' => $date === false ? "" : $date
+            //         ]
+            //     ] ,
+            // ] ,
+            // "pivots" => [
+            //     $unit ?
+            //     [
+            //         "relationship" => 'units',
+            //         "where" => [
+            //             "in" => [
+            //                 "field" => "id",
+            //                 "value" => [$request->unit]
+            //             ],
+            //         // "not"=> [
+            //         //     [
+            //         //         "field" => 'fieldName' ,
+            //         //         "value"=> 'value'
+            //         //     ]
+            //         // ],
+            //         // "like"=>  [
+            //         //     [
+            //         //        "field"=> 'fieldName' ,
+            //         //        "value"=> 'value'
+            //         //     ]
+            //         // ]
+            //         ]
+            //     ]
+            //     : []
+            // ],
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'name'
+                ]
+            ],
+            "order" => [
+                'field' => 'id' ,
+                'by' => 'desc'
+            ],
+        ];
 
-        // Get search string
-        if( $request->search != "" ){
-            $searchTerms = explode(' ' , $request->search) ;
-            if( is_array( $searchTerms ) && !empty( $searchTerms ) ){
-                $queryBuilder = $queryBuilder -> where( function ($query ) use ( $searchTerms ) {
-                    foreach( $searchTerms as $term ) {
-                        $query = $query -> orwhere ( 'objective', 'LIKE' , "%".$term."%") ;
-                    }
-                } );
-            }
-        }
-        // Get document type
-        if( $request->document_type != "" ){
-            $documentTypes = explode(',', $request->document_type );
-            if( is_array( $documentTypes ) && !empty( $documentTypes ) ){
-                $queryBuilder = $queryBuilder -> where( function ($query ) use ( $documentTypes ) {
-                    foreach( $documentTypes as $type ) {
-                        $query = $query -> orwhere ( 'document_type', $type ) ;
-                    }
-                } );
-            }
-        }
+        $request->merge( $queryString );
 
-        // Get document type
-        if( $request->document_ministry != "" ){
-            $documentMinistries = explode(',', $request->document_ministry );
-            if( is_array( $documentMinistries ) && !empty( $documentMinistries ) ){
-                $queryBuilder = $queryBuilder -> wherein( 'id' , function ($query ) use ( $documentMinistries ) {
-                    $query = $query->select('document_id')->wherein('ministry_id', $documentMinistries)->from('document_ministries');
-                } );
-            }
-        }
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            "user" => ['id','firstname' , 'lastname' ]
+        ]);
 
-        // Get document year
-        if( $request->document_year != "" ){
-            $queryBuilder = $queryBuilder -> where('document_year','LIKE','%'.$request->document_year.'%');
-        }
-        // Get document registration id
-        if( $request -> fid != "" ){
-            $queryBuilder = $queryBuilder -> where('fid','LIKE','%'.$request -> fid);
-        }
+        $builder = $crud->getListBuilder()->whereNull('deleted_at');
 
-        // return $queryBuilder -> toSql();
-
-        // $perpage = 
-        $records = $queryBuilder->orderby('id','desc')->get()
-                ->map( function ($record, $index) {
-                    $record->objective = strip_tags( $record->objective ) ;
-                    $path = storage_path('data') . '/' . $record->pdf;
-                    if( !is_file($path) ) $record->pdf = null ;
-                    return $record ;
-                });
-        return response([
-            'records' => $records ,
-            'message' => count( $records ) > 0 ? "មានឯកសារចំនួន ៖ " . count( $records ) : "មិនមានឯកសារត្រូវជាមួយការស្វែងរកនេះឡើយ !"
-        ],200 );
+        $responseData = $crud->pagination(true, $builder);
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        return response()->json($responseData, 200);
     }
     /**
-     * Get Folders of a specific user which has authenticated
+     * Create an account
      */
-    public function user(Request $request){
-
-        // Create Query Builder 
-        $queryBuilder = new Folder();
-
-        // Get search string
-        if( $request->search != "" ){
-            $searchTerms = explode(' ' , $request->search) ;
-            if( is_array( $searchTerms ) && !empty( $searchTerms ) ){
-                $queryBuilder = $queryBuilder -> where( function ($query ) use ( $searchTerms ) {
-                    foreach( $searchTerms as $term ) {
-                        $query = $query -> orwhere ( 'name', 'LIKE' , "%".$term."%") ;
-                    }
-                } );
-            }
-        }
-
-        $queryBuilder = $queryBuilder->where('user_id', Auth::user()->id );
-
-        $records = $queryBuilder->orderby('name','asc')->get()
-                ->map( function ($record, $index) {
-                    foreach( $record->documents AS $index => $documentFolder ){
-                        $documentFolder -> document ;
-                        $documentFolder -> document -> type ;
-
-                        $documentFolder -> document ->objective = strip_tags( $documentFolder -> document ->objective ) ; // clear some tags that product by the editor
-                        $path = storage_path('data') . '/' . $documentFolder -> document -> pdf ; // create the link to pdf file
-                        if( !is_file($path) ) $documentFolder -> document -> pdf = null ; // set the pdf link to null if it does not exist
-
-                    }
-                    return $record ;
-                });
-
-        return response([
-            'records' => $records ,
-            'message' => count( $records ) > 0 ? " មានឯកសារចំនូួន ៖ " . count( $records ) : "មិនមានកម្រងឯកសារត្រូវជាមួយការស្វែងរកនេះឡើយ !"
-        ],200 );
-    }
-    // Save the folder 
     public function store(Request $request){
-        if( $request->name != "" && Auth::user() != null ){
-            $folder = new \App\Models\Folder();
-            $folder->name = $request->name ;
-            $folder->user_id = Auth::user()->id ;
-            $folder->save() ;
-            $folder->user ;
-            $folder->documents ;
+        // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
+        $record = new RecordModel([
+            'name' => $request->name,
+            'user_id' => \Auth::user()->id 
+        ]);
+        $record->save();
+
+        if( $record ){
+            return response()->json([
+                'record' => $record ,
+                'message' => 'បង្កើតបានរួចរាល់'
+            ], 200);
+
+        }else {
+            return response()->json([
+                'user' => null ,
+                'message' => 'មានបញ្ហា។'
+            ], 201);
+        }
+    }
+    /**
+     * Create an account
+     */
+    public function update(Request $request){
+        $record = isset( $request->id ) && $request->id > 0 ? RecordModel::find($request->id) : false ;
+        if( $record ) {
+            $record->update([
+                'name' => $request->name ,
+                'user_id' => \Auth::user()->id
+            ]);
+            return response()->json([
+                'record' => $record ,
+                'message' => 'កែប្រែព័ត៌មានរួចរាល់ !' ,
+                'ok' => true
+            ], 200);
+        }else{
+            // អ្នកប្រើប្រាស់មិនមាន
+            return response([
+                'record' => null ,
+                'message' => 'គណនីដែលអ្នកចង់កែប្រែព័ត៌មាន មិនមានឡើយ។' ,
+                'ok' => false
+            ], 403);
+        }
+    }
+    /**
+     * Active function of the account
+     */
+    public function active(Request $request){
+        $user = RecordModel::find($request->id) ;
+        if( $user ){
+            $user->active = $request->active ;
+            $user->save();
             // User does exists
             return response([
-                'record' => $folder ,
-                'message' => 'កម្រងឯកសារ '.$folder->name.' បានរក្សារួចរាល់ !' 
+                'user' => $user ,
+                'ok' => true ,
+                'message' => 'គណនី '.$user->name.' បានបើកដោយជោគជ័យ !' 
                 ],
                 200
             );
@@ -140,104 +172,84 @@ class FolderController extends Controller
             // User does not exists
             return response([
                 'user' => null ,
-                'message' => 'សូមបញ្ចូលឈ្មោះកម្រងឯកសារជាមុនសិន !' ],
+                'ok' => false ,
+                'message' => 'សូមទោស គណនីនេះមិនមានទេ !' 
+                ],
                 201
             );
         }
     }
-    // delete the folder 
-    public function delete(Request $request){
-        if( $request->id != "" && Auth::user() != null ){
-            $folder = \App\Models\Folder::find($request->id);
-            if( $folder != null ){
-                $record = $folder ;
-                // Check for the documents within the folder
-                // If there is/are documents within the folder then notify user first
-                // process delete , also delete the related document within this folder [Note: we only delete the relationship of folder and document]
-                foreach( $folder -> documents as $documentFolder ){
-                    $documentFolder -> delete ();
-                }
-                $folder->delete();
-                return response([
-                    'record' => $record ,
-                    'message' => "កម្រងឯកសារ " . $record->name . " បានលុបរួចរាល់ !" 
-                    ],
-                    200
-                );
-            }else{
-                return response([
-                    'record' => $folder ,
-                    'message' => "កម្រងឯកសារនេះមិនមានឡើយ !"
-                    ],
-                    201
-                );
-            }
+    /**
+     * Unactive function of the account
+     */
+    public function unactive(Request $request){
+        $user = RecordModel::find($request->id) ;
+        if( $user ){
+            $user->active = 0 ;
+            $user->save();
+            // User does exists
+            return response([
+                'ok' => true ,
+                'user' => $user ,
+                'message' => 'គណនី '.$user->name.' បានបិទដោយជោគជ័យ !' 
+                ],
+                200
+            );
         }else{
             // User does not exists
             return response([
                 'user' => null ,
-                'message' => 'សូមបញ្ជាក់កម្រងឯកសារដែលអ្នកចង់លុប !' ],
+                'ok' => false ,
+                'message' => 'សូមទោស គណនីនេះមិនមានទេ !' ],
                 201
             );
         }
     }
-    // Remove document from folder
-    public function addDocumentToFolder($folderId, $documentId){
-        if( $folderId != "" && $documentId != "" && Auth::user() != null ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $folderId)
-                ->where('document_id' , $documentId )->first();
-            if( $documentFolder == null ){
-                $documentFolder = new \App\Models\DocumentFolder();
-                $documentFolder -> folder_id = $folderId ;
-                $documentFolder -> document_id = $documentId ;
-                $documentFolder->save();
-                return response([
-                    'record' => $documentFolder ,
-                    'message' => "បានបញ្ចូលឯកសារ ចូលទៅក្នុងកម្រងឯកសារ រួចរាល់ !"
-                    ],
-                    200
-                );
-            }else{
-                return response([
-                    'record' => $documentFolder ,
-                    'message' => "ឯកសារនេះមានក្នុងកម្រងឯកសារនេះរួចរាល់ហើយ !"
-                    ],
-                    201
-                );
-            }
+    /**
+     * Function delete an account
+     */
+    public function destroy(Request $request){
+        $record = RecordModel::find($request->id) ;
+        if( $record ){
+            $record->deleted_at = \Carbon\Carbon::now() ;
+            $record->save();
+            // User does exists
+            return response([
+                'ok' => true ,
+                'record' => $record ,
+                'message' => ' បានលុបដោយជោគជ័យ !' ,
+                'ok' => true 
+                ],
+                200
+            );
         }else{
             // User does not exists
             return response([
+                'ok' => false ,
                 'record' => null ,
-                'message' => 'សូមបំពេញព័ត៌មាន អោយបានគ្រប់គ្រាន់ !' ],
+                'message' => 'សូមទោស ព័ត៌មាននេះមិនមានទេ !' ],
                 201
             );
         }
     }
-    public function checkDocument(Request $request){
-        $folder = \App\Models\Folder::find( $request->id );
-        if( $folder !== null ){
-            if( count( $folder -> documents ) ){
-                // There is/are document(s) within this folder
-                return response([
-                    'record' => $folder ,
-                    'message' => 'កម្រងឯកសារនេះ មានឯកសារចំនួន '. count( $folder -> documents ) .' !' ],
-                    200
-                );
-            }else{
-                // There is no document within this folder
-                return response([
-                    'record' => $folder ,
-                    'message' => 'កម្រងឯកសារនេះ មិនមានឯកសារឡើយ !' ],
-                    201
-                );
-            }
-        }else{
+    /**
+     * Function Restore an account from SoftDeletes
+     */
+    public function restore(Request $request){
+        if( $user = RecordModel::restore($request->id) ){
             return response([
-                'record' => null ,
-                'message' => 'កម្រងឯកសារនេះ មិនមានឡើយ !' ],
-                201
+                'record' => $user ,
+                'ok' => true ,
+                'message' => 'បានស្ដាមកវិញដោយជោគជ័យ !'
+                ],200
             );
         }
+        return response([
+                'record' => null ,
+                'ok' => false ,
+                'message' => 'មិនមានឡើយ !'
+            ],201
+        );
     }
+    
 }

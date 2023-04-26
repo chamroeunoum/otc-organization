@@ -32,7 +32,7 @@ class Document extends Model
     */
     public function type()
     {
-        return $this->hasOne('App\Models\Type','id','document_type');
+        return $this->hasOne('App\Models\DocumentType','id','document_type');
     }
 
     public function ministries()
@@ -75,12 +75,12 @@ class Document extends Model
 
     public function createdBy()
     {
-        return $this->belongsTo('App\User', 'created_by');
+        return $this->belongsTo('App\Models\User', 'created_by');
     }
 
     public function updatedBy()
     {
-        return $this->belongsTo('App\User', 'updated_by');
+        return $this->belongsTo('App\Models\User', 'updated_by');
     }
     // relation to Unit Teamwork Type table
     public function unitTeamworkType(){

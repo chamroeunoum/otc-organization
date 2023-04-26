@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Document as RecordModel;
 use App\Http\Controllers\CrudController;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 
 class RegulatorController extends Controller
@@ -18,7 +20,10 @@ class RegulatorController extends Controller
         'document_year' ,
         'pdf' ,
         'document_type' ,
-        'publish'
+        'publish' ,
+        'active' ,
+        'created_by' ,
+        'updated_by'
     ];
     /**
      * Listing function
@@ -33,8 +38,8 @@ class RegulatorController extends Controller
             "where" => [
                 'default' => [
                     [
-                        'field' => 'active' ,
-                        'value' => 1
+                        'field' => 'created_by' ,
+                        'value' => \Auth::user()->id
                     ]
                 ],
                 // 'in' => [
@@ -43,12 +48,12 @@ class RegulatorController extends Controller
                 //         'value' => isset( $request->document_type ) && $request->document_type !== null ? [$request->document_type] : false
                 //     ]
                 // ] ,
-                'not' => [
-                    [
-                        'field' => 'document_type' ,
-                        'value' => [4]
-                    ]
-                ] ,
+                // 'not' => [
+                //     [
+                //         'field' => 'document_type' ,
+                //         'value' => [4]
+                //     ]
+                // ] ,
                 // 'like' => [
                 //     [
                 //         'field' => 'number' ,
@@ -132,12 +137,140 @@ class RegulatorController extends Controller
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name']
+            "ministries" => ['id', 'name'] ,
+            'parentDocument' => [ 'id' ,'parent_id','amend' ] ,
+            'createdBy' => [ 'id', 'firstname' , 'lastname' ] ,
+            'updatedBy' => [ 'id', 'firstname' , 'lastname' ]
         ]);
 
         $builder = $crud->getListBuilder();
 
         $responseData = $crud->pagination(true, $builder);
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        return response()->json($responseData, 200);
+    }
+    /**
+     * Listing function
+     */
+    public function child(Request $request){
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+
+        /**
+         * Get the id of the regulator and its parents to exclude them from searching
+         */
+        $regulator = isset( $request->parent_id ) && $request->parent_id > 0 ? \App\Models\Document::find( $request->parent_id ) : false ;
+
+        $queryString = [
+            "where" => [
+                // 'default' => [
+                //     [
+                //         'field' => 'publish' ,
+                //         'value' => 0
+                //     ]
+                // ],
+                // 'in' => [
+                //     [
+                //         'field' => 'document_type' ,
+                //         'value' => isset( $request->document_type ) && $request->document_type !== null ? [$request->document_type] : false
+                //     ]
+                // ] ,
+                'not' => [
+                    [
+                        'field' => 'id' ,
+                        'value' => [ $request->parent_id ]
+                    ]
+                ] // ,
+                // 'like' => [
+                //     [
+                //         'field' => 'number' ,
+                //         'value' => $number === false ? "" : $number
+                //     ],
+                //     [
+                //         'field' => 'year' ,
+                //         'value' => $date === false ? "" : $date
+                //     ]
+                // ] ,
+            ] ,
+            // "pivots" => [
+            //     $unit ?
+            //     [
+            //         "relationship" => 'units',
+            //         "where" => [
+            //             "in" => [
+            //                 "field" => "id",
+            //                 "value" => [$request->unit]
+            //             ],
+            //         // "not"=> [
+            //         //     [
+            //         //         "field" => 'fieldName' ,
+            //         //         "value"=> 'value'
+            //         //     ]
+            //         // ],
+            //         // "like"=>  [
+            //         //     [
+            //         //        "field"=> 'fieldName' ,
+            //         //        "value"=> 'value'
+            //         //     ]
+            //         // ]
+            //         ]
+            //     ]
+            //     : []
+            // ],
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'objective', 'fid', 'document_year'
+                ]
+            ],
+            "order" => [
+                'field' => 'id' ,
+                'by' => 'desc'
+            ],
+        ];
+        if( isset( $request->document_type ) ) {
+            $queryString['where']['default'] = [
+                'in' => [
+                    [
+                        'field' => 'document_type' ,
+                        'value' =>  $request->document_type
+                    ]
+                ]
+            ];
+        }
+
+        $request->merge( $queryString );
+
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            "type" => ['id', 'name', 'format', 'color', 'index'] ,
+            "ministries" => ['id', 'name'] ,
+            'parentDocument' => [ 'id' ,'parent_id', 'document_id', 'amend' ]
+        ]);
+
+        $builder = $crud->getListBuilder();
+
+        $responseData = $crud->pagination(true, $builder,[
+                'pdf' => function($pdf){
+                    $pdf = ( $pdf !== "" && \Storage::disk('document')->exists( $pdf ) )
+                    ? true
+                    // \Storage::disk('document')->url( $pdf ) 
+                    : false ;
+                    return $pdf ;
+                },
+                'objective' => function($objective){
+                    return html_entity_decode( strip_tags( $objective ) );
+                }
+            ]
+        );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
@@ -201,7 +334,7 @@ class RegulatorController extends Controller
      */
     public function pdf(Request $request)
     {
-        $document = Document::findOrFail($request->id);
+        $document = RecordModel::findOrFail($request->id);
         if($document) {
             $path = storage_path('data') . '/' . $document->pdf;
             $ext = pathinfo($path);
@@ -227,6 +360,37 @@ class RegulatorController extends Controller
             }
         }
     }
+    public function upload(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            if( ( $document = \App\Models\Document::find($request->id) ) !== null ){
+                list($year,$month,$day) = explode('-',$document->document_year);
+                $uniqeName = Storage::disk('document')->putFile( 'documents' , new File( $_FILES['files']['tmp_name'] ) );
+                $document->pdf = $uniqeName ;
+                $document->save();
+                if( Storage::disk('document')->exists( $document->pdf ) ){
+                    $document->pdf = Storage::disk("document")->url( $document->pdf  );
+                    return response([
+                        'record' => $document ,
+                        'message' => 'ជោគជ័យក្នុងការបញ្ចូលឯកសារយោង។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $document ,
+                        'message' => 'មិនមានឯកសារយោងដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់ឯកសារយោង។'
+                ],403);
+            }
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
     /** Get the year(s) that there is/are documents published base on ministry_id and document_type_id */
     public function getDocumentsAsMinistryTypeYearMonth(Request $request){
         $ministries = \App\Models\Ministry()->selectRaw('id, name')->orderby('name','asc')->get();
@@ -243,19 +407,63 @@ class RegulatorController extends Controller
          * Save information of the regulator and its related information
          */
         
-        RecordModel::create([
+        $record = RecordModel::create([
             'fid' => $request->number ,
             'title' => $request->title ,
             'objective' => $request->objective ,
             'document_year' => $request->year ,
             'document_type' => $request->type_id ,
-            'publish' => $request->publish
+            'publish' => 1 , // $request->publish
+            'active' => $request->active > 0 ? 1 : 0 ,
+            'created_by' => \Auth::user()->id ,
+            'updated_by' => \Auth::user()->id
+        ]);
         /**
-         * Upload pdf document(s) of the regulator
+         * Create detail information of the owner of the account
          */
+        $record->created_by = \Auth::user()->id ;
+        // $person = \App\Models\People::create([
+        //     'firstname' => $record->firstname , 
+        //     'lastname' => $record->lastname , 
+        //     'mobile_phone' => $record->phone , 
+        //     'email' => $record->email
+        // ]);
+        // $record->people_id = $person->id ;
+        $record->save();
+
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        $responseData['record'] = $record ;
+        return response()->json($responseData, 200);
     }
     public function update(Request $request){
-
+        if( isset( $request->id ) && $request->id > 0 && ( $record = RecordModel::find($request->id) ) !== null ){
+            /**
+             * Save information of the regulator and its related information
+             */
+            if( $record->update([
+                'fid' => $request->number ,
+                'title' => $request->title ,
+                'objective' => $request->objective ,
+                'document_year' => $request->year ,
+                'document_type' => $request->type_id ,
+                'active' => $request->active > 0 ? 1 : 0 ,
+                'updated_by' => \Auth::user()->id
+            ]) ){
+                $responseData['message'] = __("crud.read.success");
+                $responseData['ok'] = true ;
+                $responseData['record'] = $record ;
+                return response()->json($responseData, 200);
+            }else{
+                return response()->json([
+                    'message' => 'មានបញ្ហាក្នុងការរក្សារព័ត៌មានឯកសារ។'
+                ], 403);    
+            }
+        }else{
+            return response()->json([
+                'message' => 'សូមបញ្ជាក់លេខសម្គាល់ឯកសារ។'
+            ], 403);
+        }
     }
     public function read(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
@@ -278,6 +486,7 @@ class RegulatorController extends Controller
             'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
         ],201);
     }
+
     public function destroy(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
             return response()->json([
@@ -298,7 +507,9 @@ class RegulatorController extends Controller
             /**
              * Delete all the related documents own by this regulator
              */
-            
+            if( $tempRecord->pdf !== null && $tempRecord->pdf !=="" && Storage::disk('document')->exists( $tempRecord->pdf ) ){
+                Storage::disk("document")->delete( $tempRecord->pdf  );
+            }
             return response()->json([
                 'record' => $tempRecord ,
                 'ok' => true ,
@@ -310,5 +521,58 @@ class RegulatorController extends Controller
             'ok' => false ,
             'message' => 'មានបញ្ហាក្នុងការលុបទិន្ន័យ។'
         ],201);
+    }
+    public function oknha(Request $request){
+        $records = \App\Models\Document::select(['id','fid','objective','document_year'])->where('objective','LIKE','%ឧកញ៉ា%')
+        // ->orWhere('fid','LIKE','%អ្នកឧកញ៉ា%')
+        ->whereNot('objective',"LIKE",'%ឥស្សរិយយស%')
+        ->whereNotIn('id',[51567, 20014, 19451, 45672, 45673, 45684, 45688, 45693, 45697, 45705, 45716, 45717, 51794, 51453,  45723, 45724, 50355, 45761, 45764, 58693, 56440, 58908, 58458, 57730, 57705, 57692, 57677, 57073, 56265, 56148, 56084, 55414, 54445, 53835, 52968, 52965, 52049, 52036, 52034, 51409, 51408, 51407, 50318, 49856, 49601, 49564, 48893, 46788, 46760 ])
+        ->get()->map(function($r){
+            $r->objective = trim( str_replace( [ 'ព្រះរាជក្រឹត្យស្ដីពីការតែងតាំង' ,'ព្រះរាជក្រឹត្យស្ដីពីការត្រាស់បង្គាប់តែងតាំង' , 'ព្រះរាជក្រឹត្យស្ដីពីតែងតាំង' , 'ព្រះរាជក្រឹត្យស្ដីពីការត្រាស់បង្គាប់' , 'ផ្ដល់គោរមងារ' , '&nbsp;' , 'ផ្ដល់គោរមងា' , 'ព្រះរាជក្រឹត្យស្ដីពីការត្រាសបង្គាប់', 'ព្រះរាជក្រឹត្យស្ដីពីកាផ្តល់គោរមងារ' , 'រះរាជក្រឹត្យស្ដីពីការត្រាស់បង្គាប់' , 'ផ្ដល់គោរពងារ' , 'ផ្តល់គោរម្យងារ' , 'គោរមងារ' ],[ '' ],strip_tags( $r->objective ) ) );
+            return $r;
+        });
+        return view( 'oknha' , ['data' => $records] );
+    }
+    public function activate(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $record->with('ministries')->with('signatures')->with('ministries')->with('type');
+        return response()->json([
+            'record' => $record ,
+            'ok' => $record->update(['active'=>1]) ,
+            'message' => 'បានបើកឯកសាររួចរាល់។'
+        ],200);
+    }
+    public function deactivate(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $record->with('ministries')->with('signatures')->with('ministries')->with('type');
+        return response()->json([
+            'record' => $record ,
+            'ok' => $record->update(['active'=>0]) ,
+            'message' => 'បានបើកឯកសាររួចរាល់។'
+        ],200);
     }
 }

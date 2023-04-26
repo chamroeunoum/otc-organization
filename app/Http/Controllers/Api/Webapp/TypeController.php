@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Webapp;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CrudController;
-use App\Models\Type as RecordModel;
+use App\Models\DocumentType as RecordModel;
 
 
 class TypeController extends Controller
@@ -16,7 +16,7 @@ class TypeController extends Controller
     public function index(Request $request){
         // $perpage = 
         return response([
-            'records' => \App\Models\Type::where('id','<>',4)->orderby('document_index','asc')->get(),
+            'records' => RecordModel::where('id','<>',4)->orderby('document_index','asc')->get(),
             'message' => 'អានព័ត៌មាននៃគណនីបានរួចរាល់ !' 
         ],200 );
     }
@@ -26,7 +26,7 @@ class TypeController extends Controller
     public function byMinistry(Request $request){
         // $perpage = 
         return response([
-            'records' => \App\Models\Type::where('id','<>',4)->orderby('document_index','asc')->get(),
+            'records' => RecordModel::where('id','<>',4)->orderby('document_index','asc')->get(),
             'message' => 'អានព័ត៌មាននៃគណនីបានរួចរាល់ !' 
         ],200 );
     }

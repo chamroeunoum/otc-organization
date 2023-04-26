@@ -10,6 +10,7 @@ use App\Notifications\Webapp\SignupActivate;
 use App\Http\Controllers\Controller;
 use Avatar;
 use Storage;
+use Illuminate\Http\File;
 
 class AuthController extends Controller
 {
@@ -133,7 +134,7 @@ class AuthController extends Controller
         /**
          * Check roles
          */
-        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core')->pluck('id')->toArray() ) ) ){
+        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core_service')->pluck('id')->toArray() ) ) ){
             /**
              * User seem does not have any right to login into backend / core service
              */

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\Webapp\SignupActivate;
 use Illuminate\Support\Str;
 use Avatar;
+use Illuminate\Http\File;
 use Storage;
 
 class AuthController extends Controller
@@ -65,6 +66,14 @@ class AuthController extends Controller
         ]);
         $user->people_id = $person->id ;
         $user->save();
+
+        /**
+         * Assign role to user
+         */
+        $webappClientRole = \App\Models\Role::where('name','Client')->first();
+        if( $webappClientRole != null ){
+            $user->assignRole( $webappClientRole );
+        }
 
         $user->notify(new SignupActivate($user));
 

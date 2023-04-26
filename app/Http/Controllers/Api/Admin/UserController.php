@@ -9,6 +9,8 @@ use App\Mail\MobilePasswordResetRequest;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User as RecordModel ;
 use App\Http\Controllers\CrudController;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 
 class UserController extends Controller
@@ -99,7 +101,8 @@ class UserController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] 
+            "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
+            "roles" => ['id','name', 'tag']
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
@@ -133,6 +136,15 @@ class UserController extends Controller
                 'phone' => $request->phone ,
                 'username' => $request->username
             ]);
+
+            /**
+             * Assign role
+             */
+            $backendMemberRole = \App\Models\Role::where('name','Backend member')->first();
+            if( $backendMemberRole != null ){
+                $record->assignRole( $backendMemberRole );
+            }
+            
             $user->save();
             if( $user ){
                 
@@ -404,7 +416,7 @@ class UserController extends Controller
         }else{
             $record->avatar_url = null ;
         }
-    
+
         $record->person ;
 
         return response()->json([

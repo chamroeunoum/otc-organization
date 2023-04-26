@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\UserController;
+use App\Http\Controllers\Api\Admin\FolderController;
 use App\Http\Controllers\Api\Admin\RegulatorController;
 use App\Http\Controllers\Api\Admin\DocumentParentController;
 use App\Http\Controllers\Api\Admin\TypeController;
@@ -57,6 +58,25 @@ Route::group([
             Route::get('username/exist',[UserController::class,'checkUsername']);
             Route::get('phone/exist',[UserController::class,'checkPhone']);
             Route::get('email/exist',[UserController::class,'checkEmail']);
+    });
+
+    /** FOLDER SECTION */
+    Route::group([
+        'prefix' => 'folders' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[FolderController::class,'index']);
+            Route::post('create',[FolderController::class,'store']);
+            Route::put('update',[FolderController::class,'update']);
+            Route::get('{id}/read',[FolderController::class,'read']);
+            Route::delete('{id}/delete',[FolderController::class,'destroy']);
+            Route::put('activate',[FolderController::class,'active']);
+            /**
+             * Check the unique user information
+             */
+            Route::get('subfolders',[FolderController::class,'getSubfolders']);
+            Route::get('documents',[FolderController::class,'getDocuments']);
     });
 
     // I am here , please continue to the below lines

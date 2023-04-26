@@ -13,12 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name',191)->nullable(false)->comment('The name of the role.');
-            $table->string('guard_name',191)->nullable(false)->comment('The uniqe name of role.');
+        Schema::table('roles', function (Blueprint $table) {
             $table->string('tag',191)->nullable(false)->comment('The tag / group of the role.');
-            $table->timestamps();
         });
     }
 

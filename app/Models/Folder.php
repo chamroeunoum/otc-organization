@@ -14,9 +14,9 @@ class Folder extends Model
 
 	protected $table = 'folders';
 	// protected $primaryKey = 'id';
-	// protected $guarded = [];
+	protected $guarded = ['id'];
 	// protected $hidden = ['id'];
-	protected $fillable = ['name', 'user_id'];
+	// protected $fillable = ['name', 'user_id','pid'];
 	public $timestamps = true;
 	protected $dates = ['created_at' , 'updated' ,'deleted_at'];
 	protected $casts = [
