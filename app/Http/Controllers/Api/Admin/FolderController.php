@@ -111,7 +111,9 @@ class FolderController extends Controller
         // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
         $record = new RecordModel([
             'name' => $request->name,
-            'user_id' => \Auth::user()->id 
+            'user_id' => \Auth::user()->id ,
+            'pid' => 0 ,
+            'active' => 0
         ]);
         $record->save();
 
