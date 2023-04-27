@@ -142,7 +142,7 @@ class UserController extends Controller
              */
             $backendMemberRole = \App\Models\Role::where('name','Backend member')->first();
             if( $backendMemberRole != null ){
-                $record->assignRole( $backendMemberRole );
+                $user->assignRole( $backendMemberRole );
             }
             
             $user->save();
