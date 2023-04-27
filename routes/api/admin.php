@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\FolderController;
+use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\RegulatorController;
 use App\Http\Controllers\Api\Admin\DocumentParentController;
 use App\Http\Controllers\Api\Admin\TypeController;
@@ -77,6 +78,19 @@ Route::group([
              */
             Route::get('subfolders',[FolderController::class,'getSubfolders']);
             Route::get('documents',[FolderController::class,'getDocuments']);
+    });
+
+    /** ROLE SECTION */
+    Route::group([
+        'prefix' => 'roles' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[RoleController::class,'index']);
+            Route::post('create',[RoleController::class,'store']);
+            Route::put('update',[RoleController::class,'update']);
+            Route::get('{id}/read',[RoleController::class,'read']);
+            Route::delete('{id}/delete',[RoleController::class,'destroy']);
     });
 
     // I am here , please continue to the below lines
