@@ -26,7 +26,7 @@ class FolderController extends Controller
      * Listing function
      */
     public function index(Request $request){
-        $user = Auth::user();
+        $user = Auth::user() != null ? \Auth::user() : false ;
 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
@@ -35,12 +35,12 @@ class FolderController extends Controller
 
         $queryString = [
             "where" => [
-                'default' => [
-                    [
-                        'field' => 'user_id' ,
-                        'value' => $user->id
-                    ]
-                ],
+                // 'default' => [
+                //     [
+                //         'field' => 'user_id' ,
+                //         'value' => $user != null ? $user->id : false
+                //     ]
+                // ],
                 // 'in' => [
                 //     [
                 //         'field' => 'document_type' ,
@@ -206,10 +206,12 @@ class FolderController extends Controller
     }
     // Save the folder 
     public function create(Request $request){
-        if( $request->name != "" && Auth::user() != null ){
+        if( $request->name != "" 
+        // && Auth::user() != null 
+        ){
             $folder = new \App\Models\Folder();
             $folder->name = $request->name ;
-            $folder->user_id = Auth::user()->id ;
+            $folder->user_id = Auth::user() != null ? Auth::user()->id : 0 ;
             $folder->pid = 0 ;
             $folder->active = 1 ;
             $folder->save() ;
@@ -235,7 +237,8 @@ class FolderController extends Controller
     }
     // Update the folder 
     public function update(Request $request){
-        if( ( $folder = \App\Models\Folder::find($request->id) ) !== null && $request->name != "" ){
+        dd( $request->params );
+        if( ( $folder = RecordModel::find($request->id) ) != null && $request->name != "" ){
             $folder->name = $request->name ;
             $folder->save() ;
             $folder->user ;
@@ -260,7 +263,9 @@ class FolderController extends Controller
     }
     // delete the folder 
     public function delete(Request $request){
-        if( $request->id != "" && Auth::user() != null ){
+        if( $request->id != "" 
+         // && Auth::user() != null 
+        ){
             $folder = \App\Models\Folder::find($request->id);
             if( $folder != null ){
                 $record = $folder ;
@@ -301,7 +306,9 @@ class FolderController extends Controller
     }
     // Add document from folder
     public function addDocumentToFolder(Request $request){
-        if( $request->id > 0 && $request->document_id > 0 && Auth::user() != null ){
+        if( $request->id > 0 && $request->document_id > 0 
+          // && Auth::user() != null 
+        ){
             $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             if( $documentFolder == null ){
@@ -337,7 +344,9 @@ class FolderController extends Controller
     }
     // Remove document from folder
     public function removeDocumentFromFolder(Request $request){
-        if( $request->id > 0 && $request->document_id > 0 && Auth::user() != null ){
+        if( $request->id > 0 && $request->document_id > 0 
+        // && Auth::user() != null 
+        ){
             $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             $message = $documentFolder !== null ? "បានដកឯកសារចេញរួចរាល់។" : "មិនមានឯកសារនេះក្នុងថតឯកសារឡើយ។" ;
@@ -362,14 +371,14 @@ class FolderController extends Controller
         }
     }
     public function checkDocument(Request $request){
-        $folder = \App\Models\Folder::find( $request->id );
+        $folder = RecordModel::find( $request->id );
         if( $folder !== null ){
-            if( count( $folder -> documents ) ){
+            if( count( $folder -> regulators ) ){
                 // There is/are document(s) within this folder
                 return response([
                     'ok' => true ,
                     'record' => $folder ,
-                    'message' => 'កម្រងឯកសារនេះ មានឯកសារចំនួន '. count( $folder -> documents ) .' !' ],
+                    'message' => 'កម្រងឯកសារនេះ មានឯកសារចំនួន '. count( $folder -> regulators ) .' !' ],
                     200
                 );
             }else{
@@ -426,8 +435,8 @@ class FolderController extends Controller
                 'message' => 'សូមបញ្ចាក់លេខសម្គាល់របស់ថតឯកសារ។'
             ],350);
         }
-        $folderIds = RecordModel::find($request->folder_id)->regulators->pluck('id')->all();
-        if( count( $folderIds ) <= 0 ) {
+        $regulatorIds = RecordModel::find($request->folder_id)->regulators->pluck('id')->all();
+        if( count( $regulatorIds ) <= 0 ) {
             return response()->json([
                 'ok' => false ,
                 'message' => 'ថតឯកសារនេះមិនមានឯកសារឡើយ។'
@@ -455,7 +464,7 @@ class FolderController extends Controller
                     'in' => [
                         [
                             'field' => 'id' ,
-                            'value' => $folderIds
+                            'value' => $regulatorIds
                         ]
                     ]
                 // 'not' => [

@@ -259,7 +259,7 @@ Route::group([
   /** FOLDER SECTION */
   Route::group([
     'prefix' => 'folders' ,
-    'middleware' => 'auth:api'
+    'middleware' => 'api'
     ], function() {
 
         Route::get('',[ FolderController::class , 'index']);
