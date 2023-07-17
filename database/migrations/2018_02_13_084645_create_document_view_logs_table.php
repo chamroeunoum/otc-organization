@@ -15,6 +15,7 @@ class CreateDocumentViewLogsTable extends Migration {
 		Schema::create('document_view_logs', function(Blueprint $table)
 		{
 			$table->integer('user_id')->nullable();
+			$table->string('email',191)->nullable(true);
 			$table->integer('document_id');
 			$table->dateTime('date')->nullable();
 		});

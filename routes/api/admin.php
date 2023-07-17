@@ -110,6 +110,7 @@ Route::group([
             Route::put('{id}/deactivate',[RegulatorController::class,'deactivate']);
             Route::delete('',[RegulatorController::class,'destroy']);
             Route::post('upload',[RegulatorController::class,'upload']);
+            
 
             // Route::get('get/document/years','RegulatorController@getYears');
             Route::get('pdf',[RegulatorController::class,'pdf']);
@@ -119,6 +120,10 @@ Route::group([
                 ], function() {
                     Route::get('compact', [TypeController::class,'compactList']);
             });
+
+            Route::put('addreader',[RegulatorController::class,'addReaders']);
+            Route::put('removereader',[RegulatorController::class,'removeReaders']);
+            Route::put('{id}/accessibility',[RegulatorController::class,'accessibility']);
             
             Route::group([
                 'prefix' => 'oknha'

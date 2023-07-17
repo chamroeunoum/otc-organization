@@ -189,6 +189,10 @@ class User extends Authenticatable
         return true;
     }
 
+    public function regulators(){
+      return $this->belongsToMany(\App\Models\Document::class,'document_users','user_id','document_id');
+    }
+
     public static function boot()
     {
         parent::boot();

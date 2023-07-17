@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class Document extends Model
 {
     use SoftDeletes;
@@ -16,7 +17,7 @@ class Document extends Model
     //protected $primaryKey = 'id';
     public $timestamps = true;
     protected $guarded = ['id'];
-    protected $fillable = ['fid','title','objective', 'document_year','document_type','pdf','created_by','updated_by','publish', 'active'];
+    protected $fillable = ['fid','title','objective', 'document_year','document_type','pdf','created_by','updated_by','publish', 'active', 'accessibility'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -91,6 +92,15 @@ class Document extends Model
     }
     public function getChildDocuments(){
         
+    }
+    /**
+     * Get all of the comments for the Document
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function readers()
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'document_users','document_id','user_id');
     }
     /**
      * Function

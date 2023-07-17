@@ -15,8 +15,8 @@ class CreateDocumentFavoritesTable extends Migration {
 		Schema::create('document_favorites', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('document_id')->unsigned();
 			$table->integer('user_id')->unsigned();
+			$table->integer('document_ids')->unsigned();
 			$table->timestamps();
 			$table->softDeletes();
 		});

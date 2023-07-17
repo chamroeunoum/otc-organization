@@ -15,8 +15,9 @@ class CreateFoldersTable extends Migration {
 		Schema::create('folders', function(Blueprint $table)
 		{
 			$table->increments('id');
+			$table->integer('user_id')->nullable(false);
 			$table->string('name', 191)->nullable();
-			$table->integer('user_id')->unsigned()->index('document_folders_user_id_foreign');
+			$table->text('description')->nullable();
 			$table->integer('pid')->unsigned()->comment('The parent id of the folder');
 			$table->integer('active')->unsigned()->comment('The status of the folder to be used or disabled.');
 			$table->timestamps();

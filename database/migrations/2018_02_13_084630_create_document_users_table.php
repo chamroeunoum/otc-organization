@@ -15,8 +15,8 @@ class CreateDocumentUsersTable extends Migration {
 		Schema::create('document_users', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('document_id')->index('document_id_3');
-			$table->integer('user_id')->index('user_id_3');
+			$table->integer('document_id')->index('document_id');
+			$table->integer('user_id')->index('user_id');
 			$table->integer('created_by')->nullable()->default(0);
 			$table->integer('modified_by')->nullable()->default(0);
 			$table->integer('deleted_by')->nullable()->default(0);

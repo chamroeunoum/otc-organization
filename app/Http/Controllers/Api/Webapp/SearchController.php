@@ -19,7 +19,8 @@ class SearchController extends Controller
         'pdf' ,
         'document_type' ,
         'publish' ,
-        'created_by'
+        'created_by' ,
+        'accessibility'
     ];
     /**
      * Listing function
@@ -29,13 +30,16 @@ class SearchController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-
         $queryString = [
             "where" => [
                 'default' => [
                     [
                         'field' => 'active' ,
                         'value' => 1
+                    ] ,
+                    [
+                        'field' => 'accessibility' ,
+                        'value' => [ 2 , 4 ]
                     ]
                 ],
                 // 'in' => [
@@ -118,17 +122,30 @@ class SearchController extends Controller
             /**
              * custom the value of the field
              */
-            'pdf' => function($pdf){
-                $pdf = ( $pdf !== "" && $pdf !== null && \Storage::disk('document')->exists( $pdf ) )
-                ? true
-                // \Storage::disk('document')->url( $pdf ) 
-                : false ;
-                return $pdf ;
+            'pdf' => function($record){
+                $record->pdf = is_array( $record->pdf ) && !empty( $record->pdf ) ?
+                    (
+                        array_map(function($file){ return (
+                            \Storage::disk('document')->exists( $file ) ? str_replace(['.pdf','documents/'],$file ) : false 
+                        ); } , $record->pdf )
+                    ) : 
+                    (
+                        $record->pdf != "" && $record->pdf != null 
+                        ? ( 
+                            \Storage::disk('document')->exists( $record->pdf ) ? str_replace(['.pdf','documents/'],"",$record->pdf) : false 
+                        )
+                        : false
+                    ) ;
+                return $record->pdf ;
             },
-           'objective' => function($objective){
-                    return html_entity_decode( strip_tags( $objective ) );
+           'objective' => function($record){
+                    return html_entity_decode( strip_tags( $record->objective ) );
                 }
             ]);
+        /**
+         * Set the storage driver name for CRUD
+         */
+        $crud->setStorageDriver( 'document' );
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "type" => ['id', 'name', 'format', 'color', 'index'] ,
@@ -202,24 +219,53 @@ class SearchController extends Controller
      */
     public function pdf(Request $request)
     {
-        $document = RecordModel::findOrFail($request->id);
-        if($document) {
-            $path = storage_path('data') . '/' . $document->pdf;
+        $documentId = isset( $request->id ) && intval( $request->id ) > 0 ? $request->id : false ;
+        $documentSerial = isset( $request->serial ) && is_string( $request->serial ) ? $request->serial : false ;
+        $document = $documentId 
+            ? RecordModel::findOrFail($request->id) 
+            : (
+                $documentSerial 
+                ? RecordModel::where('pdf','like','%documents/' . $documentSerial . '.pdf%')->first()
+                : false
+            ) ;
+        if( $document ) {
+            /**
+             * Check whether the document a public (accessibility = 2 ) or global type (accessibility = 4)
+             */
+            if( !in_array( $document->accessibility , [ 2, 4 ] ) ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => 'មិនមានសិទ្ធិលើឯកសារ។'
+                ],403);
+            }
+            /**
+             * Check whether the pdf is array or string of document path
+             */
+            $path = '' ;
+            if( $documentId !== false ){
+                $path = storage_path('data') . '/' 
+                . ( is_array( $document->pdf ) && !empty( $document->pdf ) ? $document->pdf[0] : '' ) 
+                . ( is_string( $document->pdf ) ? $document->pdf : '' ) ;    
+            }
+            if( $documentSerial !== false ){
+                $path = storage_path('data') . '/documents/' . $documentSerial . '.pdf' ;    
+            }
+
             $ext = pathinfo($path);
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
             
             /**   Log the access of the user */
             if( \Auth::user() !== null ){
-                $user_id= \Auth::user()->id;
                 $current_date = date('Y-m-d H:i:s');
-                DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
+                DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [\Auth::user()->id, $document->id, $current_date]);
             }
 
             if(is_file($path)) {
                 $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
-                    "filename" => $filename
+                    "filename" => $filename ,
+                    "ok" => true
                 ],200);
             }else
             {
@@ -228,6 +274,68 @@ class SearchController extends Controller
                     'path' => $path
                 ],404 );
             }
+        }else{
+            return response([
+                'message' => 'មិនមានឯកសារដែលស្វែងរក។' ,
+                'ok' => false
+            ],403 );
+        }
+    }
+    /**
+     * View the pdf file
+     */
+    public function sharedPdf(Request $request)
+    {
+        $documentSerial = isset( $request->serial ) && is_string( $request->serial ) ? $request->serial : false ;
+        $document = $documentSerial 
+            ? RecordModel::where('pdf','like','%documents/' . $documentSerial . '.pdf%')->first()
+            : false;
+        if( $document ) {
+            /**
+             * Check whether the document a public (accessibility = 2 ) or global type (accessibility = 4)
+             */
+            if( $document->accessibility != 4 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => 'ឯកសារមិនមានឡើយ។'
+                ],403);
+            }
+            /**
+             * Check whether the pdf is array or string of document path
+             */
+            $path = '' ;
+            if( $documentSerial !== false ){
+                $path = storage_path('data') . '/documents/' . $documentSerial . '.pdf' ;    
+            }
+
+            $ext = pathinfo($path);
+            $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
+            
+            /**   Log the access of the user */
+            // if( \Auth::user() !== null ){
+            //     $current_date = date('Y-m-d H:i:s');
+            //     DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [\Auth::user()->id, $document->id, $current_date]);
+            // }
+
+            if(is_file($path)) {
+                $pdfBase64 = base64_encode( file_get_contents($path) );
+                return response([
+                    "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                    "filename" => $filename ,
+                    "ok" => true
+                ],200);
+            }else
+            {
+                return response([
+                    'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
+                    'path' => $path
+                ],404 );
+            }
+        }else{
+            return response([
+                'message' => 'មិនមានឯកសារដែលស្វែងរក។' ,
+                'ok' => false
+            ],403 );
         }
     }
     /** Get the year(s) that there is/are documents published base on ministry_id and document_type_id */

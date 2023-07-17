@@ -87,7 +87,7 @@ class UserController extends Controller
             "search" => $search === false ? [] : [
                 'value' => $search ,
                 'fields' => [
-                    'name', 'email', 'username' , 'phone' ,
+                    'firstname', 'lastname', 'email', 'username' , 'phone' ,
                 ]
             ],
             "order" => [
@@ -101,7 +101,12 @@ class UserController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] 
+            "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
+            "roles" => ['id','name', 'tag'] ,
+            /**
+             * Useful document to add the right to read
+             */
+            'regulators' => [ 'id' , 'fid', 'title', 'objective', 'document_year']
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
@@ -470,27 +475,35 @@ class UserController extends Controller
     public function upload(Request $request){
         $user = \Auth::user();
         if( $user ){
-            if( ( $user = RecordModel::find($request->id) ) !== null ){
-                $uniqeName = Storage::disk('public')->putFile( 'avatars/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
-                $user->avatar_url = $uniqeName ;
-                $user->save();
-                if( Storage::disk('public')->exists( $user->avatar_url ) ){
-                    $user->avatar_url = Storage::disk('public')->url( $user->avatar_url  );
-                    return response([
-                        'record' => $user ,
-                        'message' => 'ជោគជ័យក្នុងការបញ្ចូលរូបថត។'
-                    ],200);
+            if( isset( $_FILES['files']['tmp_name'] ) && $_FILES['files']['tmp_name'] != "" ) {
+                if( ( $user = RecordModel::find($request->id) ) !== null ){
+                    $uniqeName = Storage::disk('public')->putFile( 'avatars/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
+                    $user->avatar_url = $uniqeName ;
+                    $user->save();
+                    if( Storage::disk('public')->exists( $user->avatar_url ) ){
+                        $user->avatar_url = Storage::disk('public')->url( $user->avatar_url  );
+                        return response([
+                            'record' => $user ,
+                            'message' => 'ជោគជ័យក្នុងការបញ្ចូលរូបថត។'
+                        ],200);
+                    }else{
+                        return response([
+                            'record' => $user ,
+                            'message' => 'គណនីនេះមិនមានរូបថតឡើយ។'
+                        ],403);
+                    }
                 }else{
                     return response([
-                        'record' => $user ,
-                        'message' => 'គណនីនេះមិនមានរូបថតឡើយ។'
+                        'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់គណនី។'
                     ],403);
                 }
             }else{
                 return response([
-                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់គណនី។'
+                    'result' => $_FILES ,
+                    'message' => 'មានបញ្ហាជាមួយរូបភាពដែលអ្នកបញ្ជូនមក។'
                 ],403);
             }
+            
         }else{
             return response([
                 'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'

@@ -9,19 +9,55 @@ use Http\Client\Exception;
 use Illuminate\Database\Eloquent\Collection;
 
 class CrudController extends Controller {
+    /**
+     * Set the model for the CrudController to work on
+     */
     private $model = null ;
+    /**
+     * Set selected fields that will retrive information from database
+     */
     private $fields = ['id', 'created_at', 'updated_at'];
+    /**
+     * Set the field that need to be renamed, the original name will be renamed while runtime
+     */
     private $renameFields = [];
+    /**
+     * Set the callback function for the field, in order to adjust the value of the field
+     */
     private $fieldsWithCallback = [] ;
+    /**
+     * Set the request object
+     */
     private $request = null ;
+    /**
+     * Set the relationship function to be called while retrieving information
+     */
     private $relationshipFunctions = [] ;
+    /**
+     * Set extra fields when extra fields are need for the model
+     */
+    private $extraFields = [] ;
+    /**
+     * File fields
+     */
+    private $fileFields = [ 'file' , 'files' , 'photo' , 'photos' , 'pdf' , 'pdfs' , 'image' , 'images' , 'avatar' , 'avatar_url' ] ;
+    /**
+     * Fields that except from Saving or Updating
+     */
+    private $exceptFields = [ 'file' , 'files' , 'photo' , 'photos' , 'pdf' , 'pdfs' , 'image' , 'images' , 'avatar' , 'avatar_url' ] ;
+    /**
+     * Set the storage driver
+     */
+    private $storageDriver = "public" ;
 
-    public function __construct($model=false,$request=false,$fields=false,$fieldsWithCallback=false,$renameFields=false){
+    public function __construct($model=false,$request=false,$fields=false,$fieldsWithCallback=false,$renameFields=false,$extraFields=false,$storageDriver='public'){
         $model ? $this->setModel($model) : false ;
         $request ? $this->setRequest($request) : false ;
         is_array( $fields ) && !empty( $fields ) ? $this->setFields($fields) : false ;
         is_array( $renameFields ) && !empty( $renameFields ) ? $this->setRenameFields($renameFields) : false ;
         is_array( $fieldsWithCallback ) && !empty( $fieldsWithCallback ) ? $this->setFieldsWithCallback($fieldsWithCallback) : false ;
+        is_array( $extraFields ) && !empty( $extraFields ) ? $this->setExtraFields($extraFields) : false ;
+        $this->setStorageDriver( $storageDriver );
     }
     public function setModel($model){
         if (!is_object($model)) throw new Exception("Error execute function : " . __FUNCTION__ . " on class " . __CLASS__, 1);
@@ -39,14 +75,23 @@ class CrudController extends Controller {
     public function setFields($fields){
         $this->fields = $fields !== false && is_array($fields) && !empty($fields) ? $fields : $this->fields;
     }
+    public function setExtraFields($fields){
+        $this->extraFields = $fields !== false && is_array($fields) && !empty($fields) ? $fields : $this->extraFields;
+    }
     public function setRenameFields($fields){
         $this->renameFields = $fields !== false && is_array($fields) && !empty($fields) ? $fields : $this->renameFields;
     }
     public function setFieldsWithCallback($fields){
         $this->fieldsWithCallback = $fields !== false && is_array($fields) && !empty($fields) ? $fields : $this->fieldsWithCallback;
     }
+    public function setStorageDriver($storageDriver){
+        $this->storageDriver = is_string( $storageDriver ) ? $storageDriver : 'public' ;
+    }
     public function getFields(){
         return $this->fields;
+    }
+    public function getStorageDriver(){
+        return $this->storageDriver ;
     }
     public function setRelationshipFunctions($relationshipFunctions=false){
         $this->relationshipFunctions = $relationshipFunctions !== false && !empty( $relationshipFunctions ) ? $relationshipFunctions : [] ;
@@ -121,6 +166,21 @@ class CrudController extends Controller {
                     /** Construct the filter with where in conditions */
                     if (
                         isset($pivot['relationship']) &&
+                        isset($pivot['where']['default']['field']) &&
+                        !empty($pivot['where']['default']['field']) &&
+                        isset($pivot['where']['default']['value'])
+                    ) {
+                        $query = $query->whereHas($pivot['relationship'], function ($pivotQuery) use($pivot) {
+                            if (is_array($pivot['where']['default']['value']) && !empty($pivot['where']['default']['value'])) {
+                                $pivotQuery->where($pivot['where']['default']['field'], $pivot['where']['default']['value']);
+                            }else if ( isset($pivot['where']['default']['value'] ) && !is_array($pivot['where']['default']['value']) ) {
+                                $pivotQuery->where($pivot['where']['default']['field'], [$pivot['where']['default']['value']] );
+                            }
+                        });
+                    }
+                    /** Construct the filter with where in conditions */
+                    if (
+                        isset($pivot['relationship']) &&
                         isset($pivot['where']['in']['field']) &&
                         !empty($pivot['where']['in']['field']) &&
                         isset($pivot['where']['in']['value'])
@@ -143,9 +203,9 @@ class CrudController extends Controller {
                     ) {
                         $query = $query->whereHas($pivot['relationship'], function ($pivotQuery) use($pivot) {
                             if (is_array($pivot['where']['not']['value']) && !empty($pivot['where']['not']['value'])) {
-                                $pivotQuery->whereIn($pivot['where']['not']['field'], $pivot['where']['not']['value']);
+                                $pivotQuery->whereNot($pivot['where']['not']['field'], $pivot['where']['not']['value']);
                             }else if ( isset($pivot['where']['not']['value'] ) && !is_array($pivot['where']['not']['value']) ) {
-                                $pivotQuery->whereIn($pivot['where']['not']['field'], [$pivot['where']['not']['value']] );
+                                $pivotQuery->whereNot($pivot['where']['not']['field'], [$pivot['where']['not']['value']] );
                             }
                         });
                     }
@@ -266,6 +326,9 @@ class CrudController extends Controller {
             : $this->getListBuilder()->get() ;
     }
 
+    /**
+     * Get data with pagination
+     */
     public function pagination($formatRecord = false, $query_builder = false){
         // $query_builder = $query_builder !== false ? $query_builder : $this->getListBuilder() ;
         $query_builder = $query_builder !== false ? $query_builder : $this->getListBuilder();
@@ -338,43 +401,20 @@ class CrudController extends Controller {
         });
     }
     public function formatRecord($record){
-        // if (isset($record->photos) && is_array($record->photos) ){
-        //     $photos = [];
-        //     foreach ($record->photos as $index => $photo) {
-        //         if ($photo != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($photo)) {
-        //             $photos[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($photo);
-        //         }
-        //     }
-        //     $record->photos = $photos;
-        // }
-        // else{
-        //     if( isset($record->photos ) ) $record->photos = [] ;
-        // }
-        // $pdfs = [];
-        // if (isset($record->pdfs) && is_array($record->pdfs)) {
-        //     foreach ($record->pdfs as $index => $pdf) {
-        //         if ($pdf != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($pdf)) {
-        //             $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($pdf);
-        //         }
-        //     }
-        // } else if( isset($record->pdfs) && !is_array($record->pdfs) ) {
-        //     if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->pdfs)) {
-        //         $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->pdfs);
-        //     }else{
-        //         $pdfs=[];
-        //     }
-        // }
-        // $record->pdfs = $pdfs;
-        // /** In case, record has field avatar_url */
-        // if (isset($record->avatar_url ) && $record->avatar_url !== "" ) {
-        //     if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->avatar_url)) {
-        //         $record->avatar_url = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->avatar_url);
-        //     } else {
-        //         $record->avatar_url = null;
-        //     }
-        // } else {
-        //     if (isset($record->avatar_url)) $record->avatar_url = null ;
-        // }
+        foreach( $this->fileFields AS $fieldIndex => $fieldName ){
+            if( isset($record->$fieldName) && !array_key_exists( $fieldName , $this->fieldsWithCallback ) ){
+                $record->$fieldName = is_array($record->$fieldName)
+                ? ( count( $record->$fieldName )> 0 
+                    ? array_map( function($file){
+                        return $file != null && $file != "" && Storage::disk( $this->storageDriver )->exists($file)
+                            ? Storage::disk($this->storageDriver)->url($file) 
+                            : null ;
+                    } , $record->$fieldName )
+                    : []
+                )
+                : [ $record->$fieldName != "" && $record->$fieldName != null && Storage::disk($this->storageDriver)->exists( $record->$fieldName ) ? Storage::disk($this->storageDriver)->url( $record->$fieldName )  :  null ] ;
+            }
+        }
         /** Construct format of the record */
         $customRecord = [];
         if (isset( $record ) && !empty($this->fields)) {
@@ -384,13 +424,16 @@ class CrudController extends Controller {
                     is_array( $this->fieldsWithCallback ) && 
                     !empty( $this->fieldsWithCallback ) && 
                     array_key_exists( $field , $this->fieldsWithCallback ) ? 
-                        $this->fieldsWithCallback[$field]($record->$field) : 
+                        $this->fieldsWithCallback[$field]($record) : 
                         $record->$field ;
                 if( is_array( $this->renameFields ) && !empty( $this->renameFields ) && array_key_exists( $field , $this->renameFields ) ){
                     $customRecord[ $this->renameFields[$field] ] = $customRecord[ $field ] ;
                     unset( $customRecord[ $field ] );
                 }
             }
+        }
+        if (isset( $record ) && is_array( $this->extraFields ) && !empty( $this->extraFields ) ) {
+            foreach( $this->extraFields as $field => $func )$customRecord[ $field ] = $func( $record );
         }
         /** Call the relationship functions */
         if (isset($record) &&  !empty($this->relationshipFunctions)) {
@@ -420,13 +463,6 @@ class CrudController extends Controller {
             }
         }
         if( in_array('id',$this->fields) === false ) $customRecord['id'] = $record->id;
-
-        if(isset($record->document_counts)){
-            $customRecord['document_counts'] = $record->document_counts;
-        }
-        if(isset($record->already_in_folder)){
-            $customRecord['already_in_folder'] =  $record->already_in_folder > 0 ? true: false;
-        }
         return $customRecord;
     }
 
@@ -443,9 +479,10 @@ class CrudController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function create()
+    public function create($exceptFields=['id'])
     {
-        if( $record = $this->model::create($this->request->except(['id','files'])) ) return $record;
+        $this->exceptFields = array_merge( $this->exceptFields , $exceptFields );
+        if( $record = $this->model::create($this->request->except( $this->exceptFields )) ) return $record;
         return false;
     }
     /***
@@ -459,9 +496,10 @@ class CrudController extends Controller {
     /**
      * Update
      */
-    public function update($exceptFields=[])
+    public function update($exceptFields=['id'])
     {
-        $data = $this->request->except(isset($exceptFields) && !empty($exceptFields) ? $exceptFields : ['id']) ;
+        $this->exceptFields = array_merge( $this->exceptFields , $exceptFields );
+        $data = $this->request->except( $this->exceptFields ) ;
         if ($record = $this->model->where('id', $this->request->id)->update($data)) return $record;
         return false;
     }
@@ -528,7 +566,7 @@ class CrudController extends Controller {
                 /**
                  * Delete all the existing files
                  */
-                Storage::disk(env('STORAGE_DRIVER','public'))->delete( $files );
+                Storage::disk($this->storageDriver)->delete( $files );
                 $files = [] ;
             }
             /**
@@ -536,21 +574,17 @@ class CrudController extends Controller {
              */
             $uniqeName = '' ;
             if($fileName !== false ){
-                $uniqeName = Storage::disk(env('STORAGE_DRIVER','public'))->putFileAs($path, new File($file), $fileName , 'public');
+                $uniqeName = Storage::disk($this->storageDriver)->putFileAs($path, new File($file), $fileName , 'public');
             }else{
-                $uniqeName = Storage::disk(env('STORAGE_DRIVER','public'))->putFile($path, new File($file), 'public');
+                $uniqeName = Storage::disk($this->storageDriver)->putFile($path, new File($file), 'public');
             }
             $files[] = $uniqeName;
             $record->$field_name = $files;
             $record->save();
             if (is_array($record->$field_name) && count($record->$field_name)) {
-                $files = [];
-                foreach ($record->$field_name as $index => $file) {
-                    if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($file)) {
-                        $files[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($file);
-                    }
-                }
-                $record->$field_name = $files;
+                $record->$field_name = array_map(function($file){
+                    return Storage::disk($this->storageDriver)->exists($file) ? Storage::disk($this->storageDriver)->url($file) : null ;
+                },$record->$field_name);
             }
             return $record;
         }
@@ -566,12 +600,12 @@ class CrudController extends Controller {
                 foreach ($record->$field as $index => $file ) {
                     if ($this->request->index != $index){
                         $files[] = $file ;
-                        if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($file)) {
-                            $urls[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($file);
+                        if (Storage::disk($this->storageDriver)->exists($file)) {
+                            $urls[] = Storage::disk($this->storageDriver)->url($file);
                         }
                     }
                     else{
-                        Storage::disk(env('STORAGE_DRIVER','public'))->delete($file);
+                        Storage::disk($this->storageDriver)->delete($file);
                     }
                 }
                 $record->$field = $files;
@@ -599,8 +633,8 @@ class CrudController extends Controller {
             if (is_array($record->$field_name) && count($record->$field_name) > 0) {
                 $files = [];
                 foreach ($record->$field_name as $index => $file) {
-                    if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($file)) {
-                        $files[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($file);
+                    if (Storage::disk($this->storageDriver)->exists($file)) {
+                        $files[] = Storage::disk($this->storageDriver)->url($file);
                     }
                 }
                 $record->$field_name = $files;

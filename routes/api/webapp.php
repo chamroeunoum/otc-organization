@@ -147,6 +147,7 @@
   //   return await crud.get(rootState.apiServer+"/authentication/signup/activate/"+params.token)
   // },
 
+use \App\Models\TrackPerformance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\Webapp\SearchController;
 use App\Http\Controllers\Api\Webapp\AuthController;
@@ -217,19 +218,22 @@ Route::group([
   Route::group([
     'prefix' => 'search_regulators' ,
     ], function() {
-        Route::get('',[ SearchController::class , 'index']);
-        // Route::get('',function(){
-        //   return 'I am "regulators->SearchController"';
-        // });
-        Route::get('pdf',[ SearchController::class , 'pdf']);
-        Route::get('get/document/years',[ SearchController::class , 'getYears']);
-        Route::group([
-            'prefix' => 'types' ,
-            ], function() {
-                Route::get('compact', [ TypeController::class , 'index']);
-        });
-        Route::get('types/compact', [ TypeController::class , 'compactList']);
-        Route::get('{id}',[ RegulatorController::class , 'read']);
+      TrackPerformance::start('WebappSearchRegulator');
+      Route::get('',[ SearchController::class , 'index']);
+      TrackPerformance::end('WebappSearchRegulator');
+      TrackPerformance::saveToFile();
+      // Route::get('',function(){
+      //   return 'I am "regulators->SearchController"';
+      // });
+      Route::get('pdf',[ SearchController::class , 'pdf']);
+      Route::get('get/document/years',[ SearchController::class , 'getYears']);
+      Route::group([
+          'prefix' => 'types' ,
+          ], function() {
+              Route::get('compact', [ TypeController::class , 'index']);
+      });
+      Route::get('types/compact', [ TypeController::class , 'compactList']);
+      Route::get('{id}',[ RegulatorController::class , 'read']);
 
   });
 
@@ -247,6 +251,10 @@ Route::group([
         Route::delete('',[RegulatorController::class,'destroy']);
         Route::post('upload',[RegulatorController::class,'upload']);
 
+        Route::put('addreader',[RegulatorController::class,'addReaders']);
+        Route::put('removereader',[RegulatorController::class,'removeReaders']);
+        Route::put('{id}/accessibility',[RegulatorController::class,'accessibility']);
+
         Route::get('pdf',[RegulatorController::class,'pdf']);
         Route::group([
             'prefix' => 'types' ,
@@ -259,7 +267,7 @@ Route::group([
   /** FOLDER SECTION */
   Route::group([
     'prefix' => 'folders' ,
-    'middleware' => 'api'
+    'middleware' => 'auth:api'
     ], function() {
 
         Route::get('',[ FolderController::class , 'index']);

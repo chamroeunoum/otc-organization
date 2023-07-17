@@ -35,12 +35,12 @@ class FolderController extends Controller
 
         $queryString = [
             "where" => [
-                // 'default' => [
-                //     [
-                //         'field' => 'user_id' ,
-                //         'value' => $user != null ? $user->id : false
-                //     ]
-                // ],
+                'default' => [
+                    [
+                        'field' => 'user_id' ,
+                        'value' => $user != null ? $user->id : false
+                    ]
+                ],
                 // 'in' => [
                 //     [
                 //         'field' => 'document_type' ,
@@ -315,6 +315,7 @@ class FolderController extends Controller
                 $documentFolder = new \App\Models\DocumentFolder();
                 $documentFolder -> folder_id = $request->id ;
                 $documentFolder -> document_id = $request->document_id ;
+                $documentFolder -> created_by = $documentFolder -> modified_by = \Auth::user()->id ;
                 $documentFolder->save();
                 return response([
                     'ok' => true ,

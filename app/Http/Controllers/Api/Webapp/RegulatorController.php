@@ -23,8 +23,10 @@ class RegulatorController extends Controller
         'publish' ,
         'active' ,
         'created_by' ,
-        'updated_by'
+        'updated_by' ,
+        'accessibility'
     ];
+        
     /**
      * Listing function
      */
@@ -122,15 +124,15 @@ class RegulatorController extends Controller
             /**
              * custom the value of the field
              */
-            'pdf' => function($pdf){
-                $pdf = ( $pdf !== "" && $pdf !== null && \Storage::disk('document')->exists( $pdf ) )
+            'pdf' => function($record){
+                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('document')->exists( $record->pdf ) )
                 ? true
                 // \Storage::disk('document')->url( $pdf ) 
                 : false ;
-                return $pdf ;
+                return $record->pdf ;
             },
-           'objective' => function($objective){
-                    return html_entity_decode( strip_tags( $objective ) );
+           'objective' => function($record){
+                    return html_entity_decode( strip_tags( $record->objective ) );
                 }
             ]
         );
@@ -259,15 +261,15 @@ class RegulatorController extends Controller
         $builder = $crud->getListBuilder();
 
         $responseData = $crud->pagination(true, $builder,[
-                'pdf' => function($pdf){
-                    $pdf = ( $pdf !== "" && \Storage::disk('document')->exists( $pdf ) )
+                'pdf' => function($record){
+                    $record->pdf = ( $record->pdf !== "" && \Storage::disk('document')->exists( $record->pdf ) )
                     ? true
                     // \Storage::disk('document')->url( $pdf ) 
                     : false ;
-                    return $pdf ;
+                    return $record->pdf ;
                 },
-                'objective' => function($objective){
-                    return html_entity_decode( strip_tags( $objective ) );
+                'objective' => function($record){
+                    return html_entity_decode( strip_tags( $record->objective ) );
                 }
             ]
         );
@@ -348,6 +350,7 @@ class RegulatorController extends Controller
             if(is_file($path)) {
                 $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
+                    'serial' => str_replace(['documents','/','.pdf'],'',$document->pdf ) ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                     "filename" => $filename
                 ],200);
@@ -574,5 +577,60 @@ class RegulatorController extends Controller
             'ok' => $record->update(['active'=>0]) ,
             'message' => 'បានបើកឯកសាររួចរាល់។'
         ],200);
+    }
+    public function accessibility(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $result = in_array( intVal( $request->mode ) , [ 0 , 1 , 2 , 4 ] ) != false ? $record->update(['accessibility'=> intVal( $request->mode ) ] ) : false ;
+        return response()->json([
+            'record' => $result == false ? null : $record ,
+            'ok' =>  $result == false ? false : true ,
+            'message' => $result == false ? "មានបញ្ហាក្នុងការកែប្រែ។" : 'បានកែរួចរាល់។'
+        ], $result == false ? 422 : 200 );
+    }
+    /**
+     * Add reader(s) of the specific document
+     */
+    public function addReaders(Request $request){
+        $regulator = \App\Models\Document::find($request->document_id);
+        if( $regulator != null ){
+            return response()->json([
+                /**
+                 * It will return in the following format : [ attached => [] , detached => [] ]
+                 */
+                'result' => $regulator->readers()->toggle([$request->user_id])['attached'] ,
+                'message' => 'បញ្ចូលអ្នកអានរួចរាល់។'
+            ],200);
+        }
+        return response()->json([
+            'message' => 'មានបញ្ហាក្នុងការបញ្ចូលអ្នកអានឯកសារនេះ។'
+        ],422);
+    }
+
+    /**
+     * Remove reader(s) of the specific document
+     */
+    public function removeReaders(Request $request){
+        $regulator = \App\Models\Document::find($request->document_id);
+        if( $regulator != null ){
+            return response()->json([
+                'record' => $regulator->readers()->toggle([$request->user_id])['detached'] ,
+                'message' => 'ដកអ្នកអានរួចរាល់។'
+            ],200);
+        }
+        return response()->json([
+            'message' => 'មានបញ្ហាក្នុងការដកអ្នកអានឯកសារនេះ។'
+        ],422);
     }
 }

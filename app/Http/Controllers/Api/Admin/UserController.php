@@ -23,6 +23,8 @@ class UserController extends Controller
         'username' ,
         'phone' ,
         'active' ,
+        'avatar_url' ,
+        'avatar' ,
         'people_id'
     ];
     /**
@@ -87,7 +89,7 @@ class UserController extends Controller
             "search" => $search === false ? [] : [
                 'value' => $search ,
                 'fields' => [
-                    'name', 'email', 'username' , 'phone' ,
+                    'firstname','lastname', 'email', 'username' , 'phone' ,
                 ]
             ],
             "order" => [
@@ -102,7 +104,11 @@ class UserController extends Controller
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
-            "roles" => ['id','name', 'tag']
+            "roles" => ['id','name', 'tag'] ,
+            /**
+             * Useful document to add the right to read
+             */
+            'regulators' => [ 'id' , 'fid', 'title', 'objective', 'document_year']
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
