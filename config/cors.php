@@ -15,13 +15,14 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
-
-    'allowed_methods' => ['*'],
-
-    'allowed_origins' => [
-        '*'
+    'paths' => [
+        'api/*'
+        // , 'sanctum/csrf-cookie'
     ],
+
+    'allowed_methods' => [ '*' ],
+
+    'allowed_origins' => [ '*' ],
 
     'allowed_origins_patterns' => [],
 
@@ -33,6 +34,6 @@ return [
 
     'supports_credentials' => false,
     
-    'Access-Control-Allow-Origin' => ['*','https://192.168.31.32:4001']
+    'Access-Control-Allow-Origin' => ['*']
 
 ];

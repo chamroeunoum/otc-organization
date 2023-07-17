@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 
-class TrackPerformance extends Model {
+class TrackPerformance {
   private static $blockPerformances = [] ;
   public static function start($blockCodeName){
     static::$blockPerformances[ $blockCodeName ]['start'] = static::$blockPerformances[ $blockCodeName ]['end'] = microtime(TRUE);

@@ -221,7 +221,7 @@ Route::group([
       TrackPerformance::start('WebappSearchRegulator');
       Route::get('',[ SearchController::class , 'index']);
       TrackPerformance::end('WebappSearchRegulator');
-      TrackPerformance::saveToFile();
+      TrackPerformance::save();
       // Route::get('',function(){
       //   return 'I am "regulators->SearchController"';
       // });
