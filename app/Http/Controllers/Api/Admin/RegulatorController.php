@@ -30,6 +30,14 @@ class RegulatorController extends Controller
      * Listing function
      */
     public function index(Request $request){
+        $user = \Auth::user();
+        if( $user == null ){
+            return response()->json([
+                'message' => "សូមចូលប្រព័ន្ធជាមុនសិន។" ,
+                'ok' =>false
+            ],403);
+        }
+
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
@@ -37,12 +45,12 @@ class RegulatorController extends Controller
 
         $queryString = [
             "where" => [
-                // 'default' => [
-                //     [
-                //         'field' => 'publish' ,
-                //         'value' => 0
-                //     ]
-                // ],
+                'default' => [
+                    [
+                        'field' => 'created_by' ,
+                        'value' => $user->id
+                    ]
+                ],
                 // 'in' => [
                 //     [
                 //         'field' => 'document_type' ,

@@ -27,24 +27,15 @@ class ProfileController extends Controller
 
     public function updateAuthUser (Request $request)
     {
-        // $this->validate($request, [
-        //     'name' => 'required|string',
-        //     'email' => 'required|email|unique:users,email,'.Auth::id()
-        // ]);
-
-        $user = User::find(Auth::id());
-
-        $user->firstname = $request->firstname ;
-        $user->lastname = $request->lastname ;
-        $user->role = $request->role ? 1 : 0 ;
-        $user->email_verified_at = $request->email_verified_at ;
-        // $user->email = $request->email ;
-        // $user->active = $request->active ? 1 : 0 ;
-        // $user->created_at = $request->created_at ;
-        // $user->deleted_at = $request->deleted_at ;
-        $user->updated_at = $request->updated_at ;
+        $user = \App\Models\User::find(Auth::id());
+        $user->update([
+            'firstname' => $request->firstname ,
+            'lastname' => $request->lastname ,
+            'role' => $request->role ? 1 : 0 ,
+            'username' => $request->username ,
+            'updated_at' => $request->updated_at ,
+        ]);
         $user->save();
-
         return response([
             'user' => $user ,
             'message' => 'រក្សាទុកព័ត៌មានបានជោគជ័យ !'

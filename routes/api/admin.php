@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\RegulatorController;
 use App\Http\Controllers\Api\Admin\DocumentParentController;
 use App\Http\Controllers\Api\Admin\TypeController;
+use App\Http\Controllers\Api\Admin\ProfileController;
 
 
 Route::group([
@@ -49,6 +50,7 @@ Route::group([
             Route::get('',[UserController::class,'index']);
             Route::post('create',[UserController::class,'store']);
             Route::put('update',[UserController::class,'update']);
+            Route::put('authenticated',[ProfileController::class,'updateAuthUser']);
             Route::get('{id}/read',[UserController::class,'read']);
             Route::delete('{id}/delete',[UserController::class,'destroy']);
             Route::put('activate',[UserController::class,'active']);
@@ -59,6 +61,7 @@ Route::group([
             Route::get('username/exist',[UserController::class,'checkUsername']);
             Route::get('phone/exist',[UserController::class,'checkPhone']);
             Route::get('email/exist',[UserController::class,'checkEmail']);
+            Route::post('upload',[UserController::class,'upload']);
     });
 
     /** FOLDER SECTION */
@@ -78,6 +81,14 @@ Route::group([
              */
             Route::get('subfolders',[FolderController::class,'getSubfolders']);
             Route::get('documents',[FolderController::class,'getDocuments']);
+
+            Route::get('regulators',[ FolderController::class , 'regulators']);
+            Route::put('regulators/add',[ FolderController::class , 'addDocumentToFolder']);
+            Route::put('regulators/remove',[ FolderController::class , 'removeDocumentFromFolder']);
+            Route::put('regulators/check',[ FolderController::class , 'checkDocument']);
+            Route::get('user',[ FolderController::class , 'user']);
+            Route::get('list/document/validation',[ FolderController::class , 'listFolderWithDocumentValidation']);
+
     });
 
     /** ROLE SECTION */

@@ -533,4 +533,42 @@ class UserController extends Controller
             );
         }
     }
+    public function upload(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            if( isset( $_FILES['files']['tmp_name'] ) && $_FILES['files']['tmp_name'] != "" ) {
+                if( ( $user = RecordModel::find($request->id) ) !== null ){
+                    $uniqeName = Storage::disk('public')->putFile( 'avatars/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
+                    $user->avatar_url = $uniqeName ;
+                    $user->save();
+                    if( Storage::disk('public')->exists( $user->avatar_url ) ){
+                        $user->avatar_url = Storage::disk('public')->url( $user->avatar_url  );
+                        return response([
+                            'record' => $user ,
+                            'message' => 'ជោគជ័យក្នុងការបញ្ចូលរូបថត។'
+                        ],200);
+                    }else{
+                        return response([
+                            'record' => $user ,
+                            'message' => 'គណនីនេះមិនមានរូបថតឡើយ។'
+                        ],403);
+                    }
+                }else{
+                    return response([
+                        'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់គណនី។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'result' => $_FILES ,
+                    'message' => 'មានបញ្ហាជាមួយរូបភាពដែលអ្នកបញ្ជូនមក។'
+                ],403);
+            }
+            
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
 }
