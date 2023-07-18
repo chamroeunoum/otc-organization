@@ -342,6 +342,8 @@ class RegulatorController extends Controller
             if(is_file($path)) {
                 $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
+                    'serial' => str_replace(['documents','/','.pdf'],'',$document->pdf ) ,
+                    "ok" => true  ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                     "filename" => $filename
                 ],200);

@@ -352,7 +352,8 @@ class RegulatorController extends Controller
                 return response([
                     'serial' => str_replace(['documents','/','.pdf'],'',$document->pdf ) ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
-                    "filename" => $filename
+                    "filename" => $filename,
+                    "ok" => true 
                 ],200);
             }else
             {

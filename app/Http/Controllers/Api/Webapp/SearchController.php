@@ -263,6 +263,7 @@ class SearchController extends Controller
             if(is_file($path)) {
                 $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
+                    'serial' => $documentSerial ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                     "filename" => $filename ,
                     "ok" => true
