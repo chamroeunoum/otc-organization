@@ -37,6 +37,8 @@ class RegulatorController extends Controller
                 'ok' =>false
             ],403);
         }
+        // If the authenticated user is the "1 => super administrator" or "2 => Administrator" then don't filter the regulator base on the authenticated user
+        $user = count( array_filter( $user->roles->toArray() , function( $role ){ return $role['id'] == 1 || $role['id'] == 2 ; } ) ) ? false : $user ;
 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
@@ -46,10 +48,10 @@ class RegulatorController extends Controller
         $queryString = [
             "where" => [
                 'default' => [
-                    [
+                    $user ? [
                         'field' => 'created_by' ,
                         'value' => $user->id
-                    ]
+                    ] : []
                 ],
                 // 'in' => [
                 //     [

@@ -89,6 +89,8 @@ Route::group([
             Route::get('user',[ FolderController::class , 'user']);
             Route::get('list/document/validation',[ FolderController::class , 'listFolderWithDocumentValidation']);
 
+            Route::put('{id}/accessibility',[FolderController::class,'accessibility']);
+
     });
 
     /** ROLE SECTION */

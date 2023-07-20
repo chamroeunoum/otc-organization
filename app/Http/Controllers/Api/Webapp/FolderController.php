@@ -20,7 +20,8 @@ class FolderController extends Controller
         'name' ,
         'user_id' ,
         'created_at' ,
-        'updated_at' 
+        'updated_at' ,
+        'accessibility'
     ];
     /**
      * Listing function
@@ -120,6 +121,104 @@ class FolderController extends Controller
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         $responseData['user'] = $user ;
+        return response()->json($responseData, 200);
+    }
+    /**
+     * Listing of the global access folder
+     */
+    public function globalFolder(Request $request){
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+
+        $queryString = [
+            "where" => [
+                'default' => [
+                    [
+                        'field' => 'accessibility' ,
+                        'value' => 4
+                    ]
+                ],
+                // 'in' => [
+                //     [
+                //         'field' => 'document_type' ,
+                //         'value' => isset( $request->document_type ) && $request->document_type !== null ? [$request->document_type] : false
+                //     ]
+                // ] ,
+                // 'not' => [
+                //     // [
+                //     //     'field' => 'field_name' ,
+                //     //     'value' => [4]
+                //     // ]
+                // ] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'number' ,
+                //         'value' => $number === false ? "" : $number
+                //     ],
+                //     [
+                //         'field' => 'year' ,
+                //         'value' => $date === false ? "" : $date
+                //     ]
+                // ] ,
+            ] ,
+            // "pivots" => [
+            //     $unit ?
+            //     [
+            //         "relationship" => 'units',
+            //         "where" => [
+            //             "in" => [
+            //                 "field" => "id",
+            //                 "value" => [$request->unit]
+            //             ],
+            //         // "not"=> [
+            //         //     [
+            //         //         "field" => 'fieldName' ,
+            //         //         "value"=> 'value'
+            //         //     ]
+            //         // ],
+            //         // "like"=>  [
+            //         //     [
+            //         //        "field"=> 'fieldName' ,
+            //         //        "value"=> 'value'
+            //         //     ]
+            //         // ]
+            //         ]
+            //     ]
+            //     : []
+            // ],
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'name'
+                ]
+            ],
+            "order" => [
+                'field' => 'name' ,
+                'by' => 'asc'
+            ],
+        ];
+
+        $request->merge( $queryString );
+
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            'regulators' => [ 'objective' , 'fid' ] ,
+            'user' => [ 'id' , 'lastname', 'firstname' ]
+        ]);
+
+        $builder = $crud->getListBuilder();
+        $builder->has('regulators'); // Get only the folder which contains some regulators
+        $responseData = $crud->pagination(true, $builder);
+        
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
         return response()->json($responseData, 200);
     }
     /**
@@ -436,6 +535,7 @@ class FolderController extends Controller
                 'message' => 'សូមបញ្ចាក់លេខសម្គាល់របស់ថតឯកសារ។'
             ],350);
         }
+
         $regulatorIds = RecordModel::find($request->folder_id)->regulators->pluck('id')->all();
         if( count( $regulatorIds ) <= 0 ) {
             return response()->json([
@@ -563,5 +663,25 @@ class FolderController extends Controller
         // $responseData['sql'] = $builder->toSql();
         return response()->json($responseData, 200);
     }
-
+    public function accessibility(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ថតឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ថតឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $result = in_array( intVal( $request->mode ) , [ 0 , 1 , 2 , 4 ] ) != false ? $record->update(['accessibility'=> intVal( $request->mode ) ] ) : false ;
+        return response()->json([
+            'record' => $result == false ? null : $record ,
+            'ok' =>  $result == false ? false : true ,
+            'message' => $result == false ? "មានបញ្ហាក្នុងការកែប្រែ។" : 'បានកែរួចរាល់។'
+        ], $result == false ? 422 : 200 );
+    }
 }

@@ -281,6 +281,16 @@ Route::group([
         Route::put('regulators/check',[ FolderController::class , 'checkDocument']);
         Route::get('user',[ FolderController::class , 'user']);
         Route::get('list/document/validation',[ FolderController::class , 'listFolderWithDocumentValidation']);
+
+        Route::put('{id}/accessibility',[FolderController::class,'accessibility']);
+        
+  });
+  /** FOLDER SECTION */
+  Route::group([
+    'prefix' => 'folders' ,
+    'middleware' => 'api'
+    ], function() {
+        Route::get('global',[ FolderController::class , 'globalFolder']);
         
   });
   /** SECTION OF DOCUMENT TYPE */

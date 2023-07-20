@@ -16,7 +16,8 @@ class FolderController extends Controller
         'name' ,
         'user_id' ,
         'active' ,
-        'pid'
+        'pid' ,
+        'accessibility'
     ];
     /**
      * Listing function
@@ -29,6 +30,10 @@ class FolderController extends Controller
                 'ok' =>false
             ],403);
         }
+
+        // If the authenticated user is the "1 => super administrator" or "2 => Administrator" then don't filter the regulator base on the authenticated user
+        $user = count( array_filter( $user->roles->toArray() , function( $role ){ return $role['id'] == 1 || $role['id'] == 2 ; } ) ) ? false : $user ;
+
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
@@ -37,10 +42,10 @@ class FolderController extends Controller
         $queryString = [
             "where" => [
                 'default' => [
-                    [
+                    $user ? [
                         'field' => 'user_id' ,
                         'value' => $user->id
-                    ]
+                    ] : []
                 ],
                 // 'in' => [] ,
                 // 'not' => [] ,
@@ -580,5 +585,26 @@ class FolderController extends Controller
         // $responseData['folderIds'] = $folderIds ;
         // $responseData['sql'] = $builder->toSql();
         return response()->json($responseData, 200);
+    }
+    public function accessibility(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ថតឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ថតឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $result = in_array( intVal( $request->mode ) , [ 0 , 1 , 2 , 4 ] ) != false ? $record->update(['accessibility'=> intVal( $request->mode ) ] ) : false ;
+        return response()->json([
+            'record' => $result == false ? null : $record ,
+            'ok' =>  $result == false ? false : true ,
+            'message' => $result == false ? "មានបញ្ហាក្នុងការកែប្រែ។" : 'បានកែរួចរាល់។'
+        ], $result == false ? 422 : 200 );
     }
 }
