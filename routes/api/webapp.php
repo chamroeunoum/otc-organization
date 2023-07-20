@@ -264,6 +264,14 @@ Route::group([
 
 });
 
+Route::group([
+  'prefix' => 'regulators' ,
+  'namespace' => 'Api' ,
+  'middleware' => 'api'
+  ], function() {;
+      Route::get('pdf',[RegulatorController::class,'pdf']);
+});
+
   /** FOLDER SECTION */
   Route::group([
     'prefix' => 'folders' ,
