@@ -290,7 +290,8 @@ Route::group([
     'prefix' => 'folders' ,
     'middleware' => 'api'
     ], function() {
-        Route::get('global',[ FolderController::class , 'globalFolder']);
+      Route::get('regulators',[ FolderController::class , 'regulators']);
+      Route::get('global',[ FolderController::class , 'globalFolder']);
         
   });
   /** SECTION OF DOCUMENT TYPE */

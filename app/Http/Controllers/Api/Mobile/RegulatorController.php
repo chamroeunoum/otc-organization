@@ -247,6 +247,7 @@ class RegulatorController extends Controller
         /**
          * Upload pdf document(s) of the regulator
          */
+        ]);
     }
     public function update(Request $request){
 
