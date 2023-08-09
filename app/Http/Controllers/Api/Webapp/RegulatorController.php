@@ -31,6 +31,8 @@ class RegulatorController extends Controller
      * Listing function
      */
     public function index(Request $request){
+        $user = Auth::user() != null ? \Auth::user() : false ;
+
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
@@ -41,7 +43,7 @@ class RegulatorController extends Controller
                 'default' => [
                     [
                         'field' => 'created_by' ,
-                        'value' => \Auth::user()->id
+                        'value' => $user->id
                     ]
                 ],
                 // 'in' => [

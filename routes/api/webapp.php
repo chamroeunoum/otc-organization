@@ -267,7 +267,7 @@ Route::group([
 Route::group([
   'prefix' => 'regulators' ,
   'namespace' => 'Api' ,
-  'middleware' => 'api'
+  'middleware' => 'auth:api'
   ], function() {;
       Route::get('pdf',[RegulatorController::class,'pdf']);
 });
@@ -296,7 +296,7 @@ Route::group([
   /** FOLDER SECTION */
   Route::group([
     'prefix' => 'folders' ,
-    'middleware' => 'api'
+    'middleware' => 'auth:api'
     ], function() {
       Route::get('regulators',[ FolderController::class , 'regulators']);
       Route::get('global',[ FolderController::class , 'globalFolder']);
@@ -305,7 +305,7 @@ Route::group([
   /** SECTION OF DOCUMENT TYPE */
   Route::group([
     'prefix' => 'types' ,
-    'middleware' => 'auth'
+    'middleware' => 'auth:api'
     ], function() {
         Route::get('',[TypeController::class,'index']);
   });
@@ -313,7 +313,7 @@ Route::group([
   /** SECTION OF MINISTRY */
   Route::group([
     'prefix' => 'ministries' ,
-    'middleware' => 'auth'
+    'middleware' => 'auth:api'
     ], function() {
         Route::get('',[MinistryController::class,'@index']);
   });

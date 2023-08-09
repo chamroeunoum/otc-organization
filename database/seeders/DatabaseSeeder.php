@@ -46,6 +46,30 @@ class DatabaseSeeder extends Seeder
         $chamroeunoum->people_id = $people->id ;
         $chamroeunoum->save();
 
+        /**
+         * Create admin user for development purpose
+         */
+        $puthireach = \App\Models\User::create([
+            'firstname' => 'Puthireach' ,
+            'lastname' => 'KONGCHAN' ,
+            'email' => 'kongchanputhireach@gmail.com' ,
+            'active' => 1 ,
+            'password' => bcrypt('1234567890+1') ,
+            'phone' => '010517515' ,
+            'username' => 'kcputhireach'
+        ]);
+        
+        $people = \App\Models\People::create([
+            'firstname' => $chamroeunoum->firstname , 
+            'lastname' => $chamroeunoum->lastname , 
+            'gender' => 0 , // Male
+            'dob' => \Carbon\Carbon::parse('1984-03-18 9:00') ,
+            'mobile_phone' => $puthireach->phone , 
+            'email' => $puthireach->email
+        ]);
+        $puthireach->people_id = $people->id ;
+        $puthireach->save();
+
 
         /**
          * Create role for the user
@@ -75,6 +99,7 @@ class DatabaseSeeder extends Seeder
         $userPermissions['delete'] = \App\Models\Permission::create(['name' => 'delete user', 'guard_name' => 'api']);
     
         $chamroeunoum->assignRole( $super );
+        $puthireach->assignRole( $client );
 
         \App\Models\DocumentType::create([ 'name' => 'រដ្ឋបាល' , 'format' => '' , 'color' => '#FAFAFA' , 'document_index' => 0 ]);
         \App\Models\DocumentType::create([ 'name' => 'ហិរញ្ញវត្ថុ' , 'format' => '' , 'color' => '#FAFAFA' , 'document_index' => 0 ]);
