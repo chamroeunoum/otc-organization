@@ -48,12 +48,12 @@ class SearchController extends Controller
                 //         'value' => isset( $request->document_type ) && $request->document_type !== null ? [$request->document_type] : false
                 //     ]
                 // ] ,
-                'not' => [
-                    [
-                        'field' => 'document_type' ,
-                        'value' => [4]
-                    ]
-                ] ,
+                // 'not' => [
+                //     [
+                //         'field' => 'document_type' ,
+                //         'value' => [4]
+                //     ]
+                // ] ,
                 // 'like' => [
                 //     [
                 //         'field' => 'number' ,
@@ -141,11 +141,10 @@ class SearchController extends Controller
            'objective' => function($record){
                     return html_entity_decode( strip_tags( $record->objective ) );
                 }
-            ]);
+            ], false, false , 'document');
         /**
          * Set the storage driver name for CRUD
          */
-        $crud->setStorageDriver( 'document' );
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "type" => ['id', 'name', 'format', 'color', 'index'] ,
