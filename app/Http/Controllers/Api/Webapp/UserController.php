@@ -311,7 +311,7 @@ class UserController extends Controller
     }
     public function checkConfirmationCode(Request $request){
         if( $request->email != "" && $request->code != "" ){
-            $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
+            $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', strtoupper( $request->code ) )->first();
             if ($user) {
                 $user -> forgot_password_token = '' ;
                 $user -> update();
@@ -375,7 +375,7 @@ class UserController extends Controller
      */
     public function checkUsername(Request $request){
         if( isset( $request->username ) && $request->username != "" ){
-            if( ($user = \App\Models\User::where('username',$request->username)->first() ) !== null ){
+            if( ($user = \App\Models\User::where('username',strtolower( $request->username ) )->first() ) !== null ){
                 // Username does exists
                 return response([
                     'user' => $user ,
@@ -443,7 +443,7 @@ class UserController extends Controller
      */
     public function checkEmail(Request $request){
         if( isset( $request->email ) && $request->email != "" ){
-            if( ($user = \App\Models\User::where('email',$request->email)->first() ) !== null ){
+            if( ($user = \App\Models\User::where('email',strtolower( $request->email ) )->first() ) !== null ){
                 // Username does exists
                 return response([
                     'user' => $user ,

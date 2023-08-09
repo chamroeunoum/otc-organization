@@ -79,5 +79,6 @@ class DatabaseSeeder extends Seeder
         \App\Models\DocumentType::create([ 'name' => 'រដ្ឋបាល' , 'format' => '' , 'color' => '#FAFAFA' , 'document_index' => 0 ]);
         \App\Models\DocumentType::create([ 'name' => 'ហិរញ្ញវត្ថុ' , 'format' => '' , 'color' => '#FAFAFA' , 'document_index' => 0 ]);
 
+        $this->call(DocumentsTableSeeder::class);
     }
 }
