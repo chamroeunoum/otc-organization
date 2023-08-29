@@ -1,162 +1,16 @@
 <?php
 
-  // async login({state, commit, rootState }, params ){
-  //   return await auth.login(rootState.apiServer+"/authentication/login", params) 
-  // },
-   
-  // async logout({state , commit, rootState},params){
-  //   return await auth.logout(rootState.apiServer+"/authentication/logout",params)
-  // },
-
-  // async signup({state, commit, rootState }, params ){
-  //   return await auth.signup(rootState.apiServer+"/authentication/signup", params) 
-  // },
-
-  /**
-   * Section client
-   */
-  // async list ({ state, commit, rootState },params) {
-  //   return await crud.list(rootState.apiServer+"/"+state.model.name,params)
-  // },
-  // async read ({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // },
-  // async create ({ state, commit, rootState },params) {
-  //   return await crud.create(rootState.apiServer+"/"+state.model.name+"/create",params)
-  // },
-  // async update ({ state, commit, rootState },params) {
-  //   return await crud.update(rootState.apiServer+"/"+state.model.name+"/update",params)
-  // },
-  // async delete ({ state, commit, rootState },params) {
-  //   return await crud.delete(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // }
-
-  /**
-   * Section folder
-   */
-  // async list ({ state, commit, rootState },params) {
-  //   return await crud.list(rootState.apiServer+"/"+state.model.name,params)
-  // },
-  // async read ({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // },
-  // async create ({ state, commit, rootState },params) {
-  //   return await crud.create(rootState.apiServer+"/"+state.model.name+"/create",params)
-  // },
-  // async update ({ state, commit, rootState },params) {
-  //   return await crud.update(rootState.apiServer+"/"+state.model.name+"/update",params)
-  // },
-  // async delete ({ state, commit, rootState },params) {
-  //   return await crud.delete(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // },
-  // async regulators ({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/"+params.id+"/regulators")
-  // },
-  // async addRegulator ({ state, commit, rootState },params) {
-  //   return await crud.update(rootState.apiServer+"/"+state.model.name+"/regulators/add")
-  // },
-  // async removeRegulator ({ state, commit, rootState },params) {
-  //   return await crud.update(rootState.apiServer+"/"+state.model.name+"/regulators/remove")
-  // },
-
-  /**
-   * Section regulator
-   */
-
-  // async list ({ state, commit, rootState },params) {
-  //   return await crud.list(
-  //     rootState.apiServer+"/"+state.model.name + "?" + new URLSearchParams({
-  //       // unit: params.unit ,
-  //       // date: params.date ,
-  //       // number: params.number ,
-  //       // type: params.type ,
-  //       search: params.search ,
-  //       perPage: params.perPage ,
-  //       page: params.page
-  //     }).toString(),
-  //     null,
-  //     false
-  //   )
-  // },
-  // async read ({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // },
-  // async compact ({ state, commit, rootState },params) {
-  //   return await crud.list(rootState.apiServer+"/"+state.model.name + "/compact" + ( params !== undefined ? "?" + new URLSearchParams({
-  //     page: params.page ,
-  //     perPage : params.perPage ,
-  //     search: params.search ,
-  //   }).toString(): ""))
-  // },
-
-  /**
-   * Section staff
-   */
-  // async list ({ state, commit, rootState },params) {
-  //   return await crud.list(rootState.apiServer+"/"+state.model.name,params)
-  // },
-  // async read ({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // },
-  // async create ({ state, commit, rootState },params) {
-  //   return await crud.create(rootState.apiServer+"/"+state.model.name+"/create",params)
-  // },
-  // async update ({ state, commit, rootState },params) {
-  //   return await crud.update(rootState.apiServer+"/"+state.model.name+"/update",params)
-  // },
-  // async delete ({ state, commit, rootState },params) {
-  //   return await crud.delete(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // }
-
-  /**
-   * Section user / account
-   */
-  // async list ({ state, commit, rootState },params) {
-  //   return await crud.list(rootState.apiServer+"/"+state.model.name + "?" + new URLSearchParams({
-  //       search: params.search ,
-  //       perPage: params.perPage ,
-  //       page: params.page
-  //     }).toString()
-  //   )
-  // },
-  // async read ({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // },
-  // async create ({ state, commit, rootState },params) {
-  //   return await crud.create(rootState.apiServer+"/"+state.model.name,params)
-  // },
-  // async update ({ state, commit, rootState },params) {
-  //   return await crud.update(rootState.apiServer+"/"+state.model.name,params)
-  // },
-  // async passwordChange ({ state, commit, rootState },params) {
-  //   return await crud.update(rootState.apiServer+"/"+state.model.name+"/password/change",params)
-  // },
-  // async delete ({ state, commit, rootState },params) {
-  //   return await crud.delete(rootState.apiServer+"/"+state.model.name+"/"+params.id)
-  // },
-  // async checkUsername({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/username/exist?username="+params.username)
-  // },
-  // async checkPhone({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/phone/exist?phone="+params.phone)
-  // },
-  // async checkEmail({ state, commit, rootState },params) {
-  //   return await crud.read(rootState.apiServer+"/"+state.model.name+"/email/exist?email="+params.email)
-  // },
-  // async signupConfirmation({ state, commit, rootState },params) {
-  //   return await crud.get(rootState.apiServer+"/authentication/signup/activate/"+params.token)
-  // },
-
 use \App\Models\TrackPerformance;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Api\Webapp\SearchController;
 use App\Http\Controllers\Api\Webapp\AuthController;
 use App\Http\Controllers\Api\Webapp\UserController;
 use App\Http\Controllers\Api\Webapp\ProfileController;
-use App\Http\Controllers\Api\Webapp\RegulatorController;
-use App\Http\Controllers\Api\Webapp\TypeController;
 use App\Http\Controllers\Api\Webapp\FolderController;
-use App\Http\Controllers\Api\Webapp\MinistryController;
+use App\Http\Controllers\Api\Webapp\Document\SearchController;
+use App\Http\Controllers\Api\Webapp\Document\RegulatorController;
+use App\Http\Controllers\Api\Webapp\Document\TypeController;
+use App\Http\Controllers\Api\Webapp\Document\MinistryController;
+use App\Http\Controllers\Api\Webapp\Document\SignatureController;
 
 Route::group([
   'prefix' => 'webapp' ,
@@ -259,7 +113,17 @@ Route::group([
         Route::group([
             'prefix' => 'types' ,
             ], function() {
-                Route::get('compact', [TypeController::class,'compactList']);
+              Route::get('compact', [TypeController::class,'compactList']);
+        });
+        Route::group([
+          'prefix' => 'ministries' ,
+          ], function() {
+            Route::get('compact', [MinistryController::class,'compactList']);
+        });
+        Route::group([
+          'prefix' => 'signatures' ,
+          ], function() {
+            Route::get('compact', [SignatureController::class,'compactList']);
         });
 
 });
@@ -283,7 +147,7 @@ Route::group([
         Route::get('{id}/read',[ FolderController::class , 'read']);
         Route::put('',[ FolderController::class , 'update']);
         Route::delete('',[ FolderController::class , 'delete']);
-        Route::get('regulators',[ FolderController::class , 'regulators']);
+        Route::get('regulators',[ FolderController::class , 'documents']);
         Route::put('regulators/add',[ FolderController::class , 'addDocumentToFolder']);
         Route::put('regulators/remove',[ FolderController::class , 'removeDocumentFromFolder']);
         Route::put('regulators/check',[ FolderController::class , 'checkDocument']);
@@ -298,7 +162,7 @@ Route::group([
     'prefix' => 'folders' ,
     'middleware' => 'auth:api'
     ], function() {
-      Route::get('regulators',[ FolderController::class , 'regulators']);
+      Route::get('regulators',[ FolderController::class , 'documents']);
       Route::get('global',[ FolderController::class , 'globalFolder']);
         
   });

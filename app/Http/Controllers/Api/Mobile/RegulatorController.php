@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Mobile;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Document as RecordModel;
+use App\Models\Document\Document as RecordModel;
 use App\Http\Controllers\CrudController;
 
 
@@ -142,7 +142,7 @@ class RegulatorController extends Controller
     public function byTypeWithinMinistry($id){
 
         // Create Query Builder 
-        $documentIds = \App\Models\DocumentMinistry::where('ministry_id',$id)->first()->getDocuments();
+        $documentIds = \App\Models\Document\DocumentMinistry::where('ministry_id',$id)->first()->getDocuments();
         $queryBuilder = new Document();
 
         // Get search string

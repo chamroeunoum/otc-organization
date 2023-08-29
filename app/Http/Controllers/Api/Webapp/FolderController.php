@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\Webapp;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CrudController;
 use Illuminate\Http\Request;
-use App\Models\Document;
-use App\Models\Folder as RecordModel;
+use App\Models\Document\Document;
+use App\Models\Document\Folder as RecordModel;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -111,7 +111,7 @@ class FolderController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            'regulators' => [ 'objective' , 'fid' ]
+            'documents' => [ 'objective' , 'fid' ]
         ]);
 
         $builder = $crud->getListBuilder();
@@ -209,12 +209,12 @@ class FolderController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            'regulators' => [ 'objective' , 'fid' ] ,
+            'documents' => [ 'objective' , 'fid' ] ,
             'user' => [ 'id' , 'lastname', 'firstname' ]
         ]);
 
         $builder = $crud->getListBuilder();
-        $builder->has('regulators'); // Get only the folder which contains some regulators
+        $builder->has('documents'); // Get only the folder which contains some documents
         $responseData = $crud->pagination(true, $builder);
         
         $responseData['message'] = __("crud.read.success");
@@ -227,7 +227,7 @@ class FolderController extends Controller
     public function user(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Folder();
+        $queryBuilder = new \App\Models\Document\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -245,8 +245,8 @@ class FolderController extends Controller
 
         $records = $queryBuilder->orderby('name','asc')->get()
                 ->map( function ($record, $index) {
-                    if( $record->regulators !== null ){
-                        foreach( $record->regulators AS $index => $documentFolder ){
+                    if( $record->documents !== null ){
+                        foreach( $record->documents AS $index => $documentFolder ){
                             $documentFolder -> document ;
                             $documentFolder -> document -> type ;
                             $documentFolder -> document ->objective = strip_tags( $documentFolder -> document ->objective ) ; // clear some tags that product by the editor
@@ -270,7 +270,7 @@ class FolderController extends Controller
     public function listFolderWithDocumentValidation(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Folder();
+        $queryBuilder = new \App\Models\Document\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -291,8 +291,8 @@ class FolderController extends Controller
                     return [
                         'id' => $record->id ,
                         'name' => $record->name ,
-                        'exists' => $record->regulators !== null ? (
-                            in_array( $request->document_id, $record->regulators->pluck('id')->toArray() )
+                        'exists' => $record->documents !== null ? (
+                            in_array( $request->document_id, $record->documents->pluck('id')->toArray() )
                         ) : false
                     ];
                 });
@@ -308,14 +308,14 @@ class FolderController extends Controller
         if( $request->name != "" 
         // && Auth::user() != null 
         ){
-            $folder = new \App\Models\Folder();
+            $folder = new \App\Models\Document\Folder();
             $folder->name = $request->name ;
             $folder->user_id = Auth::user() != null ? Auth::user()->id : 0 ;
             $folder->pid = 0 ;
             $folder->active = 1 ;
             $folder->save() ;
             $folder->user ;
-            $folder->regulators ;
+            $folder->documents ;
             // User does exists
             return response([
                 'ok' => true ,
@@ -336,12 +336,11 @@ class FolderController extends Controller
     }
     // Update the folder 
     public function update(Request $request){
-        dd( $request->params );
         if( ( $folder = RecordModel::find($request->id) ) != null && $request->name != "" ){
             $folder->name = $request->name ;
             $folder->save() ;
             $folder->user ;
-            $folder->regulators ;
+            $folder->documents ;
             // User does exists
             return response([
                 'ok' => true ,
@@ -365,13 +364,13 @@ class FolderController extends Controller
         if( $request->id != "" 
          // && Auth::user() != null 
         ){
-            $folder = \App\Models\Folder::find($request->id);
+            $folder = \App\Models\Document\Folder::find($request->id);
             if( $folder != null ){
                 $record = $folder ;
                 // Check for the documents within the folder
                 // If there is/are documents within the folder then notify user first
                 // process delete , also delete the related document within this folder [Note: we only delete the relationship of folder and document]
-                if( $folder->regulators !== null && $folder->regulators->count() ){
+                if( $folder->documents !== null && $folder->documents->count() ){
                     foreach( $folder -> documents as $documentFolder ){
                         $documentFolder -> delete ();
                     }
@@ -408,13 +407,13 @@ class FolderController extends Controller
         if( $request->id > 0 && $request->document_id > 0 
           // && Auth::user() != null 
         ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
+            $documentFolder = \App\Models\Document\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             if( $documentFolder == null ){
-                $documentFolder = new \App\Models\DocumentFolder();
+                $documentFolder = new \App\Models\Document\DocumentFolder();
                 $documentFolder -> folder_id = $request->id ;
                 $documentFolder -> document_id = $request->document_id ;
-                $documentFolder -> created_by = $documentFolder -> modified_by = \Auth::user()->id ;
+                // $documentFolder -> created_by = $documentFolder -> updated_by = \Auth::user()->id ;
                 $documentFolder->save();
                 return response([
                     'ok' => true ,
@@ -447,7 +446,7 @@ class FolderController extends Controller
         if( $request->id > 0 && $request->document_id > 0 
         // && Auth::user() != null 
         ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
+            $documentFolder = \App\Models\Document\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             $message = $documentFolder !== null ? "បានដកឯកសារចេញរួចរាល់។" : "មិនមានឯកសារនេះក្នុងថតឯកសារឡើយ។" ;
             if( $documentFolder != null ) {
@@ -473,12 +472,12 @@ class FolderController extends Controller
     public function checkDocument(Request $request){
         $folder = RecordModel::find( $request->id );
         if( $folder !== null ){
-            if( count( $folder -> regulators ) ){
+            if( count( $folder -> documents ) ){
                 // There is/are document(s) within this folder
                 return response([
                     'ok' => true ,
                     'record' => $folder ,
-                    'message' => 'កម្រងឯកសារនេះ មានឯកសារចំនួន '. count( $folder -> regulators ) .' !' ],
+                    'message' => 'កម្រងឯកសារនេះ មានឯកសារចំនួន '. count( $folder -> documents ) .' !' ],
                     200
                 );
             }else{
@@ -521,13 +520,13 @@ class FolderController extends Controller
         ],201);
     }
     /**
-     * Listing regulators of the folder
+     * Listing documents of the folder
      */
-    public function regulators(Request $request){
+    public function documents(Request $request){
         $user = Auth::user();
 
         /**
-         * Geting all the regulators of the folder
+         * Geting all the documents of the folder
          */
         if( !isset( $request->folder_id ) || $request->folder_id <= 0 ){
             return response()->json([
@@ -536,7 +535,7 @@ class FolderController extends Controller
             ],350);
         }
 
-        $regulatorIds = RecordModel::find($request->folder_id)->regulators->pluck('id')->all();
+        $regulatorIds = RecordModel::find($request->folder_id)->documents->pluck('id')->all();
         if( count( $regulatorIds ) <= 0 ) {
             return response()->json([
                 'ok' => false ,
@@ -628,20 +627,22 @@ class FolderController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new \App\Models\Document(), $request, [
+        $crud = new CrudController(new \App\Models\Document\Document(), $request, [
             'id',
             'fid' ,
             'title' ,
             'objective',
             'document_year' ,
             'pdf' ,
-            'document_type' ,
             'publish'
         ]);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name']
+            'documents' => [ 'objective' , 'fid' ] ,
+            'user' => [ 'id' , 'lastname', 'firstname' ] ,
+            'types' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'ministries' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'signatures' => [ 'id' , 'name' , 'desp' , 'pid' ]
         ]);
 
         $builder = $crud->getListBuilder();

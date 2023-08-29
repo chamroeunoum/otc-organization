@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\DocumentParent as RecordModel;
+use App\Models\Document\DocumentParent as RecordModel;
 use App\Http\Controllers\CrudController;
 
 

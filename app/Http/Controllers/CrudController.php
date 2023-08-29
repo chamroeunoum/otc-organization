@@ -443,6 +443,7 @@ class CrudController extends Controller {
                 if( !empty($fields) ){
                     /** if the relationship function return collection */
                     if ($record->$functionName instanceof \Illuminate\Database\Eloquent\Collection) {
+                        $customRecord[$functionName] = [] ;
                         foreach( $record->$functionName AS $index => $recordOfFunctionCollection ){
                             $tempRecord = new \StdClass;
                             foreach ($fields AS $field ) {

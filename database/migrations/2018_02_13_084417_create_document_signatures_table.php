@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateDocumentFavoritesTable extends Migration {
+class CreateDocumentSignaturesTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,11 +12,11 @@ class CreateDocumentFavoritesTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('document_favorites', function(Blueprint $table)
+		Schema::create('document_signatures', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('user_id')->unsigned();
-			$table->integer('document_id')->nullable(true);
+			$table->integer('signature_id')->unsigned();
+			$table->integer('document_id')->unsigned();
 			$table->timestamps();
 			$table->softDeletes();
 		});

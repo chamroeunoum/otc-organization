@@ -103,16 +103,6 @@ class User extends Authenticatable
       return $this->belongsToMany('App\Models\Role','user_role','user_id','role_id');
     }
 
-    public function countesies()
-    {
-        return $this->hasMany('App\Models\Countesy','countesy_id','id');
-    }
-
-    public function countesy()
-    {
-        return $this->belongsTo('App\Models\Countesy','countesy_id','id');
-    }
-
     public function dlists()
     {
         return $this->hasMany('App\Models\Dlist','user_id','id');
@@ -131,7 +121,7 @@ class User extends Authenticatable
      * ឯកសារដែលគណនីមួយនេះបានបង្កើត
      */
     public function documents(){
-        return $this->hasMany(\App\Models\Document::class,'created_by');
+        return $this->hasMany(\App\Models\Document\Document::class,'created_by');
     }
 
     public function person(){
@@ -181,7 +171,7 @@ class User extends Authenticatable
     }
 
     public function folders(){
-      return $this->hasMany('\App\Models\Folder','user_id','id');
+      return $this->hasMany('\App\Models\Document\Folder','user_id','id');
     }
 
     public function getIsAdminAttribute()
@@ -190,7 +180,7 @@ class User extends Authenticatable
     }
 
     public function regulators(){
-      return $this->belongsToMany(\App\Models\Document::class,'document_users','user_id','document_id');
+      return $this->belongsToMany(\App\Models\Document\Document::class,'document_users','user_id','document_id');
     }
 
     public static function boot()
@@ -199,5 +189,9 @@ class User extends Authenticatable
         static::deleting(function($obj) {
             \Storage::disk('uploads')->delete($obj->image);
         });
+    }
+
+    public function favorites(){
+      return $this->belongsToMany('\App\Models\Document\Document','document_favorites','user_id','document_id');
     }
 }

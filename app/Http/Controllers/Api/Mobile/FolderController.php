@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Mobile;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Document;
-use App\Models\Folder;
+use App\Models\Document\Document;
+use App\Models\Document\Folder;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -123,7 +123,7 @@ class FolderController extends Controller
     // Save the folder 
     public function store(Request $request){
         if( $request->name != "" && Auth::user() != null ){
-            $folder = new \App\Models\Folder();
+            $folder = new \App\Models\Document\Folder();
             $folder->name = $request->name ;
             $folder->user_id = Auth::user()->id ;
             $folder->save() ;
@@ -148,7 +148,7 @@ class FolderController extends Controller
     // delete the folder 
     public function delete(Request $request){
         if( $request->id != "" && Auth::user() != null ){
-            $folder = \App\Models\Folder::find($request->id);
+            $folder = \App\Models\Document\Folder::find($request->id);
             if( $folder != null ){
                 $record = $folder ;
                 // Check for the documents within the folder
@@ -184,10 +184,10 @@ class FolderController extends Controller
     // Remove document from folder
     public function addDocumentToFolder($folderId, $documentId){
         if( $folderId != "" && $documentId != "" && Auth::user() != null ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $folderId)
+            $documentFolder = \App\Models\Document\DocumentFolder::where('folder_id', $folderId)
                 ->where('document_id' , $documentId )->first();
             if( $documentFolder == null ){
-                $documentFolder = new \App\Models\DocumentFolder();
+                $documentFolder = new \App\Models\Document\DocumentFolder();
                 $documentFolder -> folder_id = $folderId ;
                 $documentFolder -> document_id = $documentId ;
                 $documentFolder->save();
@@ -215,7 +215,7 @@ class FolderController extends Controller
         }
     }
     public function checkDocument(Request $request){
-        $folder = \App\Models\Folder::find( $request->id );
+        $folder = \App\Models\Document\Folder::find( $request->id );
         if( $folder !== null ){
             if( count( $folder -> documents ) ){
                 // There is/are document(s) within this folder

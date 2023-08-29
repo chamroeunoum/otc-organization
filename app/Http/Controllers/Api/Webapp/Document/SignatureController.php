@@ -1,32 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Api\Webapp\Document;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Http\Controllers\CrudController;
-use App\Models\Document\DocumentType as RecordModel;
+use App\Models\Document\Tag\Signature as RecordModel;
 
 
-class TypeController extends Controller
+class SignatureController extends Controller
 {
+    private $model = null ;
+    private $fields = [ 'id','name','desp' , 'pid' ] ;
+    public function __construct(){
+        $this->model = new RecordModel();
+    }
     /**
      * Listing function
      */
     public function index(Request $request){
         // $perpage = 
         return response([
-            'records' => RecordModel::where('id','<>',4)->orderby('document_index','asc')->get(),
-            'message' => 'អានព័ត៌មាននៃគណនីបានរួចរាល់ !' 
-        ],200 );
-    }
-    /**
-     * Listing function
-     */
-    public function byMinistry(Request $request){
-        // $perpage = 
-        return response([
-            'records' => RecordModel::where('id','<>',4)->orderby('document_index','asc')->get(),
+            'records' => $this->model->children()->get(),
             'message' => 'អានព័ត៌មាននៃគណនីបានរួចរាល់ !' 
         ],200 );
     }
@@ -41,17 +36,17 @@ class TypeController extends Controller
             "where" => [
                 // 'default' => [
                 //     [
-                //         'field' => 'regulator_id' ,
-                //         'value' => $regulator_id === false ? "" : $regulator_id
+                //         'field' => 'model' ,
+                //         'value' => ''
                 //     ],
                 // ],
                 // 'in' => [] ,
-                'not' => [
-                    [
-                        'field' => 'id' ,
-                        'value' => 4
-                    ]
-                ] ,
+                // 'not' => [
+                //     [
+                //         'field' => 'id' ,
+                //         'value' => 4
+                //     ]
+                // ] ,
                 // 'like' => [
                 //     [
                 //         'field' => 'number' ,
@@ -70,18 +65,17 @@ class TypeController extends Controller
             "search" => $search === false ? [] : [
                 'value' => $search ,
                 'fields' => [
-                    'name'
+                    'name' , 'desp'
                 ]
             ],
             "order" => [
-                'field' => 'document_index' ,
+                'field' => 'name' ,
                 'by' => 'asc'
             ],
         ];
         $request->merge( $queryString );
-        $crud = new CrudController(new RecordModel(), $request, ['id', 'name', 'document_index', 'format' ]);
-        $builder = $crud->getListBuilder();
-        $responseData = $crud->pagination(true, $builder);
+        $crud = new CrudController(new RecordModel(), $request, $this->fields );
+        $responseData = $crud->pagination(true, $this->model->children() );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
