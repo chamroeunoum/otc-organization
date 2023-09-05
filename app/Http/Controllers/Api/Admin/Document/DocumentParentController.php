@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Api\Admin\Document;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -18,10 +18,10 @@ class DocumentParentController extends Controller
         'image' ,
         // 'document_id' ,
         // 'document_parent_id' ,
-        'parent_id'
+        'pid'
     ];
     private $renameFields = [
-        'parent_id' => 'parentId' ,
+        'pid' => 'parentId' ,
         'image' => 'imageUrl' ,  
     ];
     private $fieldsWithCallback = [];
@@ -129,7 +129,8 @@ class DocumentParentController extends Controller
             // },
             'desc' => function($desc){
                 return html_entity_decode( strip_tags( $desc ) );
-            }
+            },
+            'id' => function($r){ return $r->id . '' ; }
         ];
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields, $this->fieldsWithCallback, $this->renameFields);
         // $crud->setRelationshipFunctions([

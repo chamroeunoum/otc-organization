@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Api\Admin\Document;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Document\Document as RecordModel;
 use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
@@ -19,26 +19,18 @@ class RegulatorController extends Controller
         'objective',
         'document_year' ,
         'pdf' ,
-        'document_type' ,
         'publish' ,
         'active' ,
         'created_by' ,
         'updated_by' ,
         'accessibility'
     ];
+        
     /**
      * Listing function
      */
     public function index(Request $request){
-        $user = \Auth::user();
-        if( $user == null ){
-            return response()->json([
-                'message' => "សូមចូលប្រព័ន្ធជាមុនសិន។" ,
-                'ok' =>false
-            ],403);
-        }
-        // If the authenticated user is the "1 => super administrator" or "2 => Administrator" then don't filter the regulator base on the authenticated user
-        $user = count( array_filter( $user->roles->toArray() , function( $role ){ return $role['id'] == 1 || $role['id'] == 2 ; } ) ) ? false : $user ;
+        $user = \Auth::user() != null ? \Auth::user() : false ;
 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
@@ -47,12 +39,12 @@ class RegulatorController extends Controller
 
         $queryString = [
             "where" => [
-                'default' => [
-                    $user ? [
-                        'field' => 'created_by' ,
-                        'value' => $user->id
-                    ] : []
-                ],
+                // 'default' => [
+                //     [
+                //         'field' => 'created_by' ,
+                //         'value' => $user->id
+                //     ]
+                // ],
                 // 'in' => [
                 //     [
                 //         'field' => 'document_type' ,
@@ -116,16 +108,16 @@ class RegulatorController extends Controller
                 'by' => 'desc'
             ],
         ];
-        if( isset( $request->document_type ) ) {
-            $queryString['where']['default'] = [
-                'in' => [
-                    [
-                        'field' => 'document_type' ,
-                        'value' =>  $request->document_type
-                    ]
-                ]
-            ];
-        }
+        // if( isset( $request->document_type ) ) {
+        //     $queryString['where']['default'] = [
+        //         'in' => [
+        //             [
+        //                 'field' => 'document_type' ,
+        //                 'value' =>  $request->document_type
+        //             ]
+        //         ]
+        //     ];
+        // }
 
         $request->merge( $queryString );
 
@@ -133,18 +125,24 @@ class RegulatorController extends Controller
             /**
              * custom the value of the field
              */
+            'pdf' => function($record){
+                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('document')->exists( $record->pdf ) )
+                ? true
+                // \Storage::disk('document')->url( $pdf ) 
+                : false ;
+                return $record->pdf ;
+            },
            'objective' => function($record){
                     return html_entity_decode( strip_tags( $record->objective ) );
                 }
             ]
         );
+
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name'] ,
-            'parentDocument' => [ 'id' ,'parent_id','amend' ] ,
-            'createdBy' => [ 'id', 'firstname' , 'lastname' ] ,
-            'updatedBy' => [ 'id', 'firstname' , 'lastname' ]
+            'types' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'organizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'signatures' => [ 'id' , 'name' , 'desp' , 'pid' ]
         ]);
 
         $builder = $crud->getListBuilder();
@@ -239,16 +237,16 @@ class RegulatorController extends Controller
                 'by' => 'desc'
             ],
         ];
-        if( isset( $request->document_type ) ) {
-            $queryString['where']['default'] = [
-                'in' => [
-                    [
-                        'field' => 'document_type' ,
-                        'value' =>  $request->document_type
-                    ]
-                ]
-            ];
-        }
+        // if( isset( $request->document_type ) ) {
+        //     $queryString['where']['default'] = [
+        //         'in' => [
+        //             [
+        //                 'field' => 'document_type' ,
+        //                 'value' =>  $request->document_type
+        //             ]
+        //         ]
+        //     ];
+        // }
 
         $request->merge( $queryString );
 
@@ -263,15 +261,15 @@ class RegulatorController extends Controller
         $builder = $crud->getListBuilder();
 
         $responseData = $crud->pagination(true, $builder,[
-                'pdf' => function($pdf){
-                    $pdf = ( $pdf !== "" && \Storage::disk('document')->exists( $pdf ) )
+                'pdf' => function($record){
+                    $record->pdf = ( $record->pdf !== "" && \Storage::disk('document')->exists( $record->pdf ) )
                     ? true
                     // \Storage::disk('document')->url( $pdf ) 
                     : false ;
-                    return $pdf ;
+                    return $record->pdf ;
                 },
-                'objective' => function($objective){
-                    return html_entity_decode( strip_tags( $objective ) );
+                'objective' => function($record){
+                    return html_entity_decode( strip_tags( $record->objective ) );
                 }
             ]
         );
@@ -300,16 +298,16 @@ class RegulatorController extends Controller
             }
         }
         // Get document type
-        if( $request->document_type != "" ){
-            $documentTypes = explode(',', $request->document_type );
-            if( is_array( $documentTypes ) && !empty( $documentTypes ) ){
-                $queryBuilder = $queryBuilder -> where( function ($query ) use ( $documentTypes ) {
-                    foreach( $documentTypes as $type ) {
-                        $query = $query -> orwhere ( 'document_type', $type ) ;
-                    }
-                } );
-            }
-        }
+        // if( $request->document_type != "" ){
+        //     $documentTypes = explode(',', $request->document_type );
+        //     if( is_array( $documentTypes ) && !empty( $documentTypes ) ){
+        //         $queryBuilder = $queryBuilder -> where( function ($query ) use ( $documentTypes ) {
+        //             foreach( $documentTypes as $type ) {
+        //                 $query = $query -> orwhere ( 'document_type', $type ) ;
+        //             }
+        //         } );
+        //     }
+        // }
         // Get document year
         if( $request->document_year != "" ){
             $queryBuilder = $queryBuilder -> where('document_year','LIKE','%'.$request->document_year.'%');
@@ -353,9 +351,9 @@ class RegulatorController extends Controller
                 $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
                     'serial' => str_replace(['documents','/','.pdf'],'',$document->pdf ) ,
-                    "ok" => true  ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
-                    "filename" => $filename
+                    "filename" => $filename,
+                    "ok" => true 
                 ],200);
             }else
             {
@@ -369,6 +367,8 @@ class RegulatorController extends Controller
     public function upload(Request $request){
         $user = \Auth::user();
         if( $user ){
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
             if( ( $document = \App\Models\Document\Document::find($request->id) ) !== null ){
                 list($year,$month,$day) = explode('-',$document->document_year);
                 $uniqeName = Storage::disk('document')->putFile( 'documents' , new File( $_FILES['files']['tmp_name'] ) );
@@ -414,11 +414,10 @@ class RegulatorController extends Controller
          */
         
         $record = RecordModel::create([
-            'fid' => $request->number ,
-            'title' => $request->title ,
+            'fid' => $request->number?? ''  ,
+            'title' => $request->title?? '' ,
             'objective' => $request->objective ,
-            'document_year' => $request->year ,
-            'document_type' => $request->type_id ,
+            'document_year' => $request->year?? \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
             'publish' => 1 , // $request->publish
             'active' => $request->active > 0 ? 1 : 0 ,
             'created_by' => \Auth::user()->id ,
@@ -452,7 +451,7 @@ class RegulatorController extends Controller
                 'title' => $request->title ,
                 'objective' => $request->objective ,
                 'document_year' => $request->year ,
-                'document_type' => $request->type_id ,
+                // 'document_type' => $request->type_id ,
                 'active' => $request->active > 0 ? 1 : 0 ,
                 'updated_by' => \Auth::user()->id
             ]) ){
@@ -574,6 +573,7 @@ class RegulatorController extends Controller
                 'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
             ],423);
         }
+        $record->with('ministries')->with('signatures')->with('ministries')->with('type');
         return response()->json([
             'record' => $record ,
             'ok' => $record->update(['active'=>0]) ,

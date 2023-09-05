@@ -20,6 +20,14 @@ class DatabaseSeeder extends Seeder
          */
 
         /**
+         * Create role for the user
+         */
+        $super = \App\Models\Role::create(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        $administrator = \App\Models\Role::create(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        $backendMember = \App\Models\Role::create(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        $client = \App\Models\Role::create(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp']);
+
+        /**
          * Create accounts
          */
         /**
@@ -45,6 +53,8 @@ class DatabaseSeeder extends Seeder
         ]);
         $chamroeunoum->people_id = $people->id ;
         $chamroeunoum->save();
+        $chamroeunoum->assignRole( $administrator );
+
 
         /**
          * Create client user for development purpose
@@ -60,8 +70,8 @@ class DatabaseSeeder extends Seeder
         ]);
         
         $people = \App\Models\People\People::create([
-            'firstname' => $chamroeunoum->firstname , 
-            'lastname' => $chamroeunoum->lastname , 
+            'firstname' => $puthireach->firstname , 
+            'lastname' => $puthireach->lastname , 
             'gender' => 0 , // Male
             'dob' => \Carbon\Carbon::parse('1984-03-18 9:00') ,
             'mobile_phone' => $puthireach->phone , 
@@ -69,16 +79,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $puthireach->people_id = $people->id ;
         $puthireach->save();
-
-        /**
-         * Create role for the user
-         */
-        $super = \App\Models\Role::create(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $administrator = \App\Models\Role::create(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $backendMember = \App\Models\Role::create(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service']);
-
-        $client = \App\Models\Role::create(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp']);
-
+        $puthireach->assignRole( $backendMember );
 
         for( $i=0 ; $i<100; $i++ ){
             /**
@@ -116,113 +117,168 @@ class DatabaseSeeder extends Seeder
                 'name' => 'ប្រភេទឯកសារ' ,
                 'desp' => 'ប្រភេទឯកសារផ្លូវការរបស់ព្រះរាជាណាចក្រកម្ពុជា។' ,
                 'model' => 'App\Models\Document\Tag\Type' ,
-                'pid' => 0
+                'pid' => null ,
+                'tpid' => null ,
+                'image' => '' ,
+                'record_index' => 0 
             ]
         ]);
-        $documentTypeTag = \DB::table('tags')->where('model','App\Models\Document\Tag\Type')->where('pid',0)->first();
+        $documentTypeTag = \DB::table('tags')->where('model','App\Models\Document\Tag\Type')->whereNull('tpid')->orWhere('tpid',0)->first();
     
         \DB::table('tags')->insert( [
             [
                 'name' => 'ព្រះរាជក្រម' ,
                 'desp' => 'ព្រះរាជក្រម' ,
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 1 
+
             ],
             [
                 'name' => 'ព្រះរាជក្រឹត្យ.បក' ,
                 'desp' => 'ព្រះរាជក្រឹត្យ.បក',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 2
             ],
             [
                 'name' => 'អនុក្រឹត្យ.បក' ,
                 'desp' => 'អនុក្រឹត្យ.បក',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 3
             ],
             [
                 'name' => 'ព្រះរាជក្រឹត្យ.តត' ,
                 'desp' => 'ព្រះរាជក្រឹត្យ.តត',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 4
             ],
             [
                 'name' => 'អនុក្រឹត្យ.តត' ,
                 'desp' => 'អនុក្រឹត្យ.តត',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 5 
             ],
             [
                 'name' => 'សជណ' ,
                 'desp' => 'សជណ',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 6 
             ],
             [
                 'name' => 'សេចក្ដីសម្រេច' ,
                 'desp' => 'សេចក្ដីសម្រេច',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 7 
             ],
             [
                 'name' => 'សារាចរ និង សារាចរណែនាំ' ,
                 'desp' => 'សារាចរ និង សារាចរណែនាំ',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 8
             ],
             [
                 'name' => 'ប្រកាស' ,
                 'desp' => 'ប្រកាស',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 9 
             ],
             [
                 'name' => 'គោលនយោបាយជាតិ' ,
                 'desp' => 'គោលនយោបាយជាតិ',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 10 
             ],
             [
                 'name' => 'ផែនការយុទ្ធសាស្ត្រ' ,
                 'desp' => 'ផែនការយុទ្ធសាស្ត្រ',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 11 
             ],
             [
                 'name' => 'បទបញ្ជារាជរដ្ឋាភិបាល' ,
                 'desp' => 'បទបញ្ជារាជរដ្ឋាភិបាល',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 12 
             ],
             [
                 'name' => 'ផែនការសកម្មភាពក្រសួងនានា' ,
                 'desp' => 'ផែនការសកម្មភាពក្រសួងនានា',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 13
             ],
             [
                 'name' => 'ផែនការសកម្មភាពក្រសួងនានា' ,
                 'desp' => 'ផែនការសកម្មភាពក្រសួងនានា',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 14
             ],
             [
                 'name' => 'របាយការណ៍ប្រចាំថ្ងៃ' ,
                 'desp' => 'របាយការណ៍ប្រចាំថ្ងៃ',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 15
             ],
             [
                 'name' => 'របាយការណ៍ប្រចាំខែ' ,
                 'desp' => 'របាយការណ៍ប្រចាំខែ',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 16 
             ],
             [
                 'name' => 'របាយការណ៍ការប្រចាំឆ្នាំ' ,
                 'desp' => 'របាយការណ៍ការប្រចាំឆ្នាំ',
                 'model' => '' ,
-                'pid' => $documentTypeTag->id
+                'tpid' => $documentTypeTag->id ,
+                'pid' => $documentTypeTag->id ,
+                'image' => '' ,
+                'record_index' => 17
             ]
         ] ); 
 
@@ -264,83 +320,122 @@ class DatabaseSeeder extends Seeder
                 'name' => 'ឈ្មោះហត្ថលេខា' ,
                 'desp' => 'ឈ្មោះថ្នាក់ដឹកនាំដែលបានចុះហត្ថលេខាលើឯកសារ' ,
                 'model' => 'App\Models\Document\Tag\Signature' ,
-                'pid' => 0
+                'tpid' => null ,
+                'pid' => null ,
+                'image' => '' ,
+                'record_index' => 0 
             ]
         ]);
-        $documentSignatureTag = \DB::table('tags')->where('model','App\Models\Document\Tag\Signature')->where('pid',0)->first();
+        $documentSignatureTag = \DB::table('tags')->where('model','App\Models\Document\Tag\Signature')->whereNull('tpid')->orWhere('tpid',0)->first();
     
         \DB::table('tags')->insert( [
             [
                 'name' => 'ហ៊ុន សែន' ,
                 'desp' => 'ហ៊ុន សែន' ,
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 1
             ],
             [
                 'name' => 'ជា ស៊ីម' ,
                 'desp' => 'ជា ស៊ីម',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' =>2
             ],
             [
                 'name' => 'ហេង សំរិន' ,
                 'desp' => 'ហេង សំរិន',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 3
             ],
             [
                 'name' => 'សាយ ឈុំ' ,
                 'desp' => 'សាយ ឈុំ',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 4
             ],
             [
                 'name' => 'ត្រាំ អ៊ីវតឹក' ,
                 'desp' => 'ត្រាំ អ៊ីវតឹក',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 5
             ],
             [
                 'name' => 'ជា សុផារ៉ា' ,
                 'desp' => 'ជា សុផារ៉ា',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 6
             ],
             [
                 'name' => 'ស៊ុន ចាន់ថុល' ,
                 'desp' => 'ស៊ុន ចាន់ថុល',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 7
             ],
             [
                 'name' => 'ជា វ៉ាន់ដេត' ,
                 'desp' => 'ជា វ៉ាន់ដេត',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 8
             ],
             [
                 'name' => 'សាយ សំអាល់' ,
                 'desp' => 'សាយ សំអាល់',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 9
             ],
             [
                 'name' => 'ទៀ បាញ់' ,
                 'desp' => 'ទៀ បាញ់',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 10
             ],
             [
                 'name' => 'ស ខេង' ,
                 'desp' => 'ស ខេង',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 11
             ],
             [
                 'name' => 'ម៉ែន សំអន' ,
                 'desp' => 'ម៉ែន សំអន',
                 'model' => '' ,
-                'pid' => $documentSignatureTag->id
+                'tpid' => $documentSignatureTag->id ,
+                'pid' => $documentSignatureTag->id ,
+                'image' => '' ,
+                'record_index' => 12
             ]
         ] ); 
         $documentSignatures = [] ;
@@ -361,96 +456,135 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'ឈ្មោះអង្គភាព' ,
                 'desp' => 'ឈ្មោះអង្គភាពរាជរដ្ឋាភិបាល និងក្រៅរដ្ឋាភិបាល' ,
-                'model' => 'App\Models\Document\Tag\Ministry' ,
-                'pid' => 0
+                'model' => 'App\Models\Document\Tag\Organization' ,
+                'tpid' => null ,
+                'pid' => null ,
+                'image' => '' ,
+                'record_index' => 0
             ]
         ]);
-        $documentMinistryTag = \DB::table('tags')->where('model','App\Models\Document\Tag\Ministry')->where('pid',0)->first();
+        $documentOrganizationTag = \DB::table('tags')->where('model','App\Models\Document\Tag\Organization')->whereNull('tpid')->orWhere('tpid',0)->first();
     
         \DB::table('tags')->insert( [
             [
                 'name' => 'ទីស្ដីការគណៈរដ្ឋមន្ត្រី' ,
                 'desp' => 'ទីស្ដីការគណៈរដ្ឋមន្ត្រី' ,
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id , 
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 1
             ],
             [
                 'name' => 'ក្រសួងមហាផ្ទៃ' ,
                 'desp' => 'ក្រសួងមហាផ្ទៃ',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 2
             ],
             [
                 'name' => 'ក្រសួងការពារជាតិ' ,
                 'desp' => 'ក្រសួងការពារជាតិ',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 3
             ],
             [
                 'name' => 'ក្រសួងរៀបចំដែនដី និងនគររូបនីយកម្ម' ,
                 'desp' => 'ក្រសួងរៀបចំដែនដី និងនគររូបនីយកម្ម',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 4
             ],
             [
                 'name' => 'ក្រសួងសាធារណៈការ និងដឹកជញ្ជូន' ,
                 'desp' => 'ក្រសួងសាធារណៈការ និងដឹកជញ្ជូន',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 5
             ],
             [
                 'name' => 'ក្រសួងបរិស្ថាន' ,
                 'desp' => 'ក្រសួងបរិស្ថាន',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 6
             ],
             [
                 'name' => 'ក្រសួងសេដ្ឋកិច្ច និងហិរញ្ញវត្ថុ' ,
                 'desp' => 'ក្រសួងសេដ្ឋកិច្ច និងហិរញ្ញវត្ថុ',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 7
             ],
             [
                 'name' => 'ក្រសួងប្រៃសនីយ៍ និងគមនាគមន៍' ,
                 'desp' => 'ក្រសួងប្រៃសនីយ៍ និងគមនាគមន៍',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 8
             ],
             [
                 'name' => 'ក្រសួងផែនការ' ,
                 'desp' => 'ក្រសួងផែនការ',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 9
             ],
             [
                 'name' => 'ក្រសួង រ៉ែ និងថាមពល' ,
                 'desp' => 'ក្រសួង រ៉ែ និងថាមពល',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 10
             ],
             [
                 'name' => 'ក្រសួងឧស្សាហកម្ម សប្បកម្ម និងនិវានុវឌ្ឍន៍' ,
                 'desp' => 'ក្រសួងឧស្សាហកម្ម សប្បកម្ម និងនិវានុវឌ្ឍន៍',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 11
             ],
             [
                 'name' => 'ក្រសួងធនធានទឺក និងឧតុនិយម' ,
                 'desp' => 'ក្រសួងធនធានទឺក និងឧតុនិយម',
                 'model' => '' ,
-                'pid' => $documentMinistryTag->id
+                'tpid' => $documentOrganizationTag->id ,
+                'pid' => $documentOrganizationTag->id ,
+                'image' => '' ,
+                'record_index' => 12
             ]
         ] ); 
-        $documentMinistries = [] ;
+        $documentOrganizations = [] ;
         // Add documents to folder
         for( $i=0; $i<=100 ; $i++ ){
             // Create folder & Assign to the owner
-            $documentMinistries[] = [
+            $documentOrganizations[] = [
                 'document_id' => rand(1, 1000 ),
-                'ministry_id' => rand(32,44)
+                'organization_id' => rand(32,44)
             ];
         }
-        \DB::table('document_ministries')->insert( $documentMinistries );
+        \DB::table('organization_documents')->insert( $documentOrganizations );
 
         $foldersArray = [] ;
         $folderDocumentsArray = [] ;
@@ -491,7 +625,26 @@ class DatabaseSeeder extends Seeder
             ];
         }
         \DB::table('document_favorites')->insert( $documentFavorites );
-        
+
+        // Create root document
+        \DB::table('document_parents')->insert( [
+            'name' => "ឯកសារមេ" ,
+            'document_id' => rand(1,1000) ,
+            'tpid' => NULL ,
+            'pid' => NULL
+        ] );
+        $rootDocument = \DB::table('document_parents')->whereNull('pid')->whereNull('tpid')->first();
+        for( $i=0; $i<100 ; $i++ ){
+            // Create folder & Assign to the owner
+            \DB::table('document_parents')->insert( [
+                'name' => substr(fake()->paragraph(),0,20 ) ,
+                'document_id' => rand(1,1000),
+                'tpid' => $rootDocument->id ,
+                'pid' => \DB::table('document_parents')->inRandomOrder()->first()->id
+            ] );
+        }
+
         // $this->call(DocumentsTableSeeder::class);
+        // $this->call(TagsTableSeeder::class);
     }
 }

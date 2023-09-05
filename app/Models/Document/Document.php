@@ -33,8 +33,8 @@ class Document extends Model
     public function types(){
       return $this->belongsToMany('\App\Models\Document\Tag\Type','document_types','document_id','type_id');
     }
-    public function ministries(){
-      return $this->belongsToMany('\App\Models\Document\Tag\Ministry','document_ministries','document_id','ministry_id');
+    public function organizations(){
+      return $this->belongsToMany('\App\Models\Document\Tag\Organization','organization_documents','document_id','organization_id');
     }
     public function signatures(){
       return $this->belongsToMany('\App\Models\Document\Tag\Signature','document_signatures','document_id','signature_id');

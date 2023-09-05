@@ -165,6 +165,7 @@ class AuthController extends Controller
 
         return response()->json([
             'ok' => true ,
+            'upload_max_filesize' => ini_get("upload_max_filesize") ,
             'token' => [
                 'access_token' => $tokenResult->accessToken,
                 'token_type' => 'Bearer',

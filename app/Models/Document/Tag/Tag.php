@@ -9,6 +9,7 @@ class Tag extends Model
 {
     protected $table = "tags" ;
     private $model = null ;
+    protected $guarded = ['id'];
     
     public function __construct($model){
         $this->model = $model ;
@@ -29,14 +30,14 @@ class Tag extends Model
         return $this->where('model',$this->getModel())
             ->whereNull('deleted_at')
             ->where(function($q){ 
-                $q->whereNull('pid')->orWhere('pid',0); 
+                $q->whereNull('tpid')->orWhere('tpid',0); 
             })->first();
     }
     public function children(){
         $root = $this->root() ;
         return $root != null 
             ? $this->whereNull('deleted_at')
-                ->where('pid',$root->id)
+                ->where('tpid',$root->id)
             : null ;
     }
     public function add($name,$desp=""){
@@ -47,7 +48,8 @@ class Tag extends Model
                     'desp' => $desp 
                 ],
                 [    
-                    'pid' => $root->id ,
+                    'tpid' => $root->id ,
+                    'pid' => null ,
                     'model' => $root->model ,
                     'deleted_at' => null
                 ]

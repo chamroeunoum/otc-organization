@@ -70,30 +70,6 @@ class User extends Authenticatable
       $user = $this->find($this->id);
       return $user->lastname.' '.$user->firstname;
     }
-    public function getStatusLayout(){
-      $layout = 'Status not defined' ;
-      $user = $this->find($this->id) ;
-      switch($user->status){
-        case 1:
-        // user is allowed to login to system, account is active
-        $layout = '<span class="label label-success" >Active</span>' ;
-          break;
-        case 2:
-        // user is verifing, waiting for the email to confirm
-          break;
-        case 4:
-        // user is activated, email has confirmed
-          break;
-        case 8:
-        // user is disabled, account is disabled for some reason
-          break;
-        default:
-          //  user is blocked from login to system, account is not active
-          $layout = '<span class="label label-danger" >Blocked</span>' ;
-          break;
-        }
-      return $layout ;
-    }
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
@@ -103,20 +79,22 @@ class User extends Authenticatable
       return $this->belongsToMany('App\Models\Role','user_role','user_id','role_id');
     }
 
-    public function dlists()
-    {
-        return $this->hasMany('App\Models\Dlist','user_id','id');
-    }
+    // public function dlists()
+    // {
+    //     return $this->hasMany('App\Models\Dlist','user_id','id');
+    // }
 
-    public function groups()
-    {
-        return $this->hasMany('App\Models\Group','group_id','id');
-    }
-
-    public function ministries()
-    {
-        return $this->hasMany('App\Models\Ministry','ministry_id','id');
-    }
+    // public function groups()
+    // {
+    //     return $this->hasMany('App\Models\Group','group_id','id');
+    // }
+    /**
+     * Organization that the user is in
+     */
+    // public function ministries()
+    // {
+    //     return $this->belongsTo('App\Models\Document\Tag\Organization','organization_staffs','organization_id','user_id');
+    // }
     /**
      * ឯកសារដែលគណនីមួយនេះបានបង្កើត
      */
@@ -125,7 +103,7 @@ class User extends Authenticatable
     }
 
     public function person(){
-      return $this->belongsTo('App\Models\People','people_id','id');
+      return $this->belongsTo('App\Models\People\People','people_id','id');
     }
 
     public function setImageAttribute($value)
@@ -177,10 +155,6 @@ class User extends Authenticatable
     public function getIsAdminAttribute()
     {
         return true;
-    }
-
-    public function regulators(){
-      return $this->belongsToMany(\App\Models\Document\Document::class,'document_users','user_id','document_id');
     }
 
     public static function boot()

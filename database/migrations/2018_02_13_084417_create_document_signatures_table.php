@@ -30,7 +30,7 @@ class CreateDocumentSignaturesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('document_favorites');
+		Schema::drop('document_signatures');
 	}
 
 }

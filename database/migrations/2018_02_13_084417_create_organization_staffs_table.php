@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateDocumentTypesTable extends Migration {
+class CreateOrganizationStaffsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,11 +12,11 @@ class CreateDocumentTypesTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('document_types', function(Blueprint $table)
+		Schema::create('organization_staffs', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('type_id')->unsigned();
-			$table->integer('document_id')->unsigned();
+			$table->integer('organization_id')->unsigned(); 
+			$table->integer('user_id')->unsigned();
 			$table->timestamps();
 			$table->softDeletes();
 		});
@@ -30,7 +30,7 @@ class CreateDocumentTypesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('document_types');
+		Schema::drop('organization_staffs');
 	}
 
 }

@@ -17,9 +17,10 @@ use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\FolderController;
 use App\Http\Controllers\Api\Admin\RoleController;
-use App\Http\Controllers\Api\Admin\RegulatorController;
-use App\Http\Controllers\Api\Admin\DocumentParentController;
-use App\Http\Controllers\Api\Admin\TypeController;
+use App\Http\Controllers\Api\Admin\Document\RegulatorController;
+use App\Http\Controllers\Api\Admin\Document\DocumentParentController;
+use App\Http\Controllers\Api\Admin\Document\TypeController;
+use App\Http\Controllers\Api\Admin\Document\OrganizationController;
 use App\Http\Controllers\Api\Admin\ProfileController;
 
 
@@ -91,6 +92,27 @@ Route::group([
 
             Route::put('{id}/accessibility',[FolderController::class,'accessibility']);
 
+    });
+
+    /** ORGANIZATION SECTION */
+    Route::group([
+        'prefix' => 'organizations' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[OrganizationController::class,'index']);
+            Route::post('create',[OrganizationController::class,'store']);
+            Route::post('addchild',[OrganizationController::class,'addChild']);
+            Route::put('update',[OrganizationController::class,'update']);
+            Route::get('{id}/read',[OrganizationController::class,'read']);
+            Route::delete('{id}/delete',[OrganizationController::class,'destroy']);
+            Route::put('activate',[OrganizationController::class,'active']);
+            /**
+             * Check the unique user information
+             */
+            Route::get('children',[OrganizationController::class,'getChildren']);
+            Route::get('documents',[OrganizationController::class,'getDocuments']);
+            Route::get('staffs',[ OrganizationController::class , 'staffs']);
     });
 
     /** ROLE SECTION */
