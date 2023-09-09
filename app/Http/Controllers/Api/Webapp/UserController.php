@@ -106,7 +106,7 @@ class UserController extends Controller
             /**
              * Useful document to add the right to read
              */
-            'regulators' => [ 'id' , 'fid', 'title', 'objective', 'document_year']
+            'regulators' => [ 'id' , 'fid', 'title', 'objective', 'year']
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');

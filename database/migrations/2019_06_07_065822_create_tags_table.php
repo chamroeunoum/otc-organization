@@ -15,7 +15,7 @@ class CreateTagsTable extends Migration
     {
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name',191)->nullable(false)->comment('Name of tag');
+            $table->text('name')->nullable(false)->comment('Name of tag');
             $table->text('desp')->nullable(true)->comment('description of tag');
             $table->string('tpid',191)->nullable()->comment('The id of the parent which identify the whole type of them.');
             $table->integer('pid')->nullable()->comment('Parent id of this tag');

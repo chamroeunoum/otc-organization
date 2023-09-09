@@ -56,8 +56,8 @@ class FolderController extends Controller
         }
 
         // Get document year
-        if( $request->document_year != "" ){
-            $queryBuilder = $queryBuilder -> where('document_year','LIKE','%'.$request->document_year.'%');
+        if( $request->year != "" ){
+            $queryBuilder = $queryBuilder -> where('year','LIKE','%'.$request->year.'%');
         }
         // Get document registration id
         if( $request -> fid != "" ){

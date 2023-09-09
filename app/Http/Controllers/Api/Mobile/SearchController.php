@@ -15,7 +15,7 @@ class SearchController extends Controller
         'fid' ,
         'title' ,
         'objective',
-        'document_year' ,
+        'year' ,
         'pdf' ,
         'document_type' ,
         'publish'
@@ -92,7 +92,7 @@ class SearchController extends Controller
             "search" => $search === false ? [] : [
                 'value' => $search ,
                 'fields' => [
-                    'objective', 'fid', 'document_year'
+                    'objective', 'fid', 'year'
                 ]
             ],
             "order" => [
@@ -168,8 +168,8 @@ class SearchController extends Controller
             }
         }
         // Get document year
-        if( $request->document_year != "" ){
-            $queryBuilder = $queryBuilder -> where('document_year','LIKE','%'.$request->document_year.'%');
+        if( $request->year != "" ){
+            $queryBuilder = $queryBuilder -> where('year','LIKE','%'.$request->year.'%');
         }
         // Get document registration id
         if( $request -> fid != "" ){

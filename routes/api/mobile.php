@@ -78,7 +78,7 @@ Route::group([
     ], function() {
         Route::get('','SearchController@index');
         Route::get('pdf','SearchController@pdf');
-        Route::get('get/document/years','SearchController@getYears');
+        Route::get('get/regulator/years','SearchController@getYears');
         Route::group([
             'prefix' => 'types' ,
             ], function() {
@@ -98,9 +98,9 @@ Route::group([
     'middleware' => 'auth:api'
     ], function() {
         Route::get('list','FolderController@index');
-        Route::get('{folderId}/document/{documentId}/add','FolderController@addDocumentToFolder');
-        Route::get('{folderId}/document/{documentId}/remove','FolderController@removeDocumentToFolder');
-        Route::put('checkdocument','FolderController@checkDocument');
+        Route::get('{folderId}/regulator/{regulatorId}/add','FolderController@addRegulatorToFolder');
+        Route::get('{folderId}/regulator/{regulatorId}/remove','FolderController@removeRegulatorToFolder');
+        Route::put('checkregulator','FolderController@checkRegulator');
         Route::put('delete','FolderController@delete');
         Route::post('store','FolderController@store');
         Route::get('user','FolderController@user');

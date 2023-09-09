@@ -24,12 +24,12 @@ class CreateUsersTable extends Migration {
 			$table->string('role', 191)->default(0)->comment('1: admin,0: member');
 			$table->string('email_verified_at',191)->default('')->comment('field of email verification');
 			$table->string('password', 191);
+			$table->integer('login_count')->nullable();
 			$table->string('avatar_url',191)->nullable(true);
 			$table->string('avatar',191)->nullable(true);
 			$table->string('activation_token',191)->nullable(true);
 			$table->string('forgot_password_token',191)->nullable(true);
 			$table->string('remember_token', 100)->nullable();
-			$table->integer('login_count')->nullable();
 			$table->dateTime('last_login')->nullable();
 			$table->dateTime('last_logout')->nullable();
 			$table->string('active', 191)->nullable()->comment('0 : Blocked , 1 : Active , 2 : Verifing , 4 : Activitated');

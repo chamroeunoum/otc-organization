@@ -93,13 +93,13 @@ class User extends Authenticatable
      */
     // public function ministries()
     // {
-    //     return $this->belongsTo('App\Models\Document\Tag\Organization','organization_staffs','organization_id','user_id');
+    //     return $this->belongsTo('App\Models\Regulator\Tag\Organization','organization_staffs','organization_id','user_id');
     // }
     /**
      * ឯកសារដែលគណនីមួយនេះបានបង្កើត
      */
-    public function documents(){
-        return $this->hasMany(\App\Models\Document\Document::class,'created_by');
+    public function regulators(){
+        return $this->hasMany(\App\Models\Regulator\Regulator::class,'created_by');
     }
 
     public function person(){
@@ -149,7 +149,7 @@ class User extends Authenticatable
     }
 
     public function folders(){
-      return $this->hasMany('\App\Models\Document\Folder','user_id','id');
+      return $this->hasMany('\App\Models\Regulator\Folder','user_id','id');
     }
 
     public function getIsAdminAttribute()
@@ -166,6 +166,6 @@ class User extends Authenticatable
     }
 
     public function favorites(){
-      return $this->belongsToMany('\App\Models\Document\Document','document_favorites','user_id','document_id');
+      return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_favorites','user_id','regulator_id');
     }
 }

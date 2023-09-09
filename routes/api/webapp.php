@@ -6,11 +6,11 @@ use App\Http\Controllers\Api\Webapp\AuthController;
 use App\Http\Controllers\Api\Webapp\UserController;
 use App\Http\Controllers\Api\Webapp\ProfileController;
 use App\Http\Controllers\Api\Webapp\FolderController;
-use App\Http\Controllers\Api\Webapp\Document\SearchController;
-use App\Http\Controllers\Api\Webapp\Document\RegulatorController;
-use App\Http\Controllers\Api\Webapp\Document\TypeController;
-use App\Http\Controllers\Api\Webapp\Document\MinistryController;
-use App\Http\Controllers\Api\Webapp\Document\SignatureController;
+use App\Http\Controllers\Api\Webapp\Regulator\SearchController;
+use App\Http\Controllers\Api\Webapp\Regulator\RegulatorController;
+use App\Http\Controllers\Api\Webapp\Regulator\TypeController;
+use App\Http\Controllers\Api\Webapp\Regulator\MinistryController;
+use App\Http\Controllers\Api\Webapp\Regulator\SignatureController;
 
 Route::group([
   'prefix' => 'webapp' ,
@@ -80,7 +80,7 @@ Route::group([
       //   return 'I am "regulators->SearchController"';
       // });
       Route::get('pdf',[ SearchController::class , 'pdf']);
-      Route::get('get/document/years',[ SearchController::class , 'getYears']);
+      Route::get('get/regulator/years',[ SearchController::class , 'getYears']);
       Route::group([
           'prefix' => 'types' ,
           ], function() {
@@ -147,12 +147,12 @@ Route::group([
         Route::get('{id}/read',[ FolderController::class , 'read']);
         Route::put('',[ FolderController::class , 'update']);
         Route::delete('',[ FolderController::class , 'delete']);
-        Route::get('regulators',[ FolderController::class , 'documents']);
-        Route::put('regulators/add',[ FolderController::class , 'addDocumentToFolder']);
-        Route::put('regulators/remove',[ FolderController::class , 'removeDocumentFromFolder']);
-        Route::put('regulators/check',[ FolderController::class , 'checkDocument']);
+        Route::get('regulators',[ FolderController::class , 'regulators']);
+        Route::put('regulators/add',[ FolderController::class , 'addRegulatorToFolder']);
+        Route::put('regulators/remove',[ FolderController::class , 'removeRegulatorFromFolder']);
+        Route::put('regulators/check',[ FolderController::class , 'checkRegulator']);
         Route::get('user',[ FolderController::class , 'user']);
-        Route::get('list/document/validation',[ FolderController::class , 'listFolderWithDocumentValidation']);
+        Route::get('list/regulator/validation',[ FolderController::class , 'listFolderWithRegulatorValidation']);
 
         Route::put('{id}/accessibility',[FolderController::class,'accessibility']);
         
@@ -162,7 +162,7 @@ Route::group([
     'prefix' => 'folders' ,
     'middleware' => 'auth:api'
     ], function() {
-      Route::get('regulators',[ FolderController::class , 'documents']);
+      Route::get('regulators',[ FolderController::class , 'regulators']);
       Route::get('global',[ FolderController::class , 'globalFolder']);
         
   });

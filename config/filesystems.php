@@ -49,6 +49,12 @@ return [
             'url' => env('APP_URL').'/storage',
             'throw' => true ,
         ],
+        'regulator' => [
+            'driver' => 'local',
+            'root' => storage_path('data') ,
+            'url' => env('APP_URL').'/storage',
+            'throw' => true ,
+        ],
 
         's3' => [
             'driver' => 's3',

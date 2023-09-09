@@ -17,10 +17,11 @@ use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\FolderController;
 use App\Http\Controllers\Api\Admin\RoleController;
-use App\Http\Controllers\Api\Admin\Document\RegulatorController;
-use App\Http\Controllers\Api\Admin\Document\DocumentParentController;
-use App\Http\Controllers\Api\Admin\Document\TypeController;
-use App\Http\Controllers\Api\Admin\Document\OrganizationController;
+use App\Http\Controllers\Api\Admin\Regulator\RegulatorController;
+use App\Http\Controllers\Api\Admin\Regulator\RegulatorParentController;
+use App\Http\Controllers\Api\Admin\Regulator\TypeController;
+use App\Http\Controllers\Api\Admin\Regulator\OrganizationController;
+use App\Http\Controllers\Api\Admin\Regulator\SignatureController;
 use App\Http\Controllers\Api\Admin\ProfileController;
 
 
@@ -81,14 +82,14 @@ Route::group([
              * Check the unique user information
              */
             Route::get('subfolders',[FolderController::class,'getSubfolders']);
-            Route::get('documents',[FolderController::class,'getDocuments']);
+            Route::get('regulators',[FolderController::class,'getRegulators']);
 
             Route::get('regulators',[ FolderController::class , 'regulators']);
-            Route::put('regulators/add',[ FolderController::class , 'addDocumentToFolder']);
-            Route::put('regulators/remove',[ FolderController::class , 'removeDocumentFromFolder']);
-            Route::put('regulators/check',[ FolderController::class , 'checkDocument']);
+            Route::put('regulators/add',[ FolderController::class , 'addRegulatorToFolder']);
+            Route::put('regulators/remove',[ FolderController::class , 'removeRegulatorFromFolder']);
+            Route::put('regulators/check',[ FolderController::class , 'checkRegulator']);
             Route::get('user',[ FolderController::class , 'user']);
-            Route::get('list/document/validation',[ FolderController::class , 'listFolderWithDocumentValidation']);
+            Route::get('list/regulator/validation',[ FolderController::class , 'listFolderWithRegulatorValidation']);
 
             Route::put('{id}/accessibility',[FolderController::class,'accessibility']);
 
@@ -111,7 +112,7 @@ Route::group([
              * Check the unique user information
              */
             Route::get('children',[OrganizationController::class,'getChildren']);
-            Route::get('documents',[OrganizationController::class,'getDocuments']);
+            Route::get('regulators',[OrganizationController::class,'getRegulators']);
             Route::get('staffs',[ OrganizationController::class , 'staffs']);
     });
 
@@ -147,13 +148,23 @@ Route::group([
             Route::post('upload',[RegulatorController::class,'upload']);
             
 
-            // Route::get('get/document/years','RegulatorController@getYears');
+            // Route::get('get/regulator/years','RegulatorController@getYears');
             Route::get('pdf',[RegulatorController::class,'pdf']);
             // Route::get('types/compact', "TypeController@compactList");
             Route::group([
                 'prefix' => 'types' ,
                 ], function() {
                     Route::get('compact', [TypeController::class,'compactList']);
+            });
+            Route::group([
+                'prefix' => 'signatures' ,
+                ], function() {
+                    Route::get('compact', [SignatureController::class,'compactList']);
+            });
+            Route::group([
+                'prefix' => 'organizations' ,
+                ], function() {
+                    Route::get('compact', [OrganizationController::class,'compactList']);
             });
 
             Route::put('addreader',[RegulatorController::class,'addReaders']);
@@ -174,13 +185,13 @@ Route::group([
         'namespace' => 'Api' ,
         'middleware' => 'api'
         ], function() {;
-            Route::get('',[DocumentParentController::class,'index']);
-            Route::get('child',[DocumentParentController::class,'child']);
-            Route::get('read',[DocumentParentController::class,'read']);
-            Route::post('',[DocumentParentController::class,'create']);
-            Route::put('',[DocumentParentController::class,'update']);
-            Route::put('linkdocument',[DocumentParentController::class,'linkDocument']);
-            Route::delete('',[DocumentParentController::class,'destroy']);
+            Route::get('',[RegulatorParentController::class,'index']);
+            Route::get('child',[RegulatorParentController::class,'child']);
+            Route::get('read',[RegulatorParentController::class,'read']);
+            Route::post('',[RegulatorParentController::class,'create']);
+            Route::put('',[RegulatorParentController::class,'update']);
+            Route::put('linkregulator',[RegulatorParentController::class,'linkRegulator']);
+            Route::delete('',[RegulatorParentController::class,'destroy']);
     });
 
     /** FOLDER SECTION */
@@ -190,9 +201,9 @@ Route::group([
     //     'middleware' => 'auth:api'
     //     ], function() {
     //         Route::get('list','FolderController@index');
-    //         Route::get('{folderId}/document/{documentId}/add','FolderController@addDocumentToFolder');
-    //         Route::get('{folderId}/document/{documentId}/remove','FolderController@removeDocumentToFolder');
-    //         Route::put('checkdocument','FolderController@checkDocument');
+    //         Route::get('{folderId}/regulator/{regulatorId}/add','FolderController@addRegulatorToFolder');
+    //         Route::get('{folderId}/regulator/{regulatorId}/remove','FolderController@removeRegulatorToFolder');
+    //         Route::put('checkregulator','FolderController@checkRegulator');
     //         Route::put('delete','FolderController@delete');
     //         Route::post('store','FolderController@store');
     //         Route::get('user','FolderController@user');
