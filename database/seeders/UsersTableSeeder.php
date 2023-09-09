@@ -718,7 +718,7 @@ class UsersTableSeeder extends Seeder
         ));
         
         \App\Models\User::where('id','>',4)->get()->map(function($user) use( $backendMember ){
-            $user->assignRole( $backendMember )
+            $user->assignRole( $backendMember );
         });
         
     }
