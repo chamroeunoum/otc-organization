@@ -17,75 +17,69 @@ class UsersTableSeeder extends Seeder
         
 
         \DB::table('users')->delete();
-
-        /**
-         * Write the dumpmy data for the application
-         */
-
-        /**
-         * Create role for the user
-         */
-        $super = \App\Models\Role::create(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $administrator = \App\Models\Role::create(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $backendMember = \App\Models\Role::create(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $client = \App\Models\Role::create(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp']);
-
-        /**
-         * Create accounts
-         */
-        /**
-         * Create admin user for development purpose
-         */
-        $chamroeunoum = \App\Models\User::create([
-            'firstname' => 'Chamroeun' ,
-            'lastname' => 'OUM' ,
-            'email' => 'chamroeunoum@gmail.com' ,
-            'active' => 1 ,
-            'password' => bcrypt('031884Chamroeunoum') ,
-            'phone' => '012557200' ,
-            'username' => 'chamroeunoum'
-        ]);
-        
-        $people = \App\Models\People\People::create([
-            'firstname' => $chamroeunoum->firstname , 
-            'lastname' => $chamroeunoum->lastname , 
-            'gender' => 0 , // Male
-            'dob' => \Carbon\Carbon::parse('1984-03-18 9:00') ,
-            'mobile_phone' => $chamroeunoum->phone , 
-            'email' => $chamroeunoum->email
-        ]);
-        $chamroeunoum->people_id = $people->id ;
-        $chamroeunoum->save();
-        $chamroeunoum->assignRole( $administrator );
-
-
-        /**
-         * Create client user for development purpose
-         */
-        $puthireach = \App\Models\User::create([
-            'firstname' => 'Puthireach' ,
-            'lastname' => 'KONGCHAN' ,
-            'email' => 'kongchanputhireach@gmail.com' ,
-            'active' => 1 ,
-            'password' => bcrypt('1234567890+1') ,
-            'phone' => '010517515' ,
-            'username' => 'kcputhireach'
-        ]);
-        
-        $people = \App\Models\People\People::create([
-            'firstname' => $puthireach->firstname , 
-            'lastname' => $puthireach->lastname , 
-            'gender' => 0 , // Male
-            'dob' => \Carbon\Carbon::parse('1984-03-18 9:00') ,
-            'mobile_phone' => $puthireach->phone , 
-            'email' => $puthireach->email
-        ]);
-        $puthireach->people_id = $people->id ;
-        $puthireach->save();
-        $puthireach->assignRole( $client );
         
         \DB::table('users')->insert(array (
             0 => 
+            array (
+                'id' => 1,
+                'people_id' => 1,
+                'lastname' => 'OUM',
+                'firstname' => 'Chamroeun',
+                'phone' => '012557200',
+                'username' => 'chamroeunoum',
+                'email' => 'chamroeunoum@gmail.com',
+                'role' => '0',
+                'email_verified_at' => '',
+                'password' => '$2y$10$/0mbQhggaIV7qpp.vfSbbu4ffpN5zPEV..e1GjrTnfqivbbvKOR7m',
+                'login_count' => NULL,
+                'avatar_url' => NULL,
+                'avatar' => NULL,
+                'activation_token' => NULL,
+                'forgot_password_token' => NULL,
+                'remember_token' => NULL,
+                'last_login' => NULL,
+                'last_logout' => NULL,
+                'active' => '1',
+                'ip' => NULL,
+                'authenip' => NULL,
+                'mac_address' => NULL,
+                'image' => NULL,
+                'created_at' => '2023-09-10 06:44:28',
+                'updated_at' => '2023-09-10 06:44:28',
+                'deleted_at' => NULL,
+                'api_token' => NULL,
+            ),
+            1 => 
+            array (
+                'id' => 2,
+                'people_id' => 2,
+                'lastname' => 'KONGCHAN',
+                'firstname' => 'Puthireach',
+                'phone' => '010517515',
+                'username' => 'kcputhireach',
+                'email' => 'kongchanputhireach@gmail.com',
+                'role' => '0',
+                'email_verified_at' => '',
+                'password' => '$2y$10$PScRQoEgvlh8R3TADsAk4ehimA2sGkz4Yjat.C20.u/IU7/fvYXBK',
+                'login_count' => NULL,
+                'avatar_url' => NULL,
+                'avatar' => NULL,
+                'activation_token' => NULL,
+                'forgot_password_token' => NULL,
+                'remember_token' => NULL,
+                'last_login' => NULL,
+                'last_logout' => NULL,
+                'active' => '1',
+                'ip' => NULL,
+                'authenip' => NULL,
+                'mac_address' => NULL,
+                'image' => NULL,
+                'created_at' => '2023-09-10 06:44:28',
+                'updated_at' => '2023-09-10 06:44:28',
+                'deleted_at' => NULL,
+                'api_token' => NULL,
+            ),
+            2 => 
             array (
                 'id' => 5,
                 'people_id' => 0,
@@ -115,7 +109,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            1 => 
+            3 => 
             array (
                 'id' => 7,
                 'people_id' => 0,
@@ -145,7 +139,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            2 => 
+            4 => 
             array (
                 'id' => 8,
                 'people_id' => 0,
@@ -175,7 +169,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            3 => 
+            5 => 
             array (
                 'id' => 9,
                 'people_id' => 0,
@@ -205,7 +199,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            4 => 
+            6 => 
             array (
                 'id' => 10,
                 'people_id' => 0,
@@ -235,7 +229,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            5 => 
+            7 => 
             array (
                 'id' => 11,
                 'people_id' => 0,
@@ -265,7 +259,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            6 => 
+            8 => 
             array (
                 'id' => 14,
                 'people_id' => 0,
@@ -295,7 +289,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            7 => 
+            9 => 
             array (
                 'id' => 18,
                 'people_id' => 0,
@@ -325,7 +319,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            8 => 
+            10 => 
             array (
                 'id' => 19,
                 'people_id' => 0,
@@ -355,7 +349,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            9 => 
+            11 => 
             array (
                 'id' => 21,
                 'people_id' => 0,
@@ -385,7 +379,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            10 => 
+            12 => 
             array (
                 'id' => 22,
                 'people_id' => 0,
@@ -415,7 +409,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            11 => 
+            13 => 
             array (
                 'id' => 24,
                 'people_id' => 0,
@@ -445,7 +439,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            12 => 
+            14 => 
             array (
                 'id' => 27,
                 'people_id' => 0,
@@ -475,7 +469,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            13 => 
+            15 => 
             array (
                 'id' => 28,
                 'people_id' => 0,
@@ -505,7 +499,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            14 => 
+            16 => 
             array (
                 'id' => 30,
                 'people_id' => 0,
@@ -535,7 +529,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            15 => 
+            17 => 
             array (
                 'id' => 31,
                 'people_id' => 0,
@@ -565,7 +559,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            16 => 
+            18 => 
             array (
                 'id' => 32,
                 'people_id' => 0,
@@ -595,7 +589,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            17 => 
+            19 => 
             array (
                 'id' => 33,
                 'people_id' => 0,
@@ -625,7 +619,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            18 => 
+            20 => 
             array (
                 'id' => 34,
                 'people_id' => 0,
@@ -655,7 +649,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            19 => 
+            21 => 
             array (
                 'id' => 35,
                 'people_id' => 0,
@@ -685,7 +679,7 @@ class UsersTableSeeder extends Seeder
                 'deleted_at' => NULL,
                 'api_token' => NULL,
             ),
-            20 => 
+            22 => 
             array (
                 'id' => 36,
                 'people_id' => 0,
@@ -717,9 +711,6 @@ class UsersTableSeeder extends Seeder
             ),
         ));
         
-        \App\Models\User::where('id','>',4)->get()->map(function($user) use( $backendMember ){
-            $user->assignRole( $backendMember );
-        });
         
     }
 }

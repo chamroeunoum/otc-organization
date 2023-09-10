@@ -104,11 +104,7 @@ class UserController extends Controller
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
-            "roles" => ['id','name', 'tag'] ,
-            /**
-             * Useful document to add the right to read
-             */
-            'regulators' => [ 'id' , 'fid', 'title', 'objective', 'year']
+            "roles" => ['id','name', 'tag']
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');

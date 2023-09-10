@@ -53,10 +53,10 @@ class Regulator extends Model
     public function organizations(){
       return $this->belongsToMany('\App\Models\Regulator\Tag\Organization','organization_regulators','regulator_id','organization_id');
     }
-    public function organizationOwns(){
+    public function ownOrganizations(){
       return $this->belongsToMany('\App\Models\Regulator\Tag\Organization','organization_own_regulators','regulator_id','organization_id');
     }
-    public function organizationRelateds(){
+    public function relatedOrganizations(){
       return $this->belongsToMany('\App\Models\Regulator\Tag\Organization','organization_related_regulators','regulator_id','organization_id');
     }
     public function signatures(){

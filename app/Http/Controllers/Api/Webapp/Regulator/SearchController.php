@@ -40,7 +40,7 @@ class SearchController extends Controller
                     ] ,
                     [
                         'field' => 'accessibility' ,
-                        'value' => [ 2 , 4 ]
+                        'value' => [ 4 ]
                     ]
                 ],
                 // 'in' => [

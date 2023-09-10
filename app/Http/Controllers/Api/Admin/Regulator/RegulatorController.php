@@ -140,9 +140,11 @@ class RegulatorController extends Controller
 
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            'types' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
             'organizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
-            'signatures' => [ 'id' , 'name' , 'desp' , 'pid' ]
+            'ownOrganizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'relatedOrganizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'signatures' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'types' => [ 'id' , 'name' , 'desp' , 'pid' ] 
         ]);
 
         $builder = $crud->getListBuilder();
@@ -251,11 +253,14 @@ class RegulatorController extends Controller
         $request->merge( $queryString );
 
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+        
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name'] ,
-            'parentRegulator' => [ 'id' ,'parent_id', 'document_id', 'amend' ]
+            'organizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'ownOrganizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'relatedOrganizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'signatures' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'types' => [ 'id' , 'name' , 'desp' , 'pid' ]
         ]);
 
         $builder = $crud->getListBuilder();
