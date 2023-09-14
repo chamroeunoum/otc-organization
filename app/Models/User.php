@@ -91,10 +91,10 @@ class User extends Authenticatable
     /**
      * Organization that the user is in
      */
-    // public function ministries()
-    // {
-    //     return $this->belongsTo('App\Models\Regulator\Tag\Organization','organization_staffs','organization_id','user_id');
-    // }
+    public function organizations()
+    {
+        return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_staffs','user_id','organization_id');
+    }
     /**
      * ឯកសារដែលគណនីមួយនេះបានបង្កើត
      */

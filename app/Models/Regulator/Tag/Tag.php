@@ -30,7 +30,7 @@ class Tag extends Model
         return $this->where('model',$this->getModel())
             ->whereNull('deleted_at')
             ->where(function($q){ 
-                $q->whereNull('tpid')->orWhere('tpid',"")->orWhere('tpid',0); 
+                $q->whereNull('tpid')->orWhere('tpid',""); 
             })->first();
     }
     public function children(){
@@ -57,5 +57,4 @@ class Tag extends Model
         }
         return null ;
     }
-    
 }

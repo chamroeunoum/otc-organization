@@ -15,16 +15,19 @@ class Organization extends Tag
     /**
      * Relationship
      */
-    public function regulators(){
-        return $this->belongsToMany('\App\Models\Regulator\Regulator','organization_regulators','organization_id','regulator_id');
-    }
-    public function staffs(){
-        return $this->belongsToMany('\App\Models\User','organization_staffs','organization_id','user_id');
-    }
     public function childNodes(){
         return $this->hasMany('\App\Models\Regulator\Tag\Organization','pid','id');
     }
     public function parentNode(){
         return $this->hasOne('\App\Models\Regulator\Tag\Organization','id','pid');
+    }
+    /**
+     * Organization
+     */
+    public function organizationRegulators(){
+        return $this->belongsToMany('\App\Models\Regulator\Regulator','organization_regulators','organization_id','regulator_id');
+    }
+    public function organizationStaffs(){
+        return $this->belongsToMany('\App\Models\User','organization_staffs','organization_id','user_id');
     }
 }

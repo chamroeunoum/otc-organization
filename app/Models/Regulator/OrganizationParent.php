@@ -34,13 +34,13 @@ class OrganizationParent extends Model
     |--------------------------------------------------------------------------
     */
     public function organization(){
-        return $this->belongsTo('App\Models\Document\Tag\Organization','organization_id','id');
+        return $this->belongsTo('App\Models\Regulator\Tag\Organization','organization_id','id');
     }
     public function parentOrganization(){
-        return $this->belongsTo('App\Models\Document\Tag\Organization','tpid','id');
+        return $this->belongsTo('App\Models\Regulator\Tag\Organization','tpid','id');
     }
     public function parentRecord(){
-        return $this->belongsTo('App\Models\Document\OrganizationParent','pid','id');
+        return $this->belongsTo('App\Models\Regulator\OrganizationParent','pid','id');
     }
     /*
     |--------------------------------------------------------------------------

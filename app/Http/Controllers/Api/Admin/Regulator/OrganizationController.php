@@ -26,7 +26,7 @@ class OrganizationController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-        $id = intval( $request->id ) > 0 ? intval( $request->id ) : 33 ;
+        $id = intval( $request->id ) > 0 ? intval( $request->id ) : 164 ; // 164 ទីស្ដីការគៈណរដ្ឋនមន្ត្រី
         $root = $id > 0 
             ? RecordModel::where('id',$id)->first()
             : RecordModel::where('model', get_class( $this->model ) )->first();
@@ -82,6 +82,11 @@ class OrganizationController extends Controller
 
         $responseData = $crud->pagination(true , $builder );
         $responseData['records'] = $responseData['records']->prepend( $root );
+        $responseData['records'] = $responseData['records']->map(function($organization){
+            $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
+            $organization['staffs'] = $org != null ? $org->organizationStaffs : [] ;
+            return $organization;
+        });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
