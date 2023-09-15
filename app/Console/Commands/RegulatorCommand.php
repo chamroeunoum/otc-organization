@@ -55,11 +55,12 @@ class RegulatorCommand extends Command
         echo "START BACKING UP THE REGULATORS TO FOLDER ( " . $folderName . " ) : " . PHP_EOL ;
         $totalRegulators = 0 ;
         $totalFailedCopies = 0 ;
-        $regulatorTypeBuilder->get()->each(function( $regulatorType ) use( $folderName , &$totalRegulators , &$totalFailedCopies ) {
+        $failedIds = [] ;
+        $regulatorTypeBuilder->get()->each(function( $regulatorType ) use( $folderName , &$totalRegulators , &$totalFailedCopies , $failedIds ) {
             echo "BACKING UP REGULATOR TYPE " . $regulatorType->id . " : " . $regulatorType->name . " ( " . $regulatorType->regulators->count() . " ) " . PHP_EOL ;
             $totalRegulators += $regulatorType->regulators->count();
             // Code backing up go here
-            $regulatorType->regulators()->get()->each(function($regulator, $index) use( $regulatorType , $folderName , &$totalRegulators , &$totalFailedCopies ) {
+            $regulatorType->regulators()->get()->each(function($regulator, $index) use( $regulatorType , $folderName , &$totalRegulators , &$totalFailedCopies , $failedIds  ) {
 
                 $source = storage_path() . '/data/'. $regulator->pdf ;
                 $destination = storage_path() . '/data/'.$folderName.'/'. str_replace( ['regulators','/'] , [''] , $regulator->pdf ) ;
@@ -73,15 +74,21 @@ class RegulatorCommand extends Command
                         echo "+ REGULATOR TYPE : " . $regulatorType->id . " - INDEX : " . $index + 1 . " - REGULATOR ID : " . $regulator->id . " => OK ." . PHP_EOL ;
                     }else{
                         $totalFailedCopies++ ;
+                        $failedIds[] =  $regulatorType->id ;
                         // echo "+ REGULATOR TYPE : " . $regulatorType->id . " - INDEX : " . $index + 1 . " - REGULATOR ID : " . $regulator->id . " => FALIED ." . PHP_EOL ;
                     }
                 }else{
                     $totalFailedCopies++ ;
+                    $failedIds[] =  $regulatorType->id ;
                     // echo " NO PDF FILE." . PHP_EOL;
                 }
             });
         });
         echo "TOTAL REGULATOR(s) : " . $totalRegulators . " , FAILED COPIED : " . $totalFailedCopies . ' , SUCCEED : ' . ( $totalRegulators - $totalFailedCopies ) . PHP_EOL ;
+        if( count( $totalFailedCopies ) > 0 ){
+            echo "ID(s) OF REGULATOR THAT FAILED TO COPY : " . PHP_EOL;
+            echo implode( ' , ' , $failedIds ) . PHP_EOL;
+        }
         return Command::SUCCESS;
     }
 }
