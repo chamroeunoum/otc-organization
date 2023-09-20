@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api\Admin\Regulator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CrudController;
-use App\Models\Regulator\Tag\Organization as RecordModel;
+use App\Models\Regulator\Tag\Position as RecordModel;
 
 
-class OrganizationController extends Controller
+class PositionController extends Controller
 {
     private $model = null ;
     private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'record_index'  ] ;
@@ -26,7 +26,7 @@ class OrganizationController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-        $id = intval( $request->id ) > 0 ? intval( $request->id ) : 164 ; // 164 ទីស្ដីការគៈណរដ្ឋនមន្ត្រី
+        $id = intval( $request->id ) > 0 ? intval( $request->id ) : 489 ; // 489 តំណែងក្នុងអង្គភាព
         $root = $id > 0 
             ? RecordModel::where('id',$id)->first()
             : RecordModel::where('model', get_class( $this->model ) )->first();

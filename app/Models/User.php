@@ -79,18 +79,6 @@ class User extends Authenticatable
       return $this->belongsToMany('App\Models\Role','user_role','user_id','role_id');
     }
 
-    // public function dlists()
-    // {
-    //     return $this->hasMany('App\Models\Dlist','user_id','id');
-    // }
-
-    // public function groups()
-    // {
-    //     return $this->hasMany('App\Models\Group','group_id','id');
-    // }
-    /**
-     * Organization that the user is in
-     */
     public function organizations()
     {
         return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_staffs','user_id','organization_id');
@@ -105,6 +93,28 @@ class User extends Authenticatable
     public function person(){
       return $this->belongsTo('App\Models\People\People','people_id','id');
     }
+    public function favorites(){
+      return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_favorites','user_id','regulator_id');
+    }
+    public function positions(){
+      return $this->belongsToMany('\App\Models\Regulator\Tag\Position','position_users','user_id','position_id');
+    }
+    public function signatures(){
+      return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','user_signatures','user_id','signature_id');
+    }
+    
+    // public function dlists()
+    // {
+    //     return $this->hasMany('App\Models\Dlist','user_id','id');
+    // }
+
+    // public function groups()
+    // {
+    //     return $this->hasMany('App\Models\Group','group_id','id');
+    // }
+    /**
+     * Organization that the user is in
+     */
 
     public function setImageAttribute($value)
     {
@@ -165,7 +175,4 @@ class User extends Authenticatable
         });
     }
 
-    public function favorites(){
-      return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_favorites','user_id','regulator_id');
-    }
 }

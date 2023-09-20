@@ -15,7 +15,7 @@ class Regulator extends Model
     //protected $primaryKey = 'id';
     public $timestamps = true;
     protected $guarded = ['id'];
-    protected $fillable = ['fid','title','objective', 'regulator_year','regulator_type','pdf','created_by','updated_by','publish', 'active', 'accessibility'];
+    protected $fillable = ['fid','title','objective', 'year','pdf','created_by','updated_by','publish', 'active', 'accessibility'];
     // protected $hidden = [];
     // protected $dates = [];
 

@@ -6,7 +6,7 @@ use App\Models\Regulator\Tag\Tag;
 /**
  * This class is use to identify the organization of the regulator
  */
-class Organization extends Tag
+class Position extends Tag
 {
     // protected $guarded = ['id'];
     public function __construct(){
@@ -16,18 +16,18 @@ class Organization extends Tag
      * Relationship
      */
     public function childNodes(){
-        return $this->hasMany('\App\Models\Regulator\Tag\Organization','pid','id');
+        return $this->hasMany('\App\Models\Regulator\Tag\Position','pid','id');
     }
     public function parentNode(){
-        return $this->hasOne('\App\Models\Regulator\Tag\Organization','id','pid');
+        return $this->hasOne('\App\Models\Regulator\Tag\Position','id','pid');
     }
     /**
      * Organization
      */
     public function regulators(){
-        return $this->belongsToMany('\App\Models\Regulator\Regulator','organization_regulators','organization_id','regulator_id');
+        return $this->belongsToMany('\App\Models\Regulator\Regulator','position_regulators','position_id','regulator_id');
     }
     public function staffs(){
-        return $this->belongsToMany('\App\Models\User','organization_staffs','organization_id','user_id');
+        return $this->belongsToMany('\App\Models\User','position_users','position_id','user_id');
     }
 }

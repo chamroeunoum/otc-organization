@@ -104,7 +104,9 @@ class UserController extends Controller
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
-            "roles" => ['id','name', 'tag']
+            "roles" => ['id','name', 'tag'] ,
+            "organizations" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
+            "positions" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ]
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
@@ -148,6 +150,14 @@ class UserController extends Controller
             }
             
             $user->save();
+
+            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
+                $user->organizations()->sync( $request->organizations );
+            }
+            if( isset( $request->positions ) && !empty( $request->positions ) ){
+                $user->positions()->sync( $request->positions );
+            }
+
             if( $user ){
                 
                 return response()->json([
@@ -177,6 +187,12 @@ class UserController extends Controller
             'username' => $request->username ,
             'phone' => $request->phone
         ]) == true ){;
+            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
+                $user->organizations()->sync( $request->organizations );
+            }
+            if( isset( $request->positions ) && !empty( $request->positions ) ){
+                $user->positions()->sync( $request->positions );
+            }
             return response()->json([
                 'user' => $user ,
                 'message' => 'កែប្រែព័ត៌មានរួចរាល់ !' ,
@@ -413,7 +429,7 @@ class UserController extends Controller
             $record->save();
         }
 
-        if( $record->avatar_url !== null && Storage::disk('public')->exists( $record->avatar_url ) ){
+        if( $record->avatar_url != null && $record->avatar_url != "" && Storage::disk('public')->exists( $record->avatar_url )  ){
             $record->avatar_url = Storage::disk("public")->url( $record->avatar_url  );
         }else{
             $record->avatar_url = null ;

@@ -92,6 +92,33 @@ class DatabaseSeeder extends Seeder
         $this->call(OrganizationRegulatorsTableSeeder::class);
         $this->call(OrganizationOwnRegulatorsTableSeeder::class);
         $this->call(OrganizationRelatedRegulatorsTableSeeder::class);
-        
+        $this->call(PositionUsersTableSeeder::class);
+        $this->call(OrganizationStaffsTableSeeder::class);
+
+        echo 'RUN INDEXING OF ROLES' . PHP_EOL;
+        \DB::statement("SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles )+1);");
+        echo 'RUN INDEXING OF USERS' . PHP_EOL;
+        \DB::statement("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users )+1);");
+        echo 'RUN INDEXING OF PEOPLE' . PHP_EOL;
+        \DB::statement("SELECT setval('people_id_seq', (SELECT MAX(id) FROM people )+1);");
+        echo 'RUN INDEXING OF TAGS' . PHP_EOL;
+        \DB::statement("SELECT setval('tags_id_seq', (SELECT MAX(id) FROM tags )+1);");
+        echo 'RUN INDEXING OF REGULATORS' . PHP_EOL;
+        \DB::statement("SELECT setval('regulators_id_seq', (SELECT MAX(id) FROM regulators )+1);");
+        echo 'RUN INDEXING OF REGULATOR TYPES' . PHP_EOL;
+        \DB::statement("SELECT setval('regulator_types_id_seq', (SELECT MAX(id) FROM regulator_types )+1);");
+        echo 'RUN INDEXING OF REGULATOR SIGNATURES' . PHP_EOL;
+        \DB::statement("SELECT setval('regulator_signatures_id_seq', (SELECT MAX(id) FROM regulator_signatures )+1);");
+        echo 'RUN INDEXING OF ORGANIZATION REGULATORS' . PHP_EOL;
+        \DB::statement("SELECT setval('organization_regulators_id_seq', (SELECT MAX(id) FROM organization_regulators )+1);");
+        echo 'RUN INDEXING OF ORGANIZATION OWN REGULATORS' . PHP_EOL;
+        \DB::statement("SELECT setval('organization_own_regulators_id_seq', (SELECT MAX(id) FROM organization_own_regulators )+1);");
+        echo 'RUN INDEXING OF ORGANIZATION RELATED REGULATORS' . PHP_EOL;
+        \DB::statement("SELECT setval('organization_related_regulators_id_seq', (SELECT MAX(id) FROM organization_related_regulators )+1);");
+        echo 'RUN INDEXING OF POSITION USERS' . PHP_EOL;
+        \DB::statement("SELECT setval('position_users_id_seq', (SELECT MAX(id) FROM position_users )+1);");
+        echo 'RUN INDEXING OF ORGANIZATION STAFFS ' . PHP_EOL;
+        \DB::statement("SELECT setval('organization_staffs_id_seq', (SELECT MAX(id) FROM organization_staffs )+1);");
+
     }
 }

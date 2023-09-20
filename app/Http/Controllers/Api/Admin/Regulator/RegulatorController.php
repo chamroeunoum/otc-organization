@@ -446,6 +446,12 @@ class RegulatorController extends Controller
         if( count( $request->organizations ) > 0 ){
             $record->organizations()->sync( $request->organizations );
         }
+        if( count( $request->ownOrganizations ) > 0 ){
+            $record->ownOrganizations()->sync( $request->ownOrganizations );
+        }
+        if( count( $request->relatedOrganizations ) > 0 ){
+            $record->relatedOrganizations()->sync( $request->relatedOrganizations );
+        }
         /**
          * Sync the signatures
          */
@@ -455,8 +461,10 @@ class RegulatorController extends Controller
         /**
          * Sync the types
          */
-        if( count( $request->types ) > 0 ){
-            $record->types()->sync( $request->types );
+        if( isset( $request->types ) ){
+            is_array( $request->types ) && count( $request->types ) > 0 
+                ? $record->types()->sync( $request->types )
+                :  $record->types()->sync( [$request->types] ) ;
         }
         
         $responseData['message'] = __("crud.read.success");
@@ -478,6 +486,34 @@ class RegulatorController extends Controller
                 'active' => $request->active > 0 ? 1 : 0 ,
                 'updated_by' => \Auth::user()->id
             ]) ){
+
+                /**
+                 * Sync the organizations
+                 */
+                if( count( $request->organizations ) > 0 ){
+                    $record->organizations()->sync( $request->organizations );
+                }
+                if( count( $request->ownOrganizations ) > 0 ){
+                    $record->ownOrganizations()->sync( $request->ownOrganizations );
+                }
+                if( count( $request->relatedOrganizations ) > 0 ){
+                    $record->relatedOrganizations()->sync( $request->relatedOrganizations );
+                }
+                /**
+                 * Sync the signatures
+                 */
+                if( count( $request->signatures ) > 0 ){
+                    $record->signatures()->sync( $request->signatures );
+                }
+                /**
+                 * Sync the types
+                 */
+                if( isset( $request->types ) ){
+                    is_array( $request->types ) && count( $request->types ) > 0 
+                        ? $record->types()->sync( $request->types )
+                        :  $record->types()->sync( [$request->types] ) ;
+                }
+
                 $responseData['message'] = __("crud.read.success");
                 $responseData['ok'] = true ;
                 $responseData['record'] = $record ;

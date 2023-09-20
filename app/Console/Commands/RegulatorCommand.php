@@ -85,7 +85,7 @@ class RegulatorCommand extends Command
             });
         });
         echo "TOTAL REGULATOR(s) : " . $totalRegulators . " , FAILED COPIED : " . $totalFailedCopies . ' , SUCCEED : ' . ( $totalRegulators - $totalFailedCopies ) . PHP_EOL ;
-        if( count( $totalFailedCopies ) > 0 ){
+        if( $totalFailedCopies > 0 ){
             echo "ID(s) OF REGULATOR THAT FAILED TO COPY : " . PHP_EOL;
             echo implode( ' , ' , $failedIds ) . PHP_EOL;
         }

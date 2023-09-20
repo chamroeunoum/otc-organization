@@ -17,4 +17,7 @@ class Signature extends Tag
     public function regulators(){
         return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_signatures','signature_id','regulator_id');
     }
+    public function user(){
+        return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','user_signatures','signature_id','user_id');
+    }
 }

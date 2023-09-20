@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Admin\Regulator\RegulatorController;
 use App\Http\Controllers\Api\Admin\Regulator\RegulatorParentController;
 use App\Http\Controllers\Api\Admin\Regulator\TypeController;
 use App\Http\Controllers\Api\Admin\Regulator\OrganizationController;
+use App\Http\Controllers\Api\Admin\Regulator\PositionController;
 use App\Http\Controllers\Api\Admin\Regulator\SignatureController;
 use App\Http\Controllers\Api\Admin\ProfileController;
 
@@ -154,17 +155,17 @@ Route::group([
             Route::group([
                 'prefix' => 'types' ,
                 ], function() {
-                    Route::get('compact', [TypeController::class,'compactList']);
+                    Route::get('compact', [TypeController::class,'compact']);
             });
             Route::group([
                 'prefix' => 'signatures' ,
                 ], function() {
-                    Route::get('compact', [SignatureController::class,'compactList']);
+                    Route::get('compact', [SignatureController::class,'compact']);
             });
             Route::group([
                 'prefix' => 'organizations' ,
                 ], function() {
-                    Route::get('compact', [OrganizationController::class,'compactList']);
+                    Route::get('compact', [OrganizationController::class,'compact']);
             });
 
             Route::put('addreader',[RegulatorController::class,'addReaders']);
@@ -192,6 +193,40 @@ Route::group([
             Route::put('',[RegulatorParentController::class,'update']);
             Route::put('linkregulator',[RegulatorParentController::class,'linkRegulator']);
             Route::delete('',[RegulatorParentController::class,'destroy']);
+    });
+
+    Route::group([
+        'prefix' => 'organizations' ,
+        ], function() {
+            Route::get('',[OrganizationController::class,'index']);
+            Route::get('compact', [OrganizationController::class,'compact']);
+            Route::get('read',[OrganizationController::class,'read']);
+            Route::post('',[OrganizationController::class,'create']);
+            Route::put('',[OrganizationController::class,'update']);
+            Route::put('{id}/activate',[OrganizationController::class,'activate']);
+            Route::put('{id}/deactivate',[OrganizationController::class,'deactivate']);
+            Route::delete('',[OrganizationController::class,'destroy']);
+
+            Route::get('child',[OrganizationController::class,'child']);
+            Route::post('upload',[OrganizationController::class,'upload']);
+            
+    });
+
+    Route::group([
+        'prefix' => 'positions' ,
+        ], function() {
+            Route::get('',[PositionController::class,'index']);
+            Route::get('compact', [PositionController::class,'compact']);
+            Route::get('read',[PositionController::class,'read']);
+            Route::post('',[PositionController::class,'create']);
+            Route::put('',[PositionController::class,'update']);
+            Route::put('{id}/activate',[PositionController::class,'activate']);
+            Route::put('{id}/deactivate',[PositionController::class,'deactivate']);
+            Route::delete('',[PositionController::class,'destroy']);
+
+            Route::get('child',[PositionController::class,'child']);
+            Route::post('upload',[PositionController::class,'upload']);
+            
     });
 
     /** FOLDER SECTION */
