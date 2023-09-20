@@ -99,6 +99,8 @@ class DatabaseSeeder extends Seeder
         \DB::statement("SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles )+1);");
         echo 'RUN INDEXING OF USERS' . PHP_EOL;
         \DB::statement("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users )+1);");
+        echo 'RUN INDEXING OF USER ROLE' . PHP_EOL;
+        \DB::statement("SELECT setval('user_role_id_seq', (SELECT MAX(id) FROM user_role )+1);");
         echo 'RUN INDEXING OF PEOPLE' . PHP_EOL;
         \DB::statement("SELECT setval('people_id_seq', (SELECT MAX(id) FROM people )+1);");
         echo 'RUN INDEXING OF TAGS' . PHP_EOL;
