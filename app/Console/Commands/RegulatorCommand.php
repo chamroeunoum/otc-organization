@@ -70,13 +70,13 @@ class RegulatorCommand extends Command
                     file_exists( $source ) &&
                     is_file ( $source )
                  ){
-                    if( copy( $source , $destination ) ){
-                        echo "+ REGULATOR TYPE : " . $regulatorType->id . " - INDEX : " . $index + 1 . " - REGULATOR ID : " . $regulator->id . " => OK ." . PHP_EOL ;
-                    }else{
-                        $totalFailedCopies++ ;
-                        $failedIds[] =  $regulatorType->id ;
+                    // if( copy( $source , $destination ) ){
+                    //     echo "+ REGULATOR TYPE : " . $regulatorType->id . " - INDEX : " . $index + 1 . " - REGULATOR ID : " . $regulator->id . " => OK ." . PHP_EOL ;
+                    // }else{
+                    //     $totalFailedCopies++ ;
+                    //     $failedIds[] =  $regulatorType->id ;
                         // echo "+ REGULATOR TYPE : " . $regulatorType->id . " - INDEX : " . $index + 1 . " - REGULATOR ID : " . $regulator->id . " => FALIED ." . PHP_EOL ;
-                    }
+                    // }
                 }else{
                     $totalFailedCopies++ ;
                     $failedIds[] =  $regulatorType->id ;
