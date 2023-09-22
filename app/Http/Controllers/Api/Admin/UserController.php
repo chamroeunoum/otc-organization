@@ -416,7 +416,7 @@ class UserController extends Controller
             /**
              * Create owner of the account, in case the account does not has the owner.
              */
-            $person = \App\Models\People::create([
+            $person = \App\Models\People\People::create([
                 'firstname' => $record->firstname , 
                 'lastname' => $record->lastname , 
                 'gender' => $record->gender , 

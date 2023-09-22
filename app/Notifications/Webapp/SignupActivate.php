@@ -54,7 +54,7 @@ class SignupActivate extends Notification
          */
         return (new MailMessage)
         ->subject('បញ្ជាក់អំពីការចុះឈ្មោះ - ឯកសារអេឡិចត្រូនិច')
-        ->greeting("សួស្ដី, អ៊ុំ ចំរើន")
+        ->greeting("សួស្ដី, " . $notifiable->lastname . ' ' . $notifiable->firstname )
         ->line("ខាងក្រោមជា លេខកូត ដែលអ្នកនិងត្រូវការដើម្បីបញ្ជាក់អំពីការចុះឈ្មោះរបស់អ្នកជាមួយ អសយដ្ឋានអេឡិចត្រូនិច មួយនេះ។")
         ->line( $notifiable->activation_token )
         ->line("សូមបញ្ចូលលេខកូតនេះទៅក្នុងទំព័រ បញ្ជាក់គណនីរបស់ប្រព័ន្ធឯកសារអេឡិចត្រូនិច ដើម្បីបញ្ចប់តំណើរការចុះឈ្មោះរបស់អ្នកជាស្ថាពរ។")

@@ -11,7 +11,7 @@ use App\Models\Regulator\Tag\Signature as RecordModel;
 class SignatureController extends Controller
 {
     private $model = null ;
-    private $fields = [ 'id','name','desp' , 'pid' ] ;
+    private $fields = [ 'id','name','desp' , 'pid' , 'record_index'  ] ;
     public function __construct(){
         $this->model = new RecordModel();
     }
@@ -26,11 +26,11 @@ class SignatureController extends Controller
         ],200 );
     }
     /** Mini display */
-    public function compactList(Request $request)
+    public function compact(Request $request)
     {
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
-        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 1000 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
         $queryString = [
             "where" => [
@@ -69,13 +69,13 @@ class SignatureController extends Controller
                 ]
             ],
             "order" => [
-                'field' => 'name' ,
+                'field' => 'record_index' ,
                 'by' => 'asc'
             ],
         ];
         $request->merge( $queryString );
         $crud = new CrudController(new RecordModel(), $request, $this->fields );
-        $responseData = $crud->pagination(true, $this->model->children() );
+        $responseData = $crud->pagination(true, $this->model->children()->orderby('record_index','asc') );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);

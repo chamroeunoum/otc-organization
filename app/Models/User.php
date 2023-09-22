@@ -149,7 +149,7 @@ class User extends Authenticatable
               // 3. Save the path to the database
               $this->attributes[$attribute_name] = $disk.'/'. $destination_path.'/'.$filename;
               if($this->people_id>0){
-                $people = \App\Models\People::find($this->people_id);
+                $people = \App\Models\People\People::find($this->people_id);
                 $people->image = $disk.'/'. $destination_path.'/'.$filename;
                 $people->save();
               }

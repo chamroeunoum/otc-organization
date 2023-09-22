@@ -311,7 +311,7 @@ class UserController extends Controller
     }
     public function checkConfirmationCode(Request $request){
         if( $request->email != "" && $request->code != "" ){
-            $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', strtoupper( $request->code ) )->first();
+            $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
             if ($user) {
                 $user -> forgot_password_token = '' ;
                 $user -> update();
@@ -324,7 +324,7 @@ class UserController extends Controller
                 return response()->json([
                     'ok' => false ,
                     'message' => 'បរាជ័យក្នុងការបញ្ជាក់ពាក្យសម្ងាត់ !'
-                ], 404);
+                ], 403);
             }
         }
         return response()->json([

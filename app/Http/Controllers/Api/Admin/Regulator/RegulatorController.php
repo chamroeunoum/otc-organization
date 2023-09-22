@@ -432,7 +432,7 @@ class RegulatorController extends Controller
          * Create detail information of the owner of the account
          */
         $record->created_by = \Auth::user()->id ;
-        // $person = \App\Models\People::create([
+        // $person = \App\Models\People\People::create([
         //     'firstname' => $record->firstname , 
         //     'lastname' => $record->lastname , 
         //     'mobile_phone' => $record->phone , 

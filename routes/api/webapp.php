@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\Webapp\FolderController;
 use App\Http\Controllers\Api\Webapp\Regulator\SearchController;
 use App\Http\Controllers\Api\Webapp\Regulator\RegulatorController;
 use App\Http\Controllers\Api\Webapp\Regulator\TypeController;
-use App\Http\Controllers\Api\Webapp\Regulator\MinistryController;
+use App\Http\Controllers\Api\Webapp\Regulator\OrganizationController;
 use App\Http\Controllers\Api\Webapp\Regulator\SignatureController;
 
 Route::group([
@@ -113,20 +113,22 @@ Route::group([
         Route::group([
             'prefix' => 'types' ,
             ], function() {
-              Route::get('compact', [TypeController::class,'compactList']);
+              Route::get('', [TypeController::class,'index']);
         });
         Route::group([
-          'prefix' => 'ministries' ,
+          'prefix' => 'organizations' ,
           ], function() {
-            Route::get('compact', [MinistryController::class,'compactList']);
+            Route::get('', [OrganizationController::class,'index']);
         });
         Route::group([
           'prefix' => 'signatures' ,
           ], function() {
-            Route::get('compact', [SignatureController::class,'compactList']);
+            Route::get('', [SignatureController::class,'index']);
         });
 
 });
+
+
 
 Route::group([
   'prefix' => 'regulators' ,
@@ -165,21 +167,6 @@ Route::group([
       Route::get('regulators',[ FolderController::class , 'regulators']);
       Route::get('global',[ FolderController::class , 'globalFolder']);
         
-  });
-  /** SECTION OF DOCUMENT TYPE */
-  Route::group([
-    'prefix' => 'types' ,
-    'middleware' => 'auth:api'
-    ], function() {
-        Route::get('',[TypeController::class,'index']);
-  });
-
-  /** SECTION OF MINISTRY */
-  Route::group([
-    'prefix' => 'ministries' ,
-    'middleware' => 'auth:api'
-    ], function() {
-        Route::get('',[MinistryController::class,'@index']);
   });
 
 });

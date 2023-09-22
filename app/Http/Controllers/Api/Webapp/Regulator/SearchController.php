@@ -31,6 +31,13 @@ class SearchController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+        
+        $fid = isset( $request->fid ) && $request->fid != "" && $request->fid != null && $request->fid != 'null' ? $request->fid : false ;
+        $year = isset( $request->year ) && $request->year != "" && $request->year != null && $request->year != 'null'  ? \Carbon\Carbon::parse( $request->year ) : false ;
+        $types = isset( $request->types ) && $request->types != "" && $request->types != 'null' ? explode(',',$request->types) : false ;
+        $signatures = isset( $request->signatures ) && $request->signatures != "" && $request->signatures != 'null' ? explode(',',$request->signatures) : false ;
+        $organizations = isset( $request->organizations ) && $request->organizations != "" && $request->organizations != 'null' ? explode(',',$request->organizations) : false ;
+
         $queryString = [
             "where" => [
                 'default' => [
@@ -55,42 +62,53 @@ class SearchController extends Controller
                 //         'value' => [4]
                 //     ]
                 // ] ,
-                // 'like' => [
-                //     [
-                //         'field' => 'number' ,
-                //         'value' => $number === false ? "" : $number
-                //     ],
-                //     [
-                //         'field' => 'year' ,
-                //         'value' => $date === false ? "" : $date
-                //     ]
-                // ] ,
+                'like' => [
+                    $year ? [
+                        'field' => 'year' ,
+                        'value' => $year->format('Y-m-d')
+                    ] : [] 
+                    ,
+                    $fid ? [
+                        'field' => 'fid' ,
+                        'value' => $fid
+                    ] : []
+                ] ,
             ] ,
-            // "pivots" => [
-            //     $unit ?
-            //     [
-            //         "relationship" => 'units',
-            //         "where" => [
-            //             "in" => [
-            //                 "field" => "id",
-            //                 "value" => [$request->unit]
-            //             ],
-            //         // "not"=> [
-            //         //     [
-            //         //         "field" => 'fieldName' ,
-            //         //         "value"=> 'value'
-            //         //     ]
-            //         // ],
-            //         // "like"=>  [
-            //         //     [
-            //         //        "field"=> 'fieldName' ,
-            //         //        "value"=> 'value'
-            //         //     ]
-            //         // ]
-            //         ]
-            //     ]
-            //     : []
-            // ],
+            "pivots" => [
+                $types ?
+                [
+                    "relationship" => 'types',
+                    "where" => [
+                        "in" => [
+                            "field" => "type_id",
+                            "value" => $types
+                        ]
+                    ]
+                ]
+                : [] ,
+                $signatures ?
+                [
+                    "relationship" => 'signatures',
+                    "where" => [
+                        "in" => [
+                            "field" => "signature_id",
+                            "value" => $signatures
+                        ]
+                    ]
+                ]
+                : [] ,
+                $organizations ?
+                [
+                    "relationship" => 'organizations',
+                    "where" => [
+                        "in" => [
+                            "field" => "organization_id",
+                            "value" => $organizations
+                        ]
+                    ]
+                ]
+                : []
+            ],
             "pagination" => [
                 'perPage' => $perPage,
                 'page' => $page
@@ -98,7 +116,7 @@ class SearchController extends Controller
             "search" => $search === false ? [] : [
                 'value' => $search ,
                 'fields' => [
-                    'objective', 'fid', 'year'
+                    'objective'
                 ]
             ],
             "order" => [
@@ -138,7 +156,10 @@ class SearchController extends Controller
          */
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            'createdBy' => [ 'id' , 'firstname' , 'lastname' ]
+            'createdBy' => [ 'id' , 'firstname' , 'lastname' ] ,
+            'types' => [ 'id' , 'name' ] ,
+            'signatures' => [ 'id' , 'name' ] ,
+            'organizations' => [ 'id' , 'name' ]
         ]);
 
         $builder = $crud->getListBuilder();

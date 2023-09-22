@@ -55,7 +55,7 @@ class AuthController extends Controller
         /**
          * Create detail information of the owner of the account
          */
-        $person = \App\Models\People::create([
+        $person = \App\Models\People\People::create([
             'firstname' => $user->firstname , 
             'lastname' => $user->lastname , 
             'gender' => $user->gender , 
