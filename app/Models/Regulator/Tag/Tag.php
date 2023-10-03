@@ -37,7 +37,7 @@ class Tag extends Model
         $root = $this->root() ;
         return $root != null 
             ? $this->whereNull('deleted_at')
-                ->where('tpid',$root->id)
+                ->where('pid',$root->id)
             : null ;
     }
     public function add($name,$desp=""){

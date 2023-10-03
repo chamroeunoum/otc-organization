@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateOrganizationStaffsTable extends Migration {
+class CreateOrganizationLeaderTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,11 +12,11 @@ class CreateOrganizationStaffsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('organization_staffs', function(Blueprint $table)
+		Schema::create('organization_leader', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->integer('organization_id')->unsigned(); 
-			$table->integer('user_id')->unsigned();
+			$table->integer('people_id')->unsigned();
 			$table->timestamps();
 			$table->softDeletes();
 		});
