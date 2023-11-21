@@ -135,13 +135,13 @@ class SearchController extends Controller
                 $record->pdf = is_array( $record->pdf ) && !empty( $record->pdf ) ?
                     (
                         array_map(function($file){ return (
-                            \Storage::disk('regulator')->exists( $file ) ? str_replace(['/','.pdf','regulators'],$file ) : false 
+                            \Storage::disk('regulator')->exists( $file ) ? str_replace(['/','.pdf','regulators','documents'],$file ) : false 
                         ); } , $record->pdf )
                     ) : 
                     (
                         $record->pdf != "" && $record->pdf != null 
                         ? ( 
-                            \Storage::disk('regulator')->exists( $record->pdf ) ? str_replace(['/','.pdf','regulators'],"",$record->pdf) : false 
+                            \Storage::disk('regulator')->exists( $record->pdf ) ? str_replace(['/','.pdf','regulators','documents'],"",$record->pdf) : false 
                         )
                         : false
                     ) ;
@@ -234,7 +234,8 @@ class SearchController extends Controller
             ? RecordModel::findOrFail($request->id) 
             : (
                 $regulatorSerial 
-                ? RecordModel::where('pdf','like','%regulators/' . $regulatorSerial . '.pdf%')->first()
+                // ? RecordModel::where('pdf','like','%regulators/' . $regulatorSerial . '.pdf%')->first()
+                ? RecordModel::where('pdf','like','%documents/' . $regulatorSerial . '.pdf%')->first()
                 : false
             ) ;
         if( $regulator ) {
@@ -257,7 +258,7 @@ class SearchController extends Controller
                 . ( is_string( $regulator->pdf ) ? $regulator->pdf : '' ) ;    
             }
             if( $regulatorSerial !== false ){
-                $path = storage_path('data') . '/regulators/' . $regulatorSerial . '.pdf' ;    
+                $path = storage_path('data') . '/documents/' . $regulatorSerial . '.pdf' ;    
             }
 
             $ext = pathinfo($path);

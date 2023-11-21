@@ -21,28 +21,6 @@ class PeopleTableSeeder extends Seeder
         \DB::table('people')->insert(array (
             0 => 
             array (
-                'id' => 1,
-                'firstname' => 'Chamroeun',
-                'lastname' => 'OUM',
-                'gender' => 0,
-                'dob' => '1984-03-18',
-                'mobile_phone' => '012557200',
-                'office_phone' => NULL,
-                'email' => 'chamroeunoum@gmail.com',
-                'nid' => NULL,
-                'image' => NULL,
-                'marry_status' => NULL,
-                'father' => NULL,
-                'mother' => NULL,
-                'created_at' => '2023-09-10 06:44:28',
-                'updated_at' => '2023-09-10 06:44:28',
-                'deleted_at' => NULL,
-                'created_by' => NULL,
-                'modified_by' => NULL,
-                'deleted_by' => NULL,
-            ),
-            1 => 
-            array (
                 'id' => 2,
                 'firstname' => 'Puthireach',
                 'lastname' => 'KONGCHAN',
@@ -63,7 +41,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            2 => 
+            1 => 
             array (
                 'id' => 3,
                 'firstname' => 'ប៊ុនឈាង',
@@ -85,7 +63,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            3 => 
+            2 => 
             array (
                 'id' => 4,
                 'firstname' => 'គាងសេង',
@@ -107,7 +85,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            4 => 
+            3 => 
             array (
                 'id' => 5,
                 'firstname' => 'ធារិទ្ធិ',
@@ -129,7 +107,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            5 => 
+            4 => 
             array (
                 'id' => 6,
                 'firstname' => 'ម៉ាណេត',
@@ -151,7 +129,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            6 => 
+            5 => 
             array (
                 'id' => 7,
                 'firstname' => 'រតនា',
@@ -173,7 +151,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            7 => 
+            6 => 
             array (
                 'id' => 8,
                 'firstname' => 'នីវ៉ាដូ',
@@ -195,7 +173,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            8 => 
+            7 => 
             array (
                 'id' => 9,
                 'firstname' => 'រដ្ឋា',
@@ -217,7 +195,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            9 => 
+            8 => 
             array (
                 'id' => 10,
                 'firstname' => 'ធី',
@@ -239,7 +217,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            10 => 
+            9 => 
             array (
                 'id' => 11,
                 'firstname' => 'រដ្ឋា',
@@ -261,7 +239,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            11 => 
+            10 => 
             array (
                 'id' => 12,
                 'firstname' => 'សំអាតវាសនា',
@@ -283,7 +261,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            12 => 
+            11 => 
             array (
                 'id' => 13,
                 'firstname' => 'ពេជ្រយ៉ាតសេន',
@@ -305,7 +283,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            13 => 
+            12 => 
             array (
                 'id' => 14,
                 'firstname' => 'chamnan',
@@ -327,7 +305,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            14 => 
+            13 => 
             array (
                 'id' => 15,
                 'firstname' => 'sothun',
@@ -349,7 +327,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            15 => 
+            14 => 
             array (
                 'id' => 16,
                 'firstname' => 'ចាន់អេណា',
@@ -371,7 +349,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            16 => 
+            15 => 
             array (
                 'id' => 17,
                 'firstname' => 'សុខុន',
@@ -393,7 +371,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            17 => 
+            16 => 
             array (
                 'id' => 18,
                 'firstname' => 'vanra',
@@ -415,7 +393,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            18 => 
+            17 => 
             array (
                 'id' => 19,
                 'firstname' => 'វុទ្ធី',
@@ -437,7 +415,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            19 => 
+            18 => 
             array (
                 'id' => 20,
                 'firstname' => 'ប៉ាថ្លាវី',
@@ -459,7 +437,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            20 => 
+            19 => 
             array (
                 'id' => 21,
                 'firstname' => 'និពន្ធ',
@@ -481,7 +459,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            21 => 
+            20 => 
             array (
                 'id' => 22,
                 'firstname' => 'ផាន់ណា',
@@ -503,7 +481,7 @@ class PeopleTableSeeder extends Seeder
                 'modified_by' => NULL,
                 'deleted_by' => NULL,
             ),
-            22 => 
+            21 => 
             array (
                 'id' => 23,
                 'firstname' => 'វណ្ណៈ',
@@ -520,6 +498,50 @@ class PeopleTableSeeder extends Seeder
                 'mother' => NULL,
                 'created_at' => '2023-09-13 15:04:55',
                 'updated_at' => '2023-09-13 15:04:55',
+                'deleted_at' => NULL,
+                'created_by' => NULL,
+                'modified_by' => NULL,
+                'deleted_by' => NULL,
+            ),
+            22 => 
+            array (
+                'id' => 25,
+                'firstname' => 'ចំរើន',
+                'lastname' => 'អ៊ុំ',
+                'gender' => 0,
+                'dob' => '1984-03-18',
+                'mobile_phone' => NULL,
+                'office_phone' => NULL,
+                'email' => 'ictocm@gmail.com',
+                'nid' => NULL,
+                'image' => NULL,
+                'marry_status' => NULL,
+                'father' => NULL,
+                'mother' => NULL,
+                'created_at' => '2023-09-22 03:41:38',
+                'updated_at' => '2023-09-22 03:41:38',
+                'deleted_at' => NULL,
+                'created_by' => NULL,
+                'modified_by' => NULL,
+                'deleted_by' => NULL,
+            ),
+            23 => 
+            array (
+                'id' => 1,
+                'firstname' => 'Chamroeun',
+                'lastname' => 'OUM',
+                'gender' => 0,
+                'dob' => '1984-03-18',
+                'mobile_phone' => '012557200',
+                'office_phone' => NULL,
+                'email' => 'chamroeunoum@gmail.com',
+                'nid' => 10517515,
+                'image' => NULL,
+                'marry_status' => '1',
+                'father' => NULL,
+                'mother' => NULL,
+                'created_at' => '2023-09-10 06:44:28',
+                'updated_at' => '2023-09-10 06:44:28',
                 'deleted_at' => NULL,
                 'created_by' => NULL,
                 'modified_by' => NULL,

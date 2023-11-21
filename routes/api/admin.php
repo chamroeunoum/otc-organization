@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\Admin\Regulator\OrganizationController;
 use App\Http\Controllers\Api\Admin\Regulator\PositionController;
 use App\Http\Controllers\Api\Admin\Regulator\SignatureController;
 use App\Http\Controllers\Api\Admin\ProfileController;
+use App\Http\Controllers\Api\Admin\Attendant\AttendantController;
 
 
 Route::group([
@@ -65,6 +66,24 @@ Route::group([
             Route::get('phone/exist',[UserController::class,'checkPhone']);
             Route::get('email/exist',[UserController::class,'checkEmail']);
             Route::post('upload',[UserController::class,'upload']);
+    });
+
+    /** ATTENDANT SECTION */
+    Route::group([
+        'prefix' => 'attendants' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[AttendantController::class,'index']);
+            Route::put('update',[AttendantController::class,'update']);
+            Route::get('{id}/read',[AttendantController::class,'read']);
+            Route::delete('{id}/delete',[AttendantController::class,'destroy']);
+            Route::post('checkin/face',[AttendantController::class,'checkin']);
+            Route::post('checkin/finger',[AttendantController::class,'checkin']);
+            Route::post('checkin/system',[AttendantController::class,'checkin']);
+            Route::post('checkout/face',[AttendantController::class,'checkout']);
+            Route::post('checkout/finger',[AttendantController::class,'checkout']);
+            Route::post('checkout/system',[AttendantController::class,'checkout']);
     });
 
     /** FOLDER SECTION */

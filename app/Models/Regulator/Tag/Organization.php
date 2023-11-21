@@ -30,4 +30,7 @@ class Organization extends Tag
     public function staffs(){
         return $this->belongsToMany('\App\Models\User','organization_staffs','organization_id','user_id');
     }
+    public function leader(){
+        return $this->belongsToMany('\App\Models\User','organization_leader','organization_id','user_id');
+    }
 }

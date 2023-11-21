@@ -118,6 +118,51 @@ class OrganizationStaffsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
+            11 => 
+            array (
+                'id' => 14,
+                'organization_id' => 463,
+                'user_id' => 38,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            12 => 
+            array (
+                'id' => 15,
+                'organization_id' => 463,
+                'user_id' => 40,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            13 => 
+            array (
+                'id' => 16,
+                'organization_id' => 463,
+                'user_id' => 5,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            14 => 
+            array (
+                'id' => 17,
+                'organization_id' => 463,
+                'user_id' => 2,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            15 => 
+            array (
+                'id' => 18,
+                'organization_id' => 463,
+                'user_id' => 1,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
         ));
         
         

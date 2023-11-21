@@ -84,7 +84,8 @@ class OrganizationController extends Controller
         $responseData['records'] = $responseData['records']->prepend( $root );
         $responseData['records'] = $responseData['records']->map(function($organization){
             $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
-            $organization['staffs'] = $org != null ? $org->organizationStaffs : [] ;
+            $organization['staffs'] = $org != null ? $org->staffs : [] ;
+            $organization['leader'] = $org != null ? $org->leader : [] ;
             return $organization;
         });
         $responseData['message'] = __("crud.read.success");

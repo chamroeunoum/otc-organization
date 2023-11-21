@@ -118,6 +118,51 @@ class PositionUsersTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
+            11 => 
+            array (
+                'id' => 13,
+                'position_id' => 500,
+                'user_id' => 38,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            12 => 
+            array (
+                'id' => 14,
+                'position_id' => 502,
+                'user_id' => 40,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            13 => 
+            array (
+                'id' => 15,
+                'position_id' => 500,
+                'user_id' => 5,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            14 => 
+            array (
+                'id' => 16,
+                'position_id' => 503,
+                'user_id' => 2,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            15 => 
+            array (
+                'id' => 17,
+                'position_id' => 501,
+                'user_id' => 1,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
         ));
         
         

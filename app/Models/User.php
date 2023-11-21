@@ -14,6 +14,8 @@ use Illuminate\Foundation\File;
 use Storage;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon as Carbon;
+use \App\Models\Attendant\Attendant ;
 
 class User extends Authenticatable
 {
@@ -78,10 +80,19 @@ class User extends Authenticatable
     public function roles(){
       return $this->belongsToMany('App\Models\Role','user_role','user_id','role_id');
     }
-
+    public function attendants(){
+      return $this->hasMany( \App\Models\Attendant\Attendant::class, 'user_id' , 'id' );
+    }
+    public function timeslots(){
+      return $this->belongsToMany('App\Models\Attendant\Timeslot','user_timeslots','user_id','timeslot_id');
+    }
     public function organizations()
     {
         return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_staffs','user_id','organization_id');
+    }
+    public function organizationLeader()
+    {
+        return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_leader','user_id','organization_id');
     }
     /**
      * ឯកសារដែលគណនីមួយនេះបានបង្កើត
@@ -89,7 +100,6 @@ class User extends Authenticatable
     public function regulators(){
         return $this->hasMany(\App\Models\Regulator\Regulator::class,'created_by');
     }
-
     public function person(){
       return $this->belongsTo('App\Models\People\People','people_id','id');
     }
@@ -103,18 +113,23 @@ class User extends Authenticatable
       return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','user_signatures','user_id','signature_id');
     }
     
-    // public function dlists()
-    // {
-    //     return $this->hasMany('App\Models\Dlist','user_id','id');
-    // }
-
-    // public function groups()
-    // {
-    //     return $this->hasMany('App\Models\Group','group_id','id');
-    // }
-    /**
-     * Organization that the user is in
-     */
+    public function getAttendantsOfMonth( $date = false , $attendantTypes = false ){
+      $date = $date != false ? Carbon::parse( $date ) : Carbon::now() ;
+      $builder = $this->attendants()
+        ->whereYear('date', $date->format('Y') )
+        ->whereMonth('date', $date->format('m') );
+      if( !is_array( $attendantTypes ) && in_array( $attendantTypes , Attendant::ATTENDANT_TYPES ) ){
+        $builder->where('attendant_type',$attendantTypes );
+      }
+      else if( is_array( $attendantTypes ) && array_intersect( $attendantTypes , Attendant::ATTENDANT_TYPES ) ){
+        $builder->whereIn('attendant_type',$attendantTypes );
+      }
+      return $builder->get()
+        ->map(function($att){
+          return [ $att->date => $att->calculateWorkingTime() ];
+        });
+      ;
+    }
 
     public function setImageAttribute($value)
     {

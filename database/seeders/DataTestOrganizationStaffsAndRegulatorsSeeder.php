@@ -22,15 +22,20 @@ class DataTestOrganizationStaffsAndRegulatorsSeeder extends Seeder
         $royalGovernmentOrganization = \App\Models\Regulator\Tag\Organization::where('model','App\Models\Regulator\Tag\Organization')->first();
         $organizations = $royalGovernmentOrganization->children()->where('name','LIKE','ក្រសួង%')->get();
 
-        $super = \App\Models\Role::create(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $administrator = \App\Models\Role::create(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $backendMember = \App\Models\Role::create(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        $client = \App\Models\Role::create(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp']);
+        // $super = \App\Models\Role::create(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        // $administrator = \App\Models\Role::create(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        // $backendMember = \App\Models\Role::create(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        // $client = \App\Models\Role::create(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp']);
+
+        $super = \App\Models\Role::where(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
+        $administrator = \App\Models\Role::where(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
+        $backendMember = \App\Models\Role::where(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
+        $client = \App\Models\Role::where(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp'])->first();
 
         /**
          * Create admin user for development purpose
          */
-        $superaccount = \App\Models\User::create([
+        $superaccount = \App\Models\User::findOrCreate([
             'firstname' => 'Chamroeun' ,
             'lastname' => 'OUM' ,
             'email' => 'superuser@gmail.com' ,
@@ -40,7 +45,7 @@ class DataTestOrganizationStaffsAndRegulatorsSeeder extends Seeder
             'username' => 'superuser'
         ]);
         
-        $people = \App\Models\People\People::create([
+        $people = \App\Models\People\People::findOrCreate([
             'firstname' => $superaccount->firstname , 
             'lastname' => $superaccount->lastname , 
             'gender' => 0 , // Male
@@ -56,7 +61,7 @@ class DataTestOrganizationStaffsAndRegulatorsSeeder extends Seeder
         /**
          * Create admin user for development purpose
          */
-        $chamroeunoum = \App\Models\User::create([
+        $chamroeunoum = \App\Models\User::findOrCreate([
             'firstname' => 'Chamroeun' ,
             'lastname' => 'OUM' ,
             'email' => 'chamroeunoum@gmail.com' ,
@@ -66,7 +71,7 @@ class DataTestOrganizationStaffsAndRegulatorsSeeder extends Seeder
             'username' => 'chamroeunoum'
         ]);
         
-        $people = \App\Models\People\People::create([
+        $people = \App\Models\People\People::findOrCreate([
             'firstname' => $chamroeunoum->firstname , 
             'lastname' => $chamroeunoum->lastname , 
             'gender' => 0 , // Male
@@ -156,7 +161,6 @@ class DataTestOrganizationStaffsAndRegulatorsSeeder extends Seeder
         $deputyPrimeMinister->save();
         $deputyPrimeMinister->assignRole( $backendMember );
         $deputyPrimeMinister->syncWithoutDetaching([ $royalGovernmentOrganization->children()->first() ]);
-
 
         /**
          * Create accounts of ministers
