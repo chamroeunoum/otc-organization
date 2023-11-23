@@ -234,8 +234,8 @@ class SearchController extends Controller
             ? RecordModel::findOrFail($request->id) 
             : (
                 $regulatorSerial 
-                // ? RecordModel::where('pdf','like','%regulators/' . $regulatorSerial . '.pdf%')->first()
-                ? RecordModel::where('pdf','like','%documents/' . $regulatorSerial . '.pdf%')->first()
+                ? RecordModel::where('pdf','like','%regulators/' . $regulatorSerial . '.pdf%')->first()
+                // ? RecordModel::where('pdf','like','%documents/' . $regulatorSerial . '.pdf%')->first()
                 : false
             ) ;
         if( $regulator ) {
@@ -258,7 +258,8 @@ class SearchController extends Controller
                 . ( is_string( $regulator->pdf ) ? $regulator->pdf : '' ) ;    
             }
             if( $regulatorSerial !== false ){
-                $path = storage_path('data') . '/documents/' . $regulatorSerial . '.pdf' ;    
+                // $path = storage_path('data') . '/documents/' . $regulatorSerial . '.pdf' ;    
+                $path = storage_path('data') . '/regulators/' . $regulatorSerial . '.pdf' ;    
             }
 
             $ext = pathinfo($path);
