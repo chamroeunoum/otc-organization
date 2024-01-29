@@ -24,11 +24,26 @@ Route::group([
     Route::post('login', [AuthController::class,'login']);
     Route::post('signup', [AuthController::class,'signup']);
     Route::put('signup/activate', [AuthController::class,'signupActivate']);
+
+    /**
+         * Facebook authentication
+         */
+        Route::post('facebook',"AuthenticationController@facebookAuthentication")->name("gacebookAuthentication");
+        /**
+         * Google authentication
+         */
+        Route::post('google',"AuthenticationController@googleAuthentication")->name("googleAuthentication");
+        /**
+         * Apple authentication
+         */
+        Route::post('apple',"AuthenticationController@appleAuthentication")->name("appleAuthentication");
+        
     Route::group([
-      'middleware' => 'auth'
+      'middleware' => 'auth:api'
     ], function() {
         Route::post('logout', [AuthController::class,'logout']);
         Route::get('user', [AuthController::class,'user']);
+        Route::put('password/change',[UserController::class,'passwordChange']);
     });
   });
 
@@ -46,7 +61,7 @@ Route::group([
       Route::get('{id}',[UserController::class,'read']);
       Route::delete('',[UserController::class,'destroy']);
       Route::put('activate',[UserController::class,'active']);
-      Route::put('password/change',[UserController::class,'logout']);
+      // Route::put('password/change',[UserController::class,'logout']);
       Route::post('upload',[UserController::class,'upload']);
   });
 
@@ -210,5 +225,7 @@ Route::group([
         
   });
   
+  require('webapp/task.php');
+  require('webapp/attendant.php');
 
 });

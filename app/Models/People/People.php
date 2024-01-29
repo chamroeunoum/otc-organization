@@ -35,8 +35,26 @@ class People extends Model
   |--------------------------------------------------------------------------
   */
   public function user(){
-    return $this->hasMany('\App\User','people_id','id');
+    return $this->hasOne(\App\Models\User::class,'people_id','id');
   }
+  
+  public function countesies(){
+    return $this->belongsToMany(\App\Models\Regulator\Tag\Countesy::class,'people_countesies','people_id','countesy_id');
+  }
+
+  public function organizations()
+  {
+      return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_people','people_id','organization_id');
+  }
+  public function organizationLeader()
+  {
+      return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_leader','people_id','organization_id');
+  }
+
+  public function positions(){
+    return $this->belongsToMany('\App\Models\Regulator\Tag\Position','people_positions','people_id','position_id');
+  }
+  
   /*
   |--------------------------------------------------------------------------
   | SCOPES
@@ -97,7 +115,6 @@ class People extends Model
               }
             }
           }
-
       }
   }
 

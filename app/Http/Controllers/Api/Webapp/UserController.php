@@ -353,12 +353,19 @@ class UserController extends Controller
         // 'password' => bcrypt($request->password),
     }
     public function passwordChange(Request $request){
-        $record = \App\Models\User::find($request->id);
-        if( $record ){
-            $record->password = Hash::make($request->password);
-            $record->update();
+        $user = \Auth::user();
+        if( $user ){
+            if( !isset( $request->password ) || strlen( $request->password ) <= 0 ){
+                return response([
+                    'record' => $request->input() ,
+                    'ok' => false ,
+                    'message' => 'សូមបញ្ចូលពាក្យសម្ងាត់ !'
+                ],500);
+            }
+            $user->password = Hash::make($request->password);
+            $user->update();
             return response([
-                'record' => $record ,
+                'record' => $user ,
                 'ok' => true ,
                 'message' => 'ផ្លាស់ប្ដូរពាក្យសម្ងាត់ថ្មីបានជោគជ័យ !'
             ],200);

@@ -45,14 +45,28 @@ return [
         ],
         'document' => [
             'driver' => 'local',
-            'root' => storage_path('data') ,
-            'url' => env('APP_URL').'/storage',
+            'root' => storage_path('data/documents') ,
+            'url' => env('APP_URL').'/storage/documents',
             'throw' => true ,
         ],
         'regulator' => [
             'driver' => 'local',
-            'root' => storage_path('data') ,
-            'url' => env('APP_URL').'/storage',
+            'root' => storage_path('data/regulators') ,
+            'url' => env('APP_URL').'/storage/regulators',
+            'throw' => true ,
+        ],
+
+        'meeting' => [
+            'driver' => 'local',
+            'root' => storage_path('data/meetings') ,
+            'url' => env('APP_URL').'/storage/meetings',
+            'throw' => true ,
+        ],
+
+        'comment' => [
+            'driver' => 'local',
+            'root' => storage_path('data/comments') ,
+            'url' => env('APP_URL').'/storage/comments',
             'throw' => true ,
         ],
 

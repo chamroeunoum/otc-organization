@@ -22,7 +22,7 @@ class TimeslotsTableSeeder extends Seeder
             0 => 
             array (
                 'id' => 3,
-                'title' => 'Night',
+                'title' => 'យប់',
                 'start' => '18:00',
                 'end' => '22:00',
                 'effective_day' => '1,2,3,4,5,6',
@@ -33,7 +33,7 @@ class TimeslotsTableSeeder extends Seeder
             1 => 
             array (
                 'id' => 2,
-                'title' => 'Evening',
+                'title' => 'ល្ងាច',
                 'start' => '12:00',
                 'end' => '16:00',
                 'effective_day' => '1,2,3,4,5,6',
@@ -44,7 +44,7 @@ class TimeslotsTableSeeder extends Seeder
             2 => 
             array (
                 'id' => 1,
-                'title' => 'Morning',
+                'title' => 'ព្រឹក',
                 'start' => '07:00',
                 'end' => '11:00',
                 'effective_day' => '1,2,3,4,5,6',

@@ -112,6 +112,14 @@ class UserController extends Controller
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
 
         $responseData = $crud->pagination(true, $builder);
+        $responseData['records'] = $responseData['records']->map(function($user){
+            $people = $user['person']['id'] > 0 ? \App\Models\People\People::find( $user['person']['id'] ) : null ;
+            if( $people != null ){
+                $user['person']['organizations'] = $people->organizations;
+                $user['person']['positions'] = $people->positions;
+            }
+            return $user;
+        });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
@@ -142,6 +150,21 @@ class UserController extends Controller
             ]);
 
             /**
+             * Create detail information of the owner of the account
+             */
+            $person = \App\Models\People\People::create([
+                'firstname' => $user->firstname , 
+                'lastname' => $user->lastname , 
+                'gender' => $user->gender , 
+                'dob' => $user->dob , 
+                'mobile_phone' => $user->mobile_phone , 
+                'email' => $user->email , 
+                'image' => $user->avatar_url , 
+            ]);
+            $user->people_id = $person->id ;
+            $user->save();
+
+            /**
              * Assign role
              */
             $backendMemberRole = \App\Models\Role::where('name','Backend member')->first();
@@ -152,10 +175,10 @@ class UserController extends Controller
             $user->save();
 
             if( isset( $request->organizations ) && !empty( $request->organizations ) ){
-                $user->organizations()->sync( $request->organizations );
+                $user->person->organizations()->sync( $request->organizations );
             }
             if( isset( $request->positions ) && !empty( $request->positions ) ){
-                $user->positions()->sync( $request->positions );
+                $user->person->positions()->sync( $request->positions );
             }
 
             if( $user ){
@@ -187,11 +210,12 @@ class UserController extends Controller
             'username' => $request->username ,
             'phone' => $request->phone
         ]) == true ){;
-            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
-                $user->organizations()->sync( $request->organizations );
+            if( isset( $request->organizations ) && is_array( $request->organizations ) ){
+                $user->person->organizations()->sync( $request->organizations );
+                // $user->organizations()->sync( $request->organizations );
             }
-            if( isset( $request->positions ) && !empty( $request->positions ) ){
-                $user->positions()->sync( $request->positions );
+            if( isset( $request->positions ) && is_array( $request->positions ) ){
+                $user->person->positions()->sync( $request->positions );
             }
             return response()->json([
                 'user' => $user ,

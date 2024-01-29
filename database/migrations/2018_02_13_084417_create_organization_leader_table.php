@@ -16,7 +16,7 @@ class CreateOrganizationLeaderTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('organization_id')->unsigned(); 
-			$table->integer('user_id')->unsigned();
+			$table->integer('people_id')->unsigned();
 			$table->timestamps();
 			$table->softDeletes();
 		});
@@ -30,7 +30,7 @@ class CreateOrganizationLeaderTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('organization_staffs');
+		Schema::drop('organization_leader');
 	}
 
 }

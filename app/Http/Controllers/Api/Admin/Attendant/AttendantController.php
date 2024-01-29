@@ -16,11 +16,9 @@ class AttendantController extends Controller
         'id',
         'user_id' ,
         'date' ,
-        'worked_hours',
-        'worked_minutes' ,
-        'ot_hours' ,
-        'ot_minutes' ,
-        'attendant_type',
+        'worked_time' ,
+        'duration' ,
+        'late_or_early' ,
         'created_at' , 
         'updated_at'
     ];
@@ -46,21 +44,11 @@ class AttendantController extends Controller
         $queryString = [
             "where" => [
                 'default' => [
-                    $userId != false
-                        ? [
-                            'field' => 'user_id' ,
-                            'value' => $userId
-                        ] : [] ,
                     $date != false
                         ? [
                             'field' => 'date' ,
                             'value' => $date->format('Y-m-d')
-                        ] : [] ,
-                    $attendantType != false
-                        ? [
-                            'field' => 'attendant_type' ,
-                            'value' => $attendantType
-                        ] : []
+                        ] : [] 
                 ],
                 // 'in' => [
                 //     [
@@ -88,7 +76,7 @@ class AttendantController extends Controller
             "pivots" => [
                 $search != false ?
                 [
-                    "relationship" => 'staff',
+                    "relationship" => 'user',
                     "where" => [
                         // "in" => [
                         //     "field" => "id",
@@ -148,27 +136,37 @@ class AttendantController extends Controller
 
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            'staff' => [ 'id' , 'firstname' , 'lastname' ] ,
-            'timeslots' => [ 'id' , 'title' , 'start' , 'end' , 'effective_day' ]
+            'user' => [ 'id' , 'firstname' , 'lastname' ]
         ]);
 
         $builder = $crud->getListBuilder();
 
         // if( $search != false ){
         //     // return response()->json( $search ,200);
-        //     $builder->whereHas('staff',function($query) use($search){
+        //     $builder->whereHas('user',function($query) use($search){
         //         $query->where('firstname','like','%'.$search.'%')
         //         ->orWhere('lastname','like','%'.$search.'%')
         //         ;
         //     });
         // }
         // dd( $builder->toSql() );
+        
 
         $responseData = $crud->pagination(true, $builder);
         $responseData['records'] = $responseData['records']->map(function($att){
-            
-            $att['calculateTime'] = RecordModel::find($att['id'])->calculateWorkingTime();
-            return $att;
+            $tempAtt = RecordModel::find($att['id']);
+            return [
+                'id' => $tempAtt->id ,
+                'date' => $tempAtt->date ,
+                'calculateTime' => $tempAtt->calculateWorkingTime() ,
+                'day_of_week' => \Carbon\Carbon::parse( $tempAtt->date )->dayOfWeek ,
+                'user' => [
+                    'id' => $tempAtt->user->id ,
+                    'firstname' => $tempAtt->user->firstname ,
+                    'lastname' => $tempAtt->user->lastname ,
+                    'avatar_url' => $tempAtt->user->avatar_url != null && strlen( $tempAtt->user->avatar_url ) > 0 && \Storage::disk('public')->exists( $tempAtt->user->avatar_url ) ? \Storage::disk('public')->url( $tempAtt->user->avatar_url ) : null
+                ]
+            ];
         });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
@@ -713,5 +711,82 @@ class AttendantController extends Controller
         return response()->json([
             'message' => 'មានបញ្ហាក្នុងការដកអ្នកអានឯកសារនេះ។'
         ],422);
+    }
+
+    public function userAttendants(Request $request){
+
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->search !== "" ? $request->search : false ;
+        $perPage = intval( $request->perPage ) > 0 ? $request->perPage : 50 ;
+        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+
+        /**
+         * Filter conditions
+         */
+        $user = isset( $request->userId ) && intval( $request->userId ) > 0 ? \App\Models\User::find($request->userId) : false ;
+        $date = isset( $request->date ) & strlen( $request->date ) >= 6 ? \Carbon\Carbon::parse( $request->date ) : \Carbon\Carbon::now() ;
+
+        if( $user == false || $user == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមជ្រើសរើសបុគ្គលិកជាមុនសិន។'
+            ],500);
+        }
+
+        $queryString = [
+            "where" => [
+                'default' => [
+                    [
+                        'field' => 'user_id' ,
+                        'value' => $user->id
+                    ]
+                ]
+            ] ,
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" =>
+                $search === false ? [] : [
+                    'value' => $search ,
+                    'fields' => [
+                        'date'
+                    ] 
+                ]
+            ,
+            "order" => [
+                'field' => 'date' ,
+                'by' => 'asc'
+            ],
+        ];
+        
+        $request->merge( $queryString );
+
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+
+        $builder = $crud->getListBuilder();
+
+        $builder->whereYear('date',$date->format('Y'))
+        ->whereMonth('date',$date->format('m'));
+
+        $responseData = $crud->pagination(true, $builder);
+        $responseData['records'] = $responseData['records']->map(function($att){
+            $tempAtt = RecordModel::find($att['id']);
+            return [
+                'id' => $tempAtt->id ,
+                'date' => $tempAtt->date ,
+                'calculateTime' => $tempAtt->calculateWorkingTime() ,
+                'day_of_week' => \Carbon\Carbon::parse( $tempAtt->date )->dayOfWeek
+            ];
+        });
+        $responseData['user'] = [
+            'id' => $user->id ,
+            'firstname' => $user->firstname ,
+            'lastname' => $user->lastname ,
+            'avatar_url' => $user->avatar_url != null && strlen( $user->avatar_url ) > 0 && \Storage::disk('public')->exists( $user->avatar_url ) ? \Storage::disk('public')->url( $user->avatar_url ) : null
+        ];
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        return response()->json($responseData, 200);
     }
 }

@@ -27,6 +27,7 @@ class CreatePeopleTable extends Migration {
 			$table->string('marry_status', 191)->nullable();
 			$table->string('father', 191)->nullable();
 			$table->string('mother', 191)->nullable();
+			$table->string('model', 191)->nullable()->comment('The model path that differentiate the row data');
 			$table->timestamps();
 			$table->string('deleted_at', 191)->nullable();
 			$table->string('created_by', 191)->nullable();

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Carbon\Carbon as Carbon;
 use \App\Models\Attendant\Attendant ;
 
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles;
@@ -81,18 +82,21 @@ class User extends Authenticatable
       return $this->belongsToMany('App\Models\Role','user_role','user_id','role_id');
     }
     public function attendants(){
-      return $this->hasMany( \App\Models\Attendant\Attendant::class, 'user_id' , 'id' );
+      return $this->hasMany(\App\Models\Attendant\Attendant::class,'user_id','id');
     }
     public function timeslots(){
-      return $this->belongsToMany('App\Models\Attendant\Timeslot','user_timeslots','user_id','timeslot_id');
+      return $this->belongsToMany(\App\Models\Attendant\Timeslot::class,'user_timeslots','user_id','timeslot_id');
+    }
+    public function userTimeslots(){
+      return $this->hasMany( \App\Models\Attendant\UserTimeslot::class , 'user_id' , 'id' );
     }
     public function organizations()
     {
-        return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_staffs','user_id','organization_id');
+        return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_people','people_id','organization_id');
     }
     public function organizationLeader()
     {
-        return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_leader','user_id','organization_id');
+        return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_leader','people_id','organization_id');
     }
     /**
      * ឯកសារដែលគណនីមួយនេះបានបង្កើត
@@ -104,33 +108,15 @@ class User extends Authenticatable
       return $this->belongsTo('App\Models\People\People','people_id','id');
     }
     public function favorites(){
-      return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_favorites','user_id','regulator_id');
+      return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_favorites','people_id','regulator_id');
     }
     public function positions(){
-      return $this->belongsToMany('\App\Models\Regulator\Tag\Position','position_users','user_id','position_id');
+      return $this->belongsToMany('\App\Models\Regulator\Tag\Position','people_positions','people_id','position_id');
     }
     public function signatures(){
-      return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','user_signatures','user_id','signature_id');
+      return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','user_signatures','people_id','signature_id');
     }
     
-    public function getAttendantsOfMonth( $date = false , $attendantTypes = false ){
-      $date = $date != false ? Carbon::parse( $date ) : Carbon::now() ;
-      $builder = $this->attendants()
-        ->whereYear('date', $date->format('Y') )
-        ->whereMonth('date', $date->format('m') );
-      if( !is_array( $attendantTypes ) && in_array( $attendantTypes , Attendant::ATTENDANT_TYPES ) ){
-        $builder->where('attendant_type',$attendantTypes );
-      }
-      else if( is_array( $attendantTypes ) && array_intersect( $attendantTypes , Attendant::ATTENDANT_TYPES ) ){
-        $builder->whereIn('attendant_type',$attendantTypes );
-      }
-      return $builder->get()
-        ->map(function($att){
-          return [ $att->date => $att->calculateWorkingTime() ];
-        });
-      ;
-    }
-
     public function setImageAttribute($value)
     {
         $attribute_name = "image";
@@ -174,7 +160,7 @@ class User extends Authenticatable
     }
 
     public function folders(){
-      return $this->hasMany('\App\Models\Regulator\Folder','user_id','id');
+      return $this->hasMany('\App\Models\Regulator\Folder','people_id','id');
     }
 
     public function getIsAdminAttribute()
@@ -189,5 +175,34 @@ class User extends Authenticatable
             \Storage::disk('uploads')->delete($obj->image);
         });
     }
+    /**
+     * Route notifications for the authy channel.
+     *
+     * @return int
+     */
+    public function routeNotificationForAuthy()
+    {
+        /**
+         * Notify the sms to user
+         */
+        // $this->notify(new \App\Notifications\PhoneVerificationNotification('sms', true));
+        return $this->authy_id;
+    }
+    /**
+     * Third party authentication
+     */
+    public function thirdPartyAuthentications(){
+      return $this->hasMany(\App\ThirdPartyAuthentication::class,'user_id','id');
+    }
+    public function facebookAuthentication(){
+        $this->thirdPartyAuthentications()->where('name',\App\ThirdPartyAuthentication::FACEBOOK)->first();
+    }
+    public function googleAuthentication(){
+        $this->thirdPartyAuthentications()->where('name',\App\ThirdPartyAuthentication::GOOGLE)->first();
+    }
+    public function appleAuthentication(){
+        $this->thirdPartyAuthentications()->where('name',\App\ThirdPartyAuthentication::APPLE)->first();
+    }
+
 
 }

@@ -39,7 +39,9 @@ class OrganizationController extends Controller
                 //         'value' => $pid
                 //     ] : [] ,
                 // ],
+                
                 // 'in' => [] ,
+
                 // 'not' => [
                 //     [
                 //         'field' => 'id' ,

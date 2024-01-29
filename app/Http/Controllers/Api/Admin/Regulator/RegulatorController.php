@@ -343,7 +343,8 @@ class RegulatorController extends Controller
     {
         $document = RecordModel::findOrFail($request->id);
         if($document) {
-            $path = storage_path('data') . '/' . $document->pdf;
+            // $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( $record->pdf ) )
+            $path = storage_path('data') . '/regulators/' . $document->pdf;
             $ext = pathinfo($path);
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
             
@@ -355,7 +356,7 @@ class RegulatorController extends Controller
             if(is_file($path)) {
                 $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
-                    'serial' => str_replace(['documents','/','.pdf'],'',$document->pdf ) ,
+                    'serial' => str_replace(['regulators','/','.pdf'],'',$document->pdf ) ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                     "filename" => $filename,
                     "ok" => true 
@@ -365,7 +366,7 @@ class RegulatorController extends Controller
                 return response([
                     'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
                     'path' => $path
-                ],404 );
+                ],500 );
             }
         }
     }
@@ -376,11 +377,11 @@ class RegulatorController extends Controller
             $mbFilesize = round( $kbFilesize / 1024 , 4 );
             if( ( $document = \App\Models\Regulator\Regulator::find($request->id) ) !== null ){
                 list($year,$month,$day) = explode('-',$document->year);
-                $uniqeName = Storage::disk('regulator')->putFile( 'documents' , new File( $_FILES['files']['tmp_name'] ) );
+                $uniqeName = Storage::disk('regulator')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
                 $document->pdf = $uniqeName ;
                 $document->save();
                 if( Storage::disk('regulator')->exists( $document->pdf ) ){
-                    $document->pdf = Storage::disk("document")->url( $document->pdf  );
+                    $document->pdf = Storage::disk("regulator")->url( $document->pdf  );
                     return response([
                         'record' => $document ,
                         'message' => 'ជោគជ័យក្នុងការបញ្ចូលឯកសារយោង។'

@@ -115,8 +115,21 @@ class DatabaseSeeder extends Seeder
         $this->call(OrganizationRegulatorsTableSeeder::class);
         $this->call(OrganizationOwnRegulatorsTableSeeder::class);
         $this->call(OrganizationRelatedRegulatorsTableSeeder::class);
-        $this->call(PositionUsersTableSeeder::class);
-        $this->call(OrganizationStaffsTableSeeder::class);
+        $this->call(PeoplePositionsTableSeeder::class);
+        $this->call(OrganizationLeaderTableSeeder::class);
+        $this->call(OrganizationPeopleTableSeeder::class);
+        $this->call(TimeslotsTableSeeder::class);
+        $this->call(UserTimeslotsTableSeeder::class);
+        // About the content of the regulator
+        $this->call(BooksTableSeeder::class);
+        $this->call(KuntiesTableSeeder::class);
+        $this->call(MatikasTableSeeder::class);
+        $this->call(ChaptersTableSeeder::class);
+        $this->call(PartsTableSeeder::class);
+        $this->call(SectionsTableSeeder::class);
+        $this->call(MatrasTableSeeder::class);
+        
+        
 
         echo 'RUN INDEXING OF ROLES' . PHP_EOL;
         \DB::statement("SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles )+1);");
@@ -140,15 +153,38 @@ class DatabaseSeeder extends Seeder
         \DB::statement("SELECT setval('organization_own_regulators_id_seq', (SELECT MAX(id) FROM organization_own_regulators )+1);");
         echo 'RUN INDEXING OF ORGANIZATION RELATED REGULATORS' . PHP_EOL;
         \DB::statement("SELECT setval('organization_related_regulators_id_seq', (SELECT MAX(id) FROM organization_related_regulators )+1);");
-        echo 'RUN INDEXING OF POSITION USERS' . PHP_EOL;
-        \DB::statement("SELECT setval('position_users_id_seq', (SELECT MAX(id) FROM position_users )+1);");
+        echo 'RUN INDEXING OF PEOPLE POSITION' . PHP_EOL;
+        \DB::statement("SELECT setval('people_positions_id_seq', (SELECT MAX(id) FROM people_positions )+1);");
+        echo 'RUN INDEXING OF ORGANIZATION PEOPLE ' . PHP_EOL;
+        \DB::statement("SELECT setval('organization_people_id_seq', (SELECT MAX(id) FROM organization_people )+1);");
         echo 'RUN INDEXING OF ORGANIZATION STAFFS ' . PHP_EOL;
-        \DB::statement("SELECT setval('organization_staffs_id_seq', (SELECT MAX(id) FROM organization_staffs )+1);");
+        \DB::statement("SELECT setval('organization_people_id_seq', (SELECT MAX(id) FROM organization_people )+1);");
+        echo 'RUN INDEXING OF ORGANIZATION LEADERS ' . PHP_EOL;
+        \DB::statement("SELECT setval('organization_leader_id_seq', (SELECT MAX(id) FROM organization_leader )+1);");
+        echo 'RUN INDEXING OF TIMESLOT ' . PHP_EOL;
+        \DB::statement("SELECT setval('timeslots_id_seq', (SELECT MAX(id) FROM timeslots )+1);");
+        echo 'RUN INDEXING OF USER TIMESLOT ' . PHP_EOL;
+        \DB::statement("SELECT setval('user_timeslots_id_seq', (SELECT MAX(id) FROM user_timeslots )+1);");
 
-        /**
-         * Create more data for user to create
-         */
+        echo 'RUN INDEXING OF BOOK ' . PHP_EOL;
+        \DB::statement("SELECT setval('books_id_seq', (SELECT MAX(id) FROM books )+1);");
 
-        $this->call(TimeslotsTableSeeder::class);
+        echo 'RUN INDEXING OF KUNTY ' . PHP_EOL;
+        \DB::statement("SELECT setval('kunties_id_seq', (SELECT MAX(id) FROM kunties )+1);");
+
+        echo 'RUN INDEXING OF MATIKA ' . PHP_EOL;
+        \DB::statement("SELECT setval('matikas_id_seq', (SELECT MAX(id) FROM matikas )+1);");
+
+        echo 'RUN INDEXING OF CHAPTER ' . PHP_EOL;
+        \DB::statement("SELECT setval('chapters_id_seq', (SELECT MAX(id) FROM chapters )+1);");
+
+        echo 'RUN INDEXING OF PART ' . PHP_EOL;
+        \DB::statement("SELECT setval('parts_id_seq', (SELECT MAX(id) FROM parts )+1);");
+        
+        echo 'RUN INDEXING OF SECTION ' . PHP_EOL;
+        \DB::statement("SELECT setval('sections_id_seq', (SELECT MAX(id) FROM sections )+1);");
+
+        echo 'RUN INDEXING OF MATRA ' . PHP_EOL;
+        \DB::statement("SELECT setval('matras_id_seq', (SELECT MAX(id) FROM matras )+1);");
     }
 }

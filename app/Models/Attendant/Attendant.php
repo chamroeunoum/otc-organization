@@ -4,28 +4,39 @@ namespace App\Models\Attendant;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 use \Carbon\Carbon as Carbon;
 
 class Attendant extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes ;
+
+    protected $guarded = ['id'] ;
+
     const ATTENDANT_ABSENT = "A" , ATTENDANT_ANNUAL_LEAVE = "AL" , ATTENDANT_SICK_LEAVE = "SL" , ATTENDANT_PRESENT = "P" , ATTENDANT_PRESENT_EARLY = "PE" , ATTENDANT_PRESENT_LATE = "PL" , ATTENDANT_PERMISSION = "PM" , ATTENDANT_MATERNITY_LEAVE = "ML" , ATTENDANT_OTHER_LEAVE = "OL" ;
     const ATTENDANT_TYPES = [ "A" , "AL" , "SL" , "P" , "PE" , "PL" , "PM" , "ML" , "OL" ] ;
+    const ATTENDANT_CHECK_STATUS = [ "IN" , "OUT" ] ;
     
-    public function staff(){
-        return $this->belongsTo( \App\Models\User::class , 'user_id' , 'id' );
+    public function userTimeslot(){
+        return $this->belongsTo(\App\Models\Attendant\UserTimeslot::class,'user_timeslot_id','id');
     }
-    public function timeslots(){
-        return $this->belongsToMany( \App\Models\Attendant\Timeslot::class , 'attendant_timeslots' , 'attendant_id' , 'timeslot_id' );
+    public function user(){
+        return $this->belongsTo(\App\Models\User::class,'user_id','id');
     }
-    public function attendantCheckTimes(){
+    public function checktimes(){
         return $this->hasMany( \App\Models\Attendant\AttendantCheckTime::class , 'attendant_id' , 'id' );
     }
     /**
-     * Get the timeslot of the checktime of date
+     * Update the working time in minutes into attendant
      */
-    public function getTimeslotsOfChecktimes(){
-        return $this->attendantCheckTimes()->where('date',$this->date)->select('timeslot_id')->groupby('timeslot_id')->pluck('timeslot_id');
+    public function updateWorkingMinutes(){
+        $attendantCalculation = $this->calculateWorkingTime();
+        $this->late_or_early = $attendantCalculation['total']['lateOrEarly'];
+        $this->worked_time = $attendantCalculation['total']['workedTime'];
+        // $this->overtime = $attendantCalculation['total']['overtime'];
+        $this->duration = $attendantCalculation['total']['duration'];
+        $this->save();
     }
     /**
      * Calculate the working hour within the responseible timeslots
@@ -40,9 +51,23 @@ class Attendant extends Model
             'duration' => 0 ,
             'overtime' => 0 
         ] ;
-        $checkTimes = $this->getTimeslotsOfChecktimes()->map(function($timeslotId) use( &$total ){
-            $calculateTime = $this->attendantCheckTimes->where('timeslot_id',$timeslotId)->first()->calculateWorkingTime();
-            $total['timeslots'][] = $timeslotId ;
+        $checkTimes = $this->checktimes()->where('check_status',\App\Models\Attendant\AttendantChecktime::CHECK_STATUS_IN)->get()->map(function($checkin) use( &$total ){
+            $checkout = $checkin
+            ->checkout
+            // ->where([
+            //     'timeslot_id'=> $checkin->timeslot_id ,
+            //     'attendant_id'=> $checkin->attendant_id ,
+            //     'check_status'=> \App\Models\Attendant\AttendantChecktime::CHECK_STATUS_OUT
+            // ])->first()
+            ;
+            $calculateTime = $checkin->timeslot->calculateChecktime($checkin,$checkout);
+            $total['timeslots'][] = [
+                'id' => $checkin->timeslot->id ,
+                'title'  => $checkin->timeslot->title ,
+                'start' => $checkin->timeslot->start ,
+                'end' => $checkin->timeslot->end ,
+                'effective_day' => $checkin->timeslot->effective_day
+            ];
             $total['checkingIn'] += $calculateTime['checkingIn'];
             $total['checkingOut'] += $calculateTime['checkingOut'];
             $total['lateOrEarly'] += $calculateTime['lateOrEarly'];
@@ -71,5 +96,4 @@ class Attendant extends Model
         return false ;
         // return $this->date != null ? Carbon::parse( $this->date )->isSunday() : false ;
     }
-    
 }

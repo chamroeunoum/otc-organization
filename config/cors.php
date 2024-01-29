@@ -20,7 +20,8 @@ return [
         // , 'sanctum/csrf-cookie'
         'api/admin/*' ,
         'api/webapp/*' ,
-        'api/mobile/*'
+        'api/mobile/*' ,
+        'api/meeting/*'
     ],
 
     'allowed_methods' => [ '*' ],

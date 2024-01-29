@@ -17,6 +17,6 @@ class Holiday extends Model
         return $this->date != null ? Carbon::parse( $this->date )->isSunday() : false ;
     }
     public static function isHoliday($date){
-        return $date != null ? Carbon::parse( $this->date ) : false ;
+        return $date != null ? Carbon::parse( $date ) : false ;
     }
 }

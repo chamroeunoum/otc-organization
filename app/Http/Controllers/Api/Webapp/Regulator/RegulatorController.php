@@ -126,7 +126,7 @@ class RegulatorController extends Controller
              * custom the value of the field
              */
             'pdf' => function($record){
-                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( $record->pdf ) )
+                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('document')->exists( $record->pdf ) )
                 ? true
                 // \Storage::disk('regulator')->url( $pdf ) 
                 : false ;
@@ -262,7 +262,7 @@ class RegulatorController extends Controller
 
         $responseData = $crud->pagination(true, $builder,[
                 'pdf' => function($record){
-                    $record->pdf = ( $record->pdf !== "" && \Storage::disk('regulator')->exists( $record->pdf ) )
+                    $record->pdf = ( $record->pdf !== "" && \Storage::disk('document')->exists( $record->pdf ) )
                     ? true
                     // \Storage::disk('regulator')->url( $pdf ) 
                     : false ;
@@ -371,10 +371,10 @@ class RegulatorController extends Controller
             $mbFilesize = round( $kbFilesize / 1024 , 4 );
             if( ( $document = \App\Models\Regulator\Regulator::find($request->id) ) !== null ){
                 list($year,$month,$day) = explode('-',$document->year);
-                $uniqeName = Storage::disk('regulator')->putFile( 'documents' , new File( $_FILES['files']['tmp_name'] ) );
+                $uniqeName = Storage::disk('document')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
                 $document->pdf = $uniqeName ;
                 $document->save();
-                if( Storage::disk('regulator')->exists( $document->pdf ) ){
+                if( Storage::disk('document')->exists( $document->pdf ) ){
                     $document->pdf = Storage::disk("document")->url( $document->pdf  );
                     return response([
                         'record' => $document ,
@@ -512,7 +512,7 @@ class RegulatorController extends Controller
             /**
              * Delete all the related documents own by this regulator
              */
-            if( $tempRecord->pdf !== null && $tempRecord->pdf !=="" && Storage::disk('regulator')->exists( $tempRecord->pdf ) ){
+            if( $tempRecord->pdf !== null && $tempRecord->pdf !=="" && Storage::disk('document')->exists( $tempRecord->pdf ) ){
                 Storage::disk("document")->delete( $tempRecord->pdf  );
             }
             return response()->json([

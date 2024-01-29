@@ -24,7 +24,6 @@ use App\Http\Controllers\Api\Admin\Regulator\OrganizationController;
 use App\Http\Controllers\Api\Admin\Regulator\PositionController;
 use App\Http\Controllers\Api\Admin\Regulator\SignatureController;
 use App\Http\Controllers\Api\Admin\ProfileController;
-use App\Http\Controllers\Api\Admin\Attendant\AttendantController;
 
 
 Route::group([
@@ -66,24 +65,6 @@ Route::group([
             Route::get('phone/exist',[UserController::class,'checkPhone']);
             Route::get('email/exist',[UserController::class,'checkEmail']);
             Route::post('upload',[UserController::class,'upload']);
-    });
-
-    /** ATTENDANT SECTION */
-    Route::group([
-        'prefix' => 'attendants' ,
-        'namespace' => 'Api' ,
-        'middleware' => 'auth:api'
-        ], function() {
-            Route::get('',[AttendantController::class,'index']);
-            Route::put('update',[AttendantController::class,'update']);
-            Route::get('{id}/read',[AttendantController::class,'read']);
-            Route::delete('{id}/delete',[AttendantController::class,'destroy']);
-            Route::post('checkin/face',[AttendantController::class,'checkin']);
-            Route::post('checkin/finger',[AttendantController::class,'checkin']);
-            Route::post('checkin/system',[AttendantController::class,'checkin']);
-            Route::post('checkout/face',[AttendantController::class,'checkout']);
-            Route::post('checkout/finger',[AttendantController::class,'checkout']);
-            Route::post('checkout/system',[AttendantController::class,'checkout']);
     });
 
     /** FOLDER SECTION */
@@ -294,5 +275,318 @@ Route::group([
     //                 'ProfileController@updateAuthUserPassword');
     //     Route::post('/picture/upload','ProfileController@upload');
     // });
+
+
+    Route::group([
+        'prefix' => 'books',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'BookController@index');
+        Route::get('{id}', 'BookController@read')->where('id', '[0-9]+');
+        Route::get('{id}/structure', 'BookController@structure')->where('id', '[0-9]+');
+        Route::get('{id}/kunties', 'BookController@kunties')->where('id', '[0-9]+');
+        Route::get('{id}/matikas', 'BookController@matikas')->where('id', '[0-9]+');
+        Route::get('{id}/matras', 'MatraController@ofBook')->where('id', '[0-9]+');
+        Route::get('exists', 'BookController@exists');
+        /** Mini display */
+        Route::get('compact', "BookController@compactList");
+    
+        Route::post('', 'BookController@store');
+        Route::post('{id}/save/structure', 'BookController@saveStructure')->where('id', '[0-9]+');
+        Route::post('removefile', 'BookController@removefile');
+    
+        Route::put('', 'BookController@update')->where('id', '[0-9]+');
+        Route::post('upload', 'BookController@upload');
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'BookController@active')->where('id', '[0-9]+');
+        Route::put('{id}/deactivate', 'BookController@unactive')->where('id', '[0-9]+');
+    
+        Route::delete('{id}', 'BookController@delete')->where('id', '[0-9]+');
+    });
+    
+    Route::group([
+        'prefix' => 'books/kunties',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'KuntyController@index');
+        Route::get('{id}', 'KuntyController@read')->where('id', '[0-9]+');
+        Route::get('{id}/structure', 'KuntyController@structure')->where('id', '[0-9]+');
+        Route::get('{id}/matikas', 'KuntyController@matikas')->where('id', '[0-9]+');
+        Route::get('{id}/chapters', 'KuntyController@chapters')->where('id', '[0-9]+');
+        Route::get('exists', 'KuntyController@exists');
+        /** Mini display */
+        Route::get('compact', "KuntyController@compactList");
+    
+        Route::post('', 'KuntyController@store');
+        Route::post('{id}/save/structure', 'KuntyController@saveStructure')->where('id', '[0-9]+');
+    
+        Route::put('', 'KuntyController@update')->where('id', '[0-9]+');
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'KuntyController@active')->where('id', '[0-9]+');
+        Route::put('{id}/deactivate', 'KuntyController@unactive')->where('id', '[0-9]+');
+    
+        Route::delete('{id}', 'KuntyController@delete')->where('id', '[0-9]+');
+    });
+    
+    Route::group([
+        'prefix' => 'books/matikas',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'MatikaController@index');
+        Route::get('{id}', 'MatikaController@read')->where('id', '[0-9]+');
+        Route::get('{id}/structure', 'MatikaController@structure')->where('id', '[0-9]+');
+        Route::get('{id}/chapters', 'MatikaController@chapters')->where('id', '[0-9]+');
+        Route::get('exists', 'MatikaController@exists');
+        /** Mini display */
+        Route::get('compact', "MatikaController@compactList");
+    
+        Route::post('', 'MatikaController@store');
+        Route::post('{id}/save/structure', 'MatikaController@saveStructure')->where('id', '[0-9]+');
+    
+        Route::put('', 'MatikaController@update')->where('id', '[0-9]+');
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'MatikaController@active')->where('id', '[0-9]+');
+        Route::put('{id}/deactivate', 'MatikaController@unactive')->where('id', '[0-9]+');
+    
+        Route::delete('{id}', 'MatikaController@delete')->where('id', '[0-9]+');
+    });
+    
+    Route::group([
+        'prefix' => 'books/chapters',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'ChapterController@index');
+        Route::get('{id}', 'ChapterController@read')->where('id', '[0-9]+');
+        Route::get('{id}/structure', 'ChapterController@structure')->where('id', '[0-9]+');
+        Route::get('{id}/parts', 'ChapterController@parts')->where('id', '[0-9]+');
+        Route::get('exists', 'ChapterController@exists');
+        /** Mini display */
+        Route::get('compact', "ChapterController@compactList");
+    
+        Route::post('create', 'ChapterController@store');
+        Route::post('{id}/save/structure', 'ChapterController@saveStructure')->where('id', '[0-9]+');
+    
+        Route::post('update', 'ChapterController@update')->where('id', '[0-9]+');
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'ChapterController@active')->where('id', '[0-9]+');
+        Route::put('{id}/deactivate', 'ChapterController@unactive')->where('id', '[0-9]+');
+    
+        Route::delete('{id}', 'ChapterController@delete')->where('id', '[0-9]+');
+    });
+
+    Route::group([
+        'prefix' => 'books/parts',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'PartController@index');
+        Route::get('{id}', 'PartController@read')->where('id', '[0-9]+');
+        Route::get('{id}/structure', 'PartController@structure')->where('id', '[0-9]+');
+        Route::get('{id}/sections', 'PartController@sections')->where('id', '[0-9]+');
+        Route::get('exists', 'PartController@exists');
+        /** Mini display */
+        Route::get('compact', "PartController@compactList");
+    
+        Route::post('', 'PartController@store');
+        Route::post('{id}/save/structure', 'PartController@saveStructure')->where('id', '[0-9]+');
+    
+        Route::put('', 'PartController@update')->where('id', '[0-9]+');
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'PartController@active')->where('id', '[0-9]+');
+        Route::put('{id}/deactivate', 'PartController@unactive')->where('id', '[0-9]+');
+    
+        Route::delete('{id}', 'PartController@delete')->where('id', '[0-9]+');
+    });
+
+    Route::group([
+        'prefix' => 'books/sections',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'SectionController@index');
+        Route::get('{id}', 'SectionController@read')->where('id', '[0-9]+');
+        Route::get('{id}/structure', 'SectionController@structure')->where('id', '[0-9]+');
+        Route::get('exists', 'SectionController@exists');
+        /** Mini display */
+        Route::get('compact', "SectionController@compactList");
+    
+        Route::post('', 'SectionController@store');
+        Route::post('{id}/save/structure', 'SectionController@saveStructure')->where('id', '[0-9]+');
+    
+        Route::put('', 'SectionController@update')->where('id', '[0-9]+');
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'SectionController@active')->where('id', '[0-9]+');
+        Route::put('{id}/deactivate', 'SectionController@unactive')->where('id', '[0-9]+');
+    
+        Route::delete('{id}', 'SectionController@delete')->where('id', '[0-9]+');
+    });
+
+    Route::group([
+        'prefix' => 'books/types',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'TypeController@index');
+        Route::post('create', 'TypeController@store');
+        Route::post('update', 'TypeController@update');
+        Route::get('{id}/read', 'TypeController@read');
+        Route::delete('{id}/delete', 'TypeController@delete');
+        Route::get('{id}/structure', 'TypeController@structure');
+        Route::post('{id}/save/structure', 'TypeController@saveStructure');
+    
+        Route::put('exists', 'TypeController@exists');
+    
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'TypeController@active');
+        Route::put('{id}/deactivate', 'TypeController@unactive');
+    
+        /** Mini display */
+        Route::get('compact', "TypeController@compactList");
+    });
+    
+    Route::group([
+        'prefix' => 'books/matras',
+        'namespace' => 'Api\Book' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        Route::get('', 'MatraController@index');
+        Route::post('', 'MatraController@store');
+        Route::put('', 'MatraController@update');
+        Route::get('{id}', 'MatraController@read')->where('id', '[0-9]+');
+        Route::delete('{id}', 'MatraController@delete')->where('id', '[0-9]+');
+        Route::put('exists', 'MatraController@exists');
+    
+        /** Activate / Deactivate the data for using */
+        Route::put('{id}/activate', 'MatraController@active')->where('id', '[0-9]+');
+        Route::put('{id}/deactivate', 'MatraController@unactive')->where('id', '[0-9]+');
+        /** Mini display */
+        Route::get('compact', "MatraController@compactList");
+    });
+
+    Route::group([
+        'prefix' => 'tasks',
+        'namespace' => 'tasks' ,
+        'middleware' => 'auth:api'
+    ],function(){
+        /**
+         * Methods to apply for each of the CRUD operations
+         * Create => POST
+         * Read => GET
+         * Update => PUT
+         * Delete => DELETE
+         */
+    
+        /**
+         * Get all records
+         */
+        Route::get('',"TaskController@index")->name("taskList");
+        /**
+         * Get a record with id
+         */
+        Route::get('{id}/read',"TaskController@read")->name("taskRead");
+        /**
+         * Create a record
+         */
+        Route::post('',"TaskController@create")->name("taskCreate");
+        /**
+         * Update a reccord with id
+         */
+        Route::put('',"TaskController@update")->name("taskUpdate");
+        /**
+         * Delete a record
+         */
+        Route::delete('users',"TaskController@delete")->name("taskDelete");
+    
+        /**
+         * Activate, Deactivate account
+         */
+        Route::put('activate','TaskController@activate')->name('taskActivate');
+        Route::put('deactivate','TaskController@deactivate')->name('taskDeactivate');
+    
+        Route::put('start','TaskController@startTask')->name('taskStart');
+        Route::put('end','TaskController@endTask')->name('taskEnd');
+        Route::put('pending','TaskController@pendingTask')->name('taskPending');
+        Route::put('continue','TaskController@continueTask')->name('taskContinue');
+        /**
+         * Get number of the tasks base on it status
+         */
+        Route::get('total_number_of_each_status',function(Request $request){
+            return response()->json([
+                'new' => \App\Models\Task\Task::getTotalNewTasks() ,
+                'in_progress' => \App\Models\Task\Task::getTotalInProgressTasks() ,
+                'pending' => \App\Models\Task\Task::getTotalPendingTasks() ,
+                'ended' => \App\Models\Task\Task::getTotalEndedTasks()
+            ],200);
+        });
+        Route::get('total_number_of_new',function(Request $request){
+            return \App\Models\Task\Task::getTotalNewTasks();
+        });
+        Route::get('total_number_of_in_progress',function(Request $request){
+            return \App\Models\Task\Task::getTotalInProgressTasks();
+        });
+        Route::get('total_number_of_pending',function(Request $request){
+            return \App\Models\Task\Task::getTotalPendingTasks();
+        });
+        Route::get('total_number_of_ended',function(Request $request){
+            return \App\Models\Task\Task::getTotalEndedTasks();
+        });
+        /**
+         * Get total earn
+         */
+        Route::get('total_earn',function(){
+            return \App\Models\Task\Task::getTotalEarn();
+        });
+        Route::get('total_earn_by_month_of_year/{date}',function(){
+            return \App\Models\Task\Task::getTotalEarn($date);
+        });
+        Route::get('total_earn_between/{start}/{end}',function(){
+            return \App\Models\Task\Task::getTotalEarn($start,$end);
+        });
+        /**
+         * Get total expense
+         */
+        Route::get('total_expense',function(){
+            return \App\Models\Task\Task::getTotalExpense();
+        });
+        Route::get('total_expense_by_month_of_year/{date}',function(){
+            return \App\Models\Task\Task::getTotalExpenseByMonthOfYear($date);
+        });
+        Route::get('total_expense_between/{start}/{end}',function(){
+            return \App\Models\Task\Task::getTotalExpenseBetween($start,$end);
+        });
+        /**
+         * Get total expense and earn
+         */
+        /**
+         * Total tasks, expense, earn by day
+         */
+        Route::get('total_tasks_earn_expense',function(Request $request){
+            return response()->json([
+                'new' => \App\Models\Task\Task::getTotalNewTasks() ,
+                'progress' => \App\Models\Task\Task::getTotalInProgressTasks() ,
+                'pending' => \App\Models\Task\Task::getTotalPendingTasks() ,
+                'ended' => \App\Models\Task\Task::getTotalEndedTasks() ,
+                'earn' => \App\Models\Task\Task::getTotalEarn() ,
+                'expense' => \App\Models\Task\Task::getTotalExpense()
+            ],200);
+        });
+        Route::get('total_tasks_earn_expense_by_day',function(Request $request){
+            return response()->json([
+                'new' => \App\Models\Task\Task::getNewTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
+                'progress' => \App\Models\Task\Task::getInProgressTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
+                'pending' => \App\Models\Task\Task::getPendingTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
+                'ended' => \App\Models\Task\Task::getEndedTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
+                'earn' => number_format( \App\Models\Task\Task::getTotalEarnBetween(\Carbon\Carbon::now()->format('Y-m-d'),\Carbon\Carbon::now()->format('Y-m-d'))->sum('total'),2,'.',',' ) ,
+                'expense' => number_format( \App\Models\Task\Task::getTotalExpenseBetween(\Carbon\Carbon::now()->format('Y-m-d'),\Carbon\Carbon::now()->format('Y-m-d'))->sum('total'),2,'.',',' )
+            ],200);
+        });
+    });
+
+    require( 'admin/attendant.php' );
+    require( 'admin/book.php' );
 
 });

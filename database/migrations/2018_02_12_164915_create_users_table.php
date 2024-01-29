@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration {
 			$table->string('phone', 191)->nullable();
 			$table->string('username', 100)->nullable();
 			$table->string('email', 191);
+			$table->string('model', 191)->nullable(true)->comment("Model type of the user");
 			$table->string('role', 191)->default(0)->comment('1: admin,0: member');
 			$table->string('email_verified_at',191)->default('')->comment('field of email verification');
 			$table->string('password', 191);
@@ -40,6 +41,7 @@ class CreateUsersTable extends Migration {
 			$table->timestamps();
 			$table->softDeletes();
 			$table->string('api_token', 191)->nullable();
+			$table->integer('authy_id')->default(0);
 		});
 	}
 

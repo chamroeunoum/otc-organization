@@ -135,13 +135,13 @@ class SearchController extends Controller
                 $record->pdf = is_array( $record->pdf ) && !empty( $record->pdf ) ?
                     (
                         array_map(function($file){ return (
-                            \Storage::disk('regulator')->exists( $file ) ? str_replace(['/','.pdf','regulators','documents'],$file ) : false 
+                            \Storage::disk('document')->exists( $file ) ? str_replace(['/','.pdf','documents'],$file ) : false 
                         ); } , $record->pdf )
                     ) : 
                     (
                         $record->pdf != "" && $record->pdf != null 
                         ? ( 
-                            \Storage::disk('regulator')->exists( $record->pdf ) ? str_replace(['/','.pdf','regulators','documents'],"",$record->pdf) : false 
+                            \Storage::disk('document')->exists( $record->pdf ) ? str_replace(['/','.pdf','documents'],"",$record->pdf) : false 
                         )
                         : false
                     ) ;
@@ -234,8 +234,7 @@ class SearchController extends Controller
             ? RecordModel::findOrFail($request->id) 
             : (
                 $regulatorSerial 
-                ? RecordModel::where('pdf','like','%regulators/' . $regulatorSerial . '.pdf%')->first()
-                // ? RecordModel::where('pdf','like','%documents/' . $regulatorSerial . '.pdf%')->first()
+                ? RecordModel::where('pdf','like','%' . $regulatorSerial . '.pdf%')->first()
                 : false
             ) ;
         if( $regulator ) {
@@ -258,8 +257,7 @@ class SearchController extends Controller
                 . ( is_string( $regulator->pdf ) ? $regulator->pdf : '' ) ;    
             }
             if( $regulatorSerial !== false ){
-                // $path = storage_path('data') . '/documents/' . $regulatorSerial . '.pdf' ;    
-                $path = storage_path('data') . '/regulators/' . $regulatorSerial . '.pdf' ;    
+                $path = storage_path('data') . '/documents/' . $regulatorSerial . '.pdf' ;    
             }
 
             $ext = pathinfo($path);
@@ -300,7 +298,7 @@ class SearchController extends Controller
     {
         $regulatorSerial = isset( $request->serial ) && is_string( $request->serial ) ? $request->serial : false ;
         $regulator = $regulatorSerial 
-            ? RecordModel::where('pdf','like','%regulators/' . $regulatorSerial . '.pdf%')->first()
+            ? RecordModel::where('pdf','like','%' . $regulatorSerial . '.pdf%')->first()
             : false;
         if( $regulator ) {
             /**
@@ -317,7 +315,7 @@ class SearchController extends Controller
              */
             $path = '' ;
             if( $regulatorSerial !== false ){
-                $path = storage_path('data') . '/regulators/' . $regulatorSerial . '.pdf' ;    
+                $path = storage_path('data') . '/documents/' . $regulatorSerial . '.pdf' ;    
             }
 
             $ext = pathinfo($path);

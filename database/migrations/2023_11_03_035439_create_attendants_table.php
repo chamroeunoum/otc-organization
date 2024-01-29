@@ -15,13 +15,11 @@ return new class extends Migration
     {
         Schema::create('attendants', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->nullable(false)->comment('The ID of the user/staff');
+            $table->integer('user_id')->default(0)->comment('The ID of the user');
             $table->date('date')->nullable(false)->comment('The date of the attendant');
-            $table->double('worked_hours',8,4)->default(0)->comment('The number of hours worked in a day');
-            $table->double('worked_minutes',8,4)->default(0)->comment('The number of minutes worked in a day');
-            $table->double('ot_hours',8,4)->default(0)->comment('The number of hours worked in a day');
-            $table->double('ot_minutes',8,4)->default(0)->comment('The number of minutes worked in a day');
-            $table->string('attendant_type',100)->default('P')->comment('The type of the attendant such as Absent -> A , Annual Leave -> AL , Sick Leave -> SL , Present -> P , Present Early -> PE , Present Late -> PL , Permission -> PM , Maternity Leave -> ML ');
+            $table->integer('late_or_early')->default(0)->comment('Total minutes that overtime (+) or owned (-).');
+            $table->integer('worked_time')->default(0)->comment('Total minutes that has worded the whole day');
+            $table->integer('duration')->default(0)->comment('Total minutes that need to complete for the whole day');
             $table->timestamps();
             $table->softDeletes();
         });

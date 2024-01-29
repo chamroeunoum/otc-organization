@@ -40,3 +40,4 @@ Route::group([
 
 require('api/webapp.php');
 require('api/admin.php');
+require('api/meeting.php');

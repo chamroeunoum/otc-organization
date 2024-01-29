@@ -11,12 +11,8 @@ class Timeslot extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    public function attendants(){
-        return $this->belongsToMany( \App\Models\Attendant\Attendant::class , 'attendant_timeslots' , 'timeslot_id' , 'attendant_id' );
-    }
-
     public function users(){
-        return $this->belongsToMany('App\Models\User','user_timeslots','timeslot_id','user_id');
+        return $this->belongsToMany( \App\Models\User::class,'user_timeslots','timeslot_id','user_id');
     }
 
     /**
@@ -63,12 +59,18 @@ class Timeslot extends Model
      * @return float
      * The value will be total minutes of the hours
      */
-    public function getDuration(){
+    public function getMinutes(){
         $start = $this->start != null && $this->start != "" ? Carbon::parse( $this->start ) : false ;
         $end = $this->end != null && $this->end != "" ? Carbon::parse( $this->end ) : false ;
         return !$start || !$end ? 0 : $start->diffInMinutes( $end ) ;
     }
-
+    /**
+     * Get hours of the timeslot
+     */
+    public function getHours(){
+        return intval( $this->getMinutes() / 60 );
+    }
+    
     /**
      * Check-in
      * @param $checktime
@@ -78,7 +80,7 @@ class Timeslot extends Model
         $checktime = $checktime != null && $checktime != "" ? Carbon::parse( $checktime ) : false ;
         $start = $this->start != null && $this->start != "" ? Carbon::parse( $this->start ) : false ;
         return ( !$checktime || !$start )
-            ? 0 
+            ? false
             : (
                 $checktime->lt( $start )
                     // Check-in time is early than start time
@@ -102,7 +104,7 @@ class Timeslot extends Model
         $checktime = $checktime != null && $checktime != "" ? Carbon::parse( $checktime ) : false ;
         $end = $this->end != null && $this->end != "" ? Carbon::parse( $this->end ) : false ;
         return ( !$checktime || !$end )
-            ? 0
+            ? false
             : (
                 $checktime->lt( $end )
                     // Check-out time is early than end time
@@ -122,9 +124,12 @@ class Timeslot extends Model
      * @param $checkInTime $checkOutTime
      * @return Array
      */
-    public function calculateWorkingTime( $checkTimeIn , $checkTimeOut ){
-        $duration = $this->getDuration();
+    public function calculateChecktime( $checkTimeIn , $checkTimeOut ){
+        $duration = $this->getMinutes();
         $workingTime = [
+            'checkin_id' => $checkTimeIn->id ,
+            'checkout_id' => $checkTimeOut != null ? $checkTimeOut->id : null ,
+            'status' => $checkTimeIn->getStatus() ,
             'timeslot' => [
                 'id' => $this->id ,
                 'title' => $this->title ,
@@ -132,20 +137,31 @@ class Timeslot extends Model
                 'end' => $this->end ,
                 'effective_day' => $this->effective_day ,
             ],
-            'date' => $checkTimeIn->date ,
+            'date' => $checkTimeIn->attendant->date ,
+            'day_of_week' => \Carbon\Carbon::parse( $checkTimeIn->attendant->date )->dayOfWeek ,
             'checkin' => $checkTimeIn->checktime ,
-            'checkout' => $checkTimeOut->checktime ,
+            'checkout' => $checkTimeOut != null ? $checkTimeOut->checktime : null ,
             'checkingIn' => $this->checkIn( $checkTimeIn->checktime ) ,
-            'checkingOut' => $this->checkOut( $checkTimeOut->checktime ) ,
+            'checkingOut' => $checkTimeOut != null ? $this->checkOut( $checkTimeOut->checktime ) : null ,
             'lateOrEarly' => 0 ,
             'workedTime' => 0 ,
             'duration' => $duration ,
             'overtime' => 0 
         ];
-        $workingTime['lateOrEarly'] = $workingTime['checkingIn'] + $workingTime['checkingOut'] ;
-        $workingTime['workedTime'] = $duration + $workingTime['lateOrEarly'] ;
-        $workingTime['overtime'] = $workingTime['lateOrEarly'] > 0 ? $workingTime['lateOrEarly'] : 0 ;
+        $workingTime['lateOrEarly'] = $checkTimeIn != null && $checkTimeOut != null ? $workingTime['checkingIn'] + $workingTime['checkingOut'] : 0 ;
+        $workingTime['workedTime'] = $checkTimeIn != null && $checkTimeOut != null ? $duration + $workingTime['lateOrEarly'] : 0 ;
+        $workingTime['overtime'] = $checkTimeIn != null && $checkTimeOut != null ? ( $workingTime['lateOrEarly'] > 0 ? $workingTime['lateOrEarly'] : 0 ) : 0 ;
         return $workingTime;
     }
-
+    public static function getTimeslot($datetime){
+        if( strlen( $datetime ) > 0 ){
+            $datetime = \Carbon\Carbon::parse( $datetime );
+            return static::orderby('start','asc')->get()->filter(function($timeslot, $key) use( $datetime ){
+                $start = \Carbon\Carbon::parse( $datetime->format("Y-m-d") . ' ' . $timeslot->start );
+                $end = \Carbon\Carbon::parse( $datetime->format("Y-m-d") . ' ' . $timeslot->end );
+                return ( $datetime->gte( $start ) && $datetime->lte( $end ) ) ;
+            })->first();
+        }
+        return null ;
+    }
 }
