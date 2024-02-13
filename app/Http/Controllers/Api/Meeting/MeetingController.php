@@ -35,6 +35,7 @@ class MeetingController extends Controller
      * Listing function
      */
     public function index(Request $request){
+
         $user = \Auth::user() != null ? \Auth::user() : false ;
 
         /** Format from query string */
@@ -46,10 +47,18 @@ class MeetingController extends Controller
         $queryString = [
             "where" => [
                 'default' => [
-                    [
-                        'field' => 'date' ,
-                        'value' => $date->format('Y-m-d')
-                    ]
+                    // [
+                    //     'field' => 'date' ,
+                    //     'value' => $date->format('Y-m-d')
+                    // ],
+                    // [
+                    //     'field' => 'pid' ,
+                    //     'value' => null
+                    // ],
+                    // [
+                    //     'field' => 'pid' ,
+                    //     'value' => 0
+                    // ]
                 ],
                 // 'in' => [
                 //     [
@@ -175,74 +184,26 @@ class MeetingController extends Controller
 
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            'comments' => [ 'id' , 'people_id' , 'comment' , 'remark' ] ,
+            'comments' => [ 'id' , 'people_id' , 'comment' ] ,
             'organizations' => [ 'id' , 'name' , 'desp' ] ,
             'rooms' => [ 'id' , 'name' , 'desp' ] ,
-            'listMembers' => [ 'id' , 'people_id' , 'role' , 'group' ,'remark' ] ,
-            'regulators' => [ 'id', 'fid' , 'title' , 'objective', 'year' , 'pdf' ],
+            'listMembers' => [ 'id' , 'people_id' , 'role' , 'group' ,'remark'
+                // Relation within listMembers
+                , 'member' => [ 'id' , 'firstname' , 'lastname' ]
+                , 'attendant' => [ 'id' , 'checktime' , 'remark' , 'people_id' ]
+            ] ,
+            'regulators' => [ 'id', 'fid' , 'title' , 'objective', 'year' , 'pdf' 
+                // Relation with regulators
+                , 'types' => [ 'id' , 'name' , 'desp' ]
+            ],
             'type' => [ 'id' , 'name' , 'desp' ] ,
             'children' => [ 'id' , 'objective' , 'date' , 'start' , 'end' ]
         ]);
-
-        $builder = $crud->getListBuilder();
-
         /**
          * Filter the meeting to get the top level
          */
-        $builder->whereNull('pid')->orWhere('pid',0);
-
-        $responseData = $crud->pagination(true, $builder);
-
-        $responseData['records'] = $responseData['records']->map(function($meeting){
-            $meetingObj = RecordModel::find( $meeting['id'] );
-            
-            // Update the status of the meeting according to the start and end time
-            $meetingObj->updateStatus();
-            $meeting['status'] = $meetingObj->status ;
-
-            $meeting['listMembers'] = collect( $meeting['listMembers'] )->map(function($meetingMember){
-                $meetingMemberObj = \App\Models\Meeting\MeetingMember::find( $meetingMember->id );
-                $people = \App\Models\People\People::find( $meetingMember->people_id );
-                $meetingMember->member = $people ;
-                $meetingMember->attendant = $meetingMemberObj->attendant ;
-                $meetingMember->attendant != null ? $meetingMember->attendant->member : null ;
-                return $meetingMember ;
-            });
-            $meeting['full_date'] = \Carbon\Carbon::parse( $meeting['date'] )->isoFormat('ddd D MMM M YYYY');
-            // $meeting['rooms'] = collect( $meeting['rooms'] )->map(function($room){
-            //     $organization = \App\Models\Regulator\Tag\Organization::find( $room['meetingRoom']->organization_id );
-            //     $meetingRoom->organization = $organization != null ? [
-            //         'id' => $organization->id ,
-            //         'name' => $organization->name ,
-            //         'desp' => $organization->desp
-            //     ] : null ;
-            //     $meetingRoom->room = $room != null ? [
-            //         'id' => $room->id ,
-            //         'name' => $room->name ,
-            //         'desp' => $room->desp
-            //     ] : null ;
-            //     return $meetingRoom ;
-            // });
-
-            $meeting['regulators'] = collect( $meeting['regulators'] )->map(function($regulator){
-                $regulator = \App\Models\Regulator\Regulator::find( $regulator->id );
-                return [
-                    'id' => $regulator->id ,
-                    'year' => $regulator->year ,
-                    'objective' => html_entity_decode( strip_tags( $regulator->objective ) ) ,
-                    'fid' => $regulator->fid ,
-                    'pdf' => strlen( $regulator->pdf ) > 0 
-                        ? \Storage::disk('regulator')->exists( $regulator->pdf ) || \Storage::disk('document')->exists( $regulator->pdf )
-                        : false ,
-                    'types' => $regulator->types->map(function($type){ return [ 'id' => $type->id , 'name' => $type->name , 'desp' => $type->desp ];})
-                ] ;
-            });
-
-
-
-            return $meeting ;
-        });
-
+        // $builder->whereNull('pid')->orWhere('pid',0);
+        $responseData = $crud->pagination(true);
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
@@ -326,7 +287,7 @@ class MeetingController extends Controller
                 'contact_info' => $request->contact_info?? '' ,
                 'updated_by' => $user->id  ,
                 'type_id' => $request->type_id ,
-                'status' => $request->status
+                'status' => $request->status > 0 ? $request->status : $record->status
             ]) ){
 
                 $responseData['message'] = __("crud.read.success");
@@ -1391,10 +1352,10 @@ class MeetingController extends Controller
         $queryString = [
             "where" => [
                 'default' => [
-                    [
-                        'field' => 'date' ,
-                        'value' => \Carbon\Carbon::now()->format('Y-m-d')
-                    ]
+                    // [
+                    //     'field' => 'date' ,
+                    //     'value' => \Carbon\Carbon::now()->format('Y-m-d')
+                    // ]
                 ],
                 // 'in' => [
                 //     [
@@ -1542,38 +1503,12 @@ class MeetingController extends Controller
             $meeting['full_date'] = \App\Helper::toKdate( $meeting['date'] , true );
             $meeting['listMembers'] = collect( $meeting['listMembers'] )->map(function($meetingMember){
                 $people = \App\Models\People\People::find( $meetingMember->people_id );
+                $people->countesies;
+                $people->positions;
+                $people->organizations;
                 $meetingMember->member = $people ;
                 return $meetingMember ;
             });
-            // $meeting['rooms'] = collect( $meeting['rooms'] )->map(function($room){
-            //     $organization = \App\Models\Regulator\Tag\Organization::find( $room['meetingRoom']->organization_id );
-            //     $meetingRoom->organization = $organization != null ? [
-            //         'id' => $organization->id ,
-            //         'name' => $organization->name ,
-            //         'desp' => $organization->desp
-            //     ] : null ;
-            //     $meetingRoom->room = $room != null ? [
-            //         'id' => $room->id ,
-            //         'name' => $room->name ,
-            //         'desp' => $room->desp
-            //     ] : null ;
-            //     return $meetingRoom ;
-            // });
-
-            // $meeting['regulators'] = collect( $meeting['regulators'] )->map(function($regulator){
-            //     $regulator = \App\Models\Regulator\Regulator::find( $regulator->id );
-            //     return [
-            //         'id' => $regulator->id ,
-            //         'year' => $regulator->year ,
-            //         'objective' => html_entity_decode( strip_tags( $regulator->objective ) ) ,
-            //         'fid' => $regulator->fid ,
-            //         'pdf' => strlen( $regulator->pdf ) > 0 
-            //             ? \Storage::disk('regulator')->exists( $regulator->pdf ) || \Storage::disk('document')->exists( $regulator->pdf )
-            //             : false ,
-            //         'types' => $regulator->types->map(function($type){ return [ 'id' => $type->id , 'name' => $type->name , 'desp' => $type->desp ];})
-            //     ] ;
-            // });
-
             return $meeting ;
         });
 

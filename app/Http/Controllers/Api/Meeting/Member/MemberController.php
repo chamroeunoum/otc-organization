@@ -11,7 +11,7 @@ use App\Models\People\People as RecordModel;
 class MemberController extends Controller
 {
     private $model = null ;
-    private $fields = [ 'id','firstname','lastname', 'mobile_phone' ] ;
+    private $fields = [ 'id','firstname','lastname', 'mobile_phone' , 'email' ] ;
     private $renameFields = [
         // 'pid' => 'parentId'
     ];
@@ -104,15 +104,19 @@ class MemberController extends Controller
     }
     public function save(Request $request){
         if( 
-            strlen( $request->firstname ) > 0 &&
-            strlen( $request->lastname ) > 0 &&
-            strlen( $request->phone ) > 0
+            strlen( $request->firstname ) > 0 
+            && strlen( $request->lastname ) > 0 
+            // && strlen( $request->phone ) > 0
         ){
             $personBuilder = \App\Models\People\People::where([
-                'firstname' => $request->firstname ,
-                'lastname' => $request->lastname ,
-                'mobile_phone' => trim($request->phone) ,
+                'firstname' => $request->firstname
+                , 'lastname' => $request->lastname
+                // , 'mobile_phone' => trim($request->phone)
             ]);
+            // Check phone
+            if( strlen( $request->phone ) > 0 ){
+                $personBuilder->where('phone',$request->phone);
+            }
             // Check email
             if( strlen( $request->email ) > 0 ){
                 $personBuilder->where('email',$request->email);
@@ -138,7 +142,7 @@ class MemberController extends Controller
                 $person = \App\Models\People\People::create([
                     'firstname' => $request->firstname , 
                     'lastname' => $request->lastname , 
-                    'mobile_phone' => $request->phone , 
+                    'mobile_phone' => $request->phone??"" , 
                     'gender' => intval( $request->gender ) > 0 ? $request->gender : 0 , 
                     'email' => $request->email??""
                 ]);

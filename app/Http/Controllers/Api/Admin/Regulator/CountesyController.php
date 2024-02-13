@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api\Admin\Regulator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CrudController;
-use App\Models\Regulator\Tag\Organization as RecordModel;
+use App\Models\Regulator\Tag\Countesy as RecordModel;
 
 
-class OrganizationController extends Controller
+class CountesyController extends Controller
 {
     private $model = null ;
     private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'record_index'  ] ;
@@ -26,7 +26,7 @@ class OrganizationController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-        $id = intval( $request->id ) > 0 ? intval( $request->id ) : 164 ; // 164 ទីស្ដីការគៈណរដ្ឋនមន្ត្រី
+        $id = intval( $request->id ) > 0 ? intval( $request->id ) : 15 ; // 15 បណ្ដុំងារ
         $root = $id > 0 
             ? RecordModel::where('id',$id)->first()
             : RecordModel::where('model', get_class( $this->model ) )->first();
@@ -84,22 +84,6 @@ class OrganizationController extends Controller
 
         $responseData = $crud->pagination(true , $builder );
         $responseData['records'] = $responseData['records']->prepend( $root );
-        $responseData['records'] = $responseData['records']->map(function($organization){
-            $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
-            $organization['staffs'] = $org != null ? $org->staffs->map(function($staff){
-                $staff->organizations;
-                $staff->positions;
-                $staff->countesies;
-                return $staff ;
-            }) : [] ;
-            $organization['leader'] = $org != null ? $org->leader->map(function($leader){
-                $leader->organizations;
-                $leader->positions;
-                $leader->countesies;
-                return $leader ;
-            }) : [] ;
-            return $organization;
-        });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);

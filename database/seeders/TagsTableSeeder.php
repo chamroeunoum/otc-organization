@@ -6816,21 +6816,6 @@ class TagsTableSeeder extends Seeder
             ),
             453 => 
             array (
-                'id' => 456,
-                'name' => 'នាយកដ្ឋានរដ្ឋបាល',
-                'desp' => 'នាយកដ្ឋានរដ្ឋបាល',
-                'tpid' => '163:164:455',
-                'pid' => 455,
-                'model' => NULL,
-                'cids' => NULL,
-                'image' => '',
-                'record_index' => NULL,
-                'created_at' => '2023-09-16 03:05:23',
-                'updated_at' => '2023-09-16 03:05:24',
-                'deleted_at' => NULL,
-            ),
-            454 => 
-            array (
                 'id' => 457,
                 'name' => 'នាយកដ្ឋានផ្គត់ផ្គង់ និងហិរញ្ញវត្ថុ',
                 'desp' => 'នាយកដ្ឋានផ្គត់ផ្គង់ និងហិរញ្ញវត្ថុ',
@@ -6844,7 +6829,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:05:39',
                 'deleted_at' => NULL,
             ),
-            455 => 
+            454 => 
             array (
                 'id' => 458,
                 'name' => 'នាយកដ្ឋានបុគ្គលិក',
@@ -6859,7 +6844,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:05:50',
                 'deleted_at' => NULL,
             ),
-            456 => 
+            455 => 
             array (
                 'id' => 459,
                 'name' => 'នាយកដ្ឋានពិធីការ',
@@ -6874,22 +6859,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:06:11',
                 'deleted_at' => NULL,
             ),
-            457 => 
-            array (
-                'id' => 164,
-                'name' => 'ទីស្តីការគណៈរដ្ឋមន្ត្រី',
-                'desp' => 'ឧបកនាយករដ្ឋមន្ត្រី វង្សី វិសុត្ស',
-                'tpid' => '163',
-                'pid' => 163,
-                'model' => NULL,
-                'cids' => NULL,
-                'image' => NULL,
-                'record_index' => 1,
-                'created_at' => NULL,
-                'updated_at' => '2023-09-16 03:06:33',
-                'deleted_at' => NULL,
-            ),
-            458 => 
+            456 => 
             array (
                 'id' => 460,
                 'name' => 'អគ្គនាយកដ្ឋានសម្របសម្រួលកិច្ចការទូទៅ',
@@ -6904,7 +6874,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:06:51',
                 'deleted_at' => NULL,
             ),
-            459 => 
+            457 => 
             array (
                 'id' => 465,
                 'name' => 'នាយកដ្ឋានឥស្សរិយយស',
@@ -6919,7 +6889,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:09:36',
                 'deleted_at' => NULL,
             ),
-            460 => 
+            458 => 
             array (
                 'id' => 462,
                 'name' => 'នាយកដ្ឋានស្រាវជ្រាវ និងរៀបចំឯកសារគាំទ្រកិច្ចប្រជុំ',
@@ -6934,7 +6904,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:08:48',
                 'deleted_at' => NULL,
             ),
-            461 => 
+            459 => 
             array (
                 'id' => 463,
                 'name' => 'នាយកដ្ឋានឯកសារអេឡិចត្រូនិច និងព័ត៌មានវិទ្យា',
@@ -6949,7 +6919,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:08:36',
                 'deleted_at' => NULL,
             ),
-            462 => 
+            460 => 
             array (
                 'id' => 461,
                 'name' => 'នាយកដ្ឋានរៀបចំកិច្ចប្រជុំពេញអង្គគណៈរដ្ឋមន្ត្រី និងកិច្ចប្រជុំផ្សេងទៀត',
@@ -6964,7 +6934,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:08:56',
                 'deleted_at' => NULL,
             ),
-            463 => 
+            461 => 
             array (
                 'id' => 464,
                 'name' => 'នាយកដ្ឋានសរុប',
@@ -6979,7 +6949,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:09:18',
                 'deleted_at' => NULL,
             ),
-            464 => 
+            462 => 
             array (
                 'id' => 466,
                 'name' => 'អគ្គនាយកដ្ឋានសហប្រតិបត្តិការអន្តរជាតិ',
@@ -6994,7 +6964,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:10:10',
                 'deleted_at' => NULL,
             ),
-            465 => 
+            463 => 
             array (
                 'id' => 467,
                 'name' => 'នាយកដ្ឋានទំនាក់ទំនងអន្តរជាតិ',
@@ -7009,7 +6979,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:10:26',
                 'deleted_at' => NULL,
             ),
-            466 => 
+            464 => 
             array (
                 'id' => 468,
                 'name' => 'នាយកដ្ឋានអាស៊ាន',
@@ -7024,7 +6994,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:10:40',
                 'deleted_at' => NULL,
             ),
-            467 => 
+            465 => 
             array (
                 'id' => 469,
                 'name' => 'អគ្គនាយកដ្ឋានសម្របសម្រួលកិច្ចការផ្ទៃក្នុង',
@@ -7039,7 +7009,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:11:08',
                 'deleted_at' => NULL,
             ),
-            468 => 
+            466 => 
             array (
                 'id' => 470,
                 'name' => 'នាយកដ្ឋានមហាផ្ទៃ ការពារជាតិ យុត្តិធម៌ និងស្ថាប័នធម្មនុញ្ញ',
@@ -7054,7 +7024,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:11:39',
                 'deleted_at' => NULL,
             ),
-            469 => 
+            467 => 
             array (
                 'id' => 471,
                 'name' => 'នាយកដ្ឋានមុខងារសាធារណៈ និងទំនាកទំនងជាមួយរដ្ឋសភា ព្រឹទ្ធសភា និងអធិការកិច្ច',
@@ -7069,7 +7039,22 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:12:18',
                 'deleted_at' => NULL,
             ),
-            470 => 
+            468 => 
+            array (
+                'id' => 456,
+                'name' => 'នាយកដ្ឋានរដ្ឋបាល',
+                'desp' => 'នាយកដ្ឋានរដ្ឋបាល',
+                'tpid' => '163:164:455',
+                'pid' => 455,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => '2023-09-16 03:05:23',
+                'updated_at' => '2024-02-01 14:14:53',
+                'deleted_at' => NULL,
+            ),
+            469 => 
             array (
                 'id' => 472,
                 'name' => 'នាយកដ្ឋានព័ត៌មាន ប្រៃសណីយ៍ និងទូរគមនាគមន៍',
@@ -7084,7 +7069,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:12:41',
                 'deleted_at' => NULL,
             ),
-            471 => 
+            470 => 
             array (
                 'id' => 473,
                 'name' => 'អគ្គនាយកដ្ឋានសេដ្ឋកិច្ច និងទេសចរណ៍',
@@ -7099,7 +7084,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:13:18',
                 'deleted_at' => NULL,
             ),
-            472 => 
+            471 => 
             array (
                 'id' => 474,
                 'name' => 'នាយកដ្ឋានហិរញ្ញវត្ថុ និងធនាគារ',
@@ -7114,7 +7099,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:13:40',
                 'deleted_at' => NULL,
             ),
-            473 => 
+            472 => 
             array (
                 'id' => 475,
                 'name' => 'នាយកដ្ឋានឧស្សាហកម្ម សិប្បកម្ម រ៉ែនិងថាមពល',
@@ -7129,7 +7114,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:14:04',
                 'deleted_at' => NULL,
             ),
-            474 => 
+            473 => 
             array (
                 'id' => 476,
                 'name' => 'នាយកដ្ឋានពាណិជកម្ម និងទេសចរណ៍',
@@ -7144,7 +7129,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:14:21',
                 'deleted_at' => NULL,
             ),
-            475 => 
+            474 => 
             array (
                 'id' => 477,
                 'name' => 'នាយកដ្ឋានផែនការនិងអភិវឌ្ឍន៍',
@@ -7159,7 +7144,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:14:35',
                 'deleted_at' => NULL,
             ),
-            476 => 
+            475 => 
             array (
                 'id' => 478,
                 'name' => 'អគ្គនាយកដ្ឋានកិច្ចការសង្គម',
@@ -7174,7 +7159,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:14:52',
                 'deleted_at' => NULL,
             ),
-            477 => 
+            476 => 
             array (
                 'id' => 479,
                 'name' => 'នាយកដ្ឋានអបរំ ការងារ វប្បធម៌ ធម្មការ និងសាសនា',
@@ -7189,7 +7174,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:15:19',
                 'deleted_at' => NULL,
             ),
-            478 => 
+            477 => 
             array (
                 'id' => 480,
                 'name' => 'នាយកដ្ឋានសុខាភិបាល សង្គមកិច្ច និងកិច្ចការនារី',
@@ -7204,7 +7189,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:15:49',
                 'deleted_at' => NULL,
             ),
-            479 => 
+            478 => 
             array (
                 'id' => 481,
                 'name' => 'អគ្គនាយកដ្ឋានផលិតកម្ម រៀបចំដែនដី នគរូបនីយកម្ម និងសំណង',
@@ -7219,7 +7204,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:16:19',
                 'deleted_at' => NULL,
             ),
-            480 => 
+            479 => 
             array (
                 'id' => 482,
                 'name' => 'នាយកដ្ឋានកសិកម្ម និងធនធានទឹក',
@@ -7234,7 +7219,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:16:37',
                 'deleted_at' => NULL,
             ),
-            481 => 
+            480 => 
             array (
                 'id' => 483,
                 'name' => 'នាយកដ្ឋានអភិវឌ្ឍន៍ជនបទ សាធារណៈការ និងដឹកជញ្ជូន',
@@ -7249,7 +7234,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:17:05',
                 'deleted_at' => NULL,
             ),
-            482 => 
+            481 => 
             array (
                 'id' => 484,
                 'name' => 'នាយកដ្ឋានរៀបចំដែនដី នគរូបនីយកម្ម សំណង់ បិងបរិស្ថាន',
@@ -7264,7 +7249,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:17:36',
                 'deleted_at' => NULL,
             ),
-            483 => 
+            482 => 
             array (
                 'id' => 485,
                 'name' => 'អគ្គនាយកដ្ឋានរាជកិច្ច',
@@ -7279,7 +7264,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:18:07',
                 'deleted_at' => NULL,
             ),
-            484 => 
+            483 => 
             array (
                 'id' => 486,
                 'name' => 'នាយកដ្ឋានរាជកិច្ច',
@@ -7294,7 +7279,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:18:18',
                 'deleted_at' => NULL,
             ),
-            485 => 
+            484 => 
             array (
                 'id' => 487,
                 'name' => 'នាយកដ្ឋានតម្កល់ឯកសារជាតិ',
@@ -7309,7 +7294,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:18:32',
                 'deleted_at' => NULL,
             ),
-            486 => 
+            485 => 
             array (
                 'id' => 488,
                 'name' => 'នាយកដ្ឋានសវនកម្មផ្ទៃក្នុង',
@@ -7324,7 +7309,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-16 03:18:52',
                 'deleted_at' => NULL,
             ),
-            487 => 
+            486 => 
             array (
                 'id' => 489,
                 'name' => 'បណ្ដុំតំណែងរបស់បុគ្គលិក',
@@ -7339,7 +7324,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            488 => 
+            487 => 
             array (
                 'id' => 490,
                 'name' => 'នាយករដ្ឋមន្ត្រី',
@@ -7354,7 +7339,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            489 => 
+            488 => 
             array (
                 'id' => 491,
                 'name' => 'ឧបនាយករដ្ឋមន្ត្រី',
@@ -7369,7 +7354,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            490 => 
+            489 => 
             array (
                 'id' => 492,
                 'name' => 'ទេសរដ្ឋមន្ត្រី',
@@ -7384,7 +7369,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            491 => 
+            490 => 
             array (
                 'id' => 493,
                 'name' => 'រដ្ឋមន្ត្រី',
@@ -7399,7 +7384,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            492 => 
+            491 => 
             array (
                 'id' => 494,
                 'name' => 'រដ្ឋលេខាធិការ',
@@ -7414,7 +7399,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            493 => 
+            492 => 
             array (
                 'id' => 495,
                 'name' => 'អនុរដ្ឋលេខាធិការ',
@@ -7429,7 +7414,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            494 => 
+            493 => 
             array (
                 'id' => 496,
                 'name' => 'អគ្គនាយក',
@@ -7444,7 +7429,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            495 => 
+            494 => 
             array (
                 'id' => 497,
                 'name' => 'អគ្គនាយករង',
@@ -7459,7 +7444,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            496 => 
+            495 => 
             array (
                 'id' => 498,
                 'name' => 'ប្រធាននាយកដ្ឋាន',
@@ -7474,7 +7459,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            497 => 
+            496 => 
             array (
                 'id' => 499,
                 'name' => 'អនុប្រធាននាយកដ្ឋាន',
@@ -7489,7 +7474,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            498 => 
+            497 => 
             array (
                 'id' => 500,
                 'name' => 'ប្រធានការិយាល័យ',
@@ -7504,7 +7489,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            499 => 
+            498 => 
             array (
                 'id' => 501,
                 'name' => 'អនុប្រធានការិយាល័យ',
@@ -7519,9 +7504,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-        ));
-        \DB::table('tags')->insert(array (
-            0 => 
+            499 => 
             array (
                 'id' => 502,
                 'name' => 'មន្ត្រី',
@@ -7536,7 +7519,9 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            1 => 
+        ));
+        \DB::table('tags')->insert(array (
+            0 => 
             array (
                 'id' => 503,
                 'name' => 'មន្ត្រីហាត់ការ',
@@ -7551,7 +7536,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            2 => 
+            1 => 
             array (
                 'id' => 163,
                 'name' => 'រាជរដ្ឋាភិបាល',
@@ -7566,7 +7551,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => '2023-09-09 07:43:47',
                 'deleted_at' => NULL,
             ),
-            3 => 
+            2 => 
             array (
                 'id' => 504,
                 'name' => 'ឋានន្តរស៏ក្កយោធា',
@@ -7581,7 +7566,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            4 => 
+            3 => 
             array (
                 'id' => 505,
                 'name' => 'នាយឧត្តមសេនីយ៍ អគ្គបញ្ជាការ',
@@ -7596,7 +7581,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            5 => 
+            4 => 
             array (
                 'id' => 506,
                 'name' => 'នាយឧត្តមសេនីយ៍',
@@ -7611,7 +7596,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            6 => 
+            5 => 
             array (
                 'id' => 508,
                 'name' => 'ឧត្តមសេនីយ៍ទោ',
@@ -7626,7 +7611,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            7 => 
+            6 => 
             array (
                 'id' => 507,
                 'name' => 'ឧត្តមសេនីយ៍ឯក',
@@ -7641,7 +7626,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            8 => 
+            7 => 
             array (
                 'id' => 509,
                 'name' => 'ឧត្តមសេនីយ៍ត្រី',
@@ -7656,7 +7641,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            9 => 
+            8 => 
             array (
                 'id' => 512,
                 'name' => 'វរសេនីយ៍ត្រី',
@@ -7671,7 +7656,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            10 => 
+            9 => 
             array (
                 'id' => 511,
                 'name' => 'វរសេនីយ៍ទោ',
@@ -7686,7 +7671,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            11 => 
+            10 => 
             array (
                 'id' => 513,
                 'name' => 'អនុសេនីយ៍ឯក',
@@ -7701,7 +7686,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            12 => 
+            11 => 
             array (
                 'id' => 514,
                 'name' => 'អនុសេនីយ៍ទោ',
@@ -7716,7 +7701,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            13 => 
+            12 => 
             array (
                 'id' => 515,
                 'name' => 'អនុសេនីយ័ត្រី',
@@ -7731,7 +7716,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            14 => 
+            13 => 
             array (
                 'id' => 516,
                 'name' => 'នាយឧត្តមនាវី',
@@ -7746,7 +7731,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            15 => 
+            14 => 
             array (
                 'id' => 519,
                 'name' => 'នាយឧត្តមនាវីត្រី',
@@ -7761,7 +7746,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            16 => 
+            15 => 
             array (
                 'id' => 518,
                 'name' => 'ឧត្តមនាវីទៅ',
@@ -7776,7 +7761,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            17 => 
+            16 => 
             array (
                 'id' => 517,
                 'name' => 'ឧត្តមនាវីឯក',
@@ -7791,7 +7776,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            18 => 
+            17 => 
             array (
                 'id' => 522,
                 'name' => 'វរនាវីត្រី',
@@ -7806,7 +7791,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            19 => 
+            18 => 
             array (
                 'id' => 521,
                 'name' => 'វរនាវីទោ',
@@ -7821,7 +7806,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            20 => 
+            19 => 
             array (
                 'id' => 520,
                 'name' => 'វរនាវីឯក',
@@ -7836,7 +7821,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            21 => 
+            20 => 
             array (
                 'id' => 523,
                 'name' => 'អនុនាវីឯក',
@@ -7851,7 +7836,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            22 => 
+            21 => 
             array (
                 'id' => 524,
                 'name' => 'អនុនាវីទោ',
@@ -7866,7 +7851,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            23 => 
+            22 => 
             array (
                 'id' => 525,
                 'name' => 'អនុនាវីត្រី',
@@ -7881,7 +7866,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            24 => 
+            23 => 
             array (
                 'id' => 526,
                 'name' => 'នាយចំណង់',
@@ -7896,7 +7881,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            25 => 
+            24 => 
             array (
                 'id' => 527,
                 'name' => 'ព្រិន្ទបាលឯក',
@@ -7911,7 +7896,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            26 => 
+            25 => 
             array (
                 'id' => 528,
                 'name' => 'ព្រិន្ទបាលទោ',
@@ -7926,7 +7911,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            27 => 
+            26 => 
             array (
                 'id' => 529,
                 'name' => 'ពលបាលឯក',
@@ -7941,7 +7926,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            28 => 
+            27 => 
             array (
                 'id' => 530,
                 'name' => 'ពលបាលទោ',
@@ -7956,7 +7941,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            29 => 
+            28 => 
             array (
                 'id' => 531,
                 'name' => 'ពលបាលត្រី',
@@ -7971,7 +7956,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            30 => 
+            29 => 
             array (
                 'id' => 532,
                 'name' => 'នាយឯក',
@@ -7986,7 +7971,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            31 => 
+            30 => 
             array (
                 'id' => 533,
                 'name' => 'នាយទោ',
@@ -8001,7 +7986,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            32 => 
+            31 => 
             array (
                 'id' => 534,
                 'name' => 'ពលឯក',
@@ -8016,7 +8001,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            33 => 
+            32 => 
             array (
                 'id' => 535,
                 'name' => 'ពលទោ',
@@ -8031,7 +8016,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            34 => 
+            33 => 
             array (
                 'id' => 536,
                 'name' => 'ព្រះមហាក្សត្រ',
@@ -8046,7 +8031,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            35 => 
+            34 => 
             array (
                 'id' => 537,
                 'name' => 'រដ្ឋមន្ត្រីប្រតិភូ',
@@ -8061,7 +8046,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            36 => 
+            35 => 
             array (
                 'id' => 538,
                 'name' => 'រដ្ឋលេខាធិការប្រចាំការ',
@@ -8076,7 +8061,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            37 => 
+            36 => 
             array (
                 'id' => 539,
                 'name' => 'រដ្ឋលេខាធិការស្ដីទី',
@@ -8091,7 +8076,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            38 => 
+            37 => 
             array (
                 'id' => 540,
                 'name' => 'អ្នកស្រី',
@@ -8106,7 +8091,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            39 => 
+            38 => 
             array (
                 'id' => 541,
                 'name' => 'អ្នកនាង',
@@ -8121,7 +8106,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            40 => 
+            39 => 
             array (
                 'id' => 542,
                 'name' => 'កុមារា',
@@ -8136,7 +8121,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            41 => 
+            40 => 
             array (
                 'id' => 543,
                 'name' => 'កុមារី',
@@ -8151,7 +8136,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            42 => 
+            41 => 
             array (
                 'id' => 544,
                 'name' => 'ទារក',
@@ -8166,7 +8151,7 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            43 => 
+            42 => 
             array (
                 'id' => 545,
                 'name' => 'ទារិកា',
@@ -8181,14 +8166,29 @@ class TagsTableSeeder extends Seeder
                 'updated_at' => NULL,
                 'deleted_at' => NULL,
             ),
-            44 => 
+            43 => 
             array (
                 'id' => 547,
                 'name' => 'បន្ទប់ប្រជុំ',
                 'desp' => 'បន្ទប់ប្រជុំ',
                 'tpid' => NULL,
                 'pid' => NULL,
-                'model' => 'App\\Models\\Meeting\\MeetingPlace',
+                'model' => 'App\\Models\\Meeting\\Room',
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            44 => 
+            array (
+                'id' => 552,
+                'name' => 'ប្រភេទប្រជុំ',
+                'desp' => 'ប្រភេទប្រជុំ',
+                'tpid' => '',
+                'pid' => NULL,
+                'model' => 'App\\Models\\Meeting\\Type',
                 'cids' => NULL,
                 'image' => NULL,
                 'record_index' => NULL,
@@ -8198,11 +8198,11 @@ class TagsTableSeeder extends Seeder
             ),
             45 => 
             array (
-                'id' => 548,
-                'name' => '១០៧',
-                'desp' => 'បន្ទប់លេខ១០៧ ជាន់ទី ៧',
-                'tpid' => '547',
-                'pid' => 547,
+                'id' => 553,
+                'name' => 'ប្រជុំជំនាញបច្ចេកទេស',
+                'desp' => 'ប្រជុំជំនាញបច្ចេកទេស',
+                'tpid' => '552',
+                'pid' => 552,
                 'model' => NULL,
                 'cids' => NULL,
                 'image' => NULL,
@@ -8213,11 +8213,11 @@ class TagsTableSeeder extends Seeder
             ),
             46 => 
             array (
-                'id' => 549,
-                'name' => '១០៨',
-                'desp' => 'បន្ទព់លេខ១០៨ ជាន់ទី ៨',
-                'tpid' => '547',
-                'pid' => 547,
+                'id' => 554,
+                'name' => 'ប្រជុំអន្តរក្រសួង',
+                'desp' => 'ប្រជុំអន្តរក្រសួង',
+                'tpid' => '552',
+                'pid' => 552,
                 'model' => NULL,
                 'cids' => NULL,
                 'image' => NULL,
@@ -8228,11 +8228,11 @@ class TagsTableSeeder extends Seeder
             ),
             47 => 
             array (
-                'id' => 550,
-                'name' => '១០៩',
-                'desp' => 'បន្ទប់លេខ១០៩ ជាន់ទី ៩',
-                'tpid' => '547',
-                'pid' => 547,
+                'id' => 555,
+                'name' => 'ប្រជុំអន្តរក្រសួងចង្អៀត',
+                'desp' => 'ប្រជុំអន្តរក្រសួងចង្អៀត',
+                'tpid' => '552',
+                'pid' => 552,
                 'model' => NULL,
                 'cids' => NULL,
                 'image' => NULL,
@@ -8243,9 +8243,54 @@ class TagsTableSeeder extends Seeder
             ),
             48 => 
             array (
-                'id' => 551,
-                'name' => '១១០',
-                'desp' => 'បន្ទប់លេខ១១០ ជាន់ទី ១០',
+                'id' => 556,
+                'name' => 'ប្រជុំត្រួតពិនិត្យចុងក្រោយ',
+                'desp' => 'ប្រជុំត្រួតពិនិត្យចុងក្រោយ',
+                'tpid' => '552',
+                'pid' => 552,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            49 => 
+            array (
+                'id' => 557,
+                'name' => 'ប្រជុំពេញអង្គ គ.រ.ម',
+                'desp' => 'ប្រជុំពេញអង្គ គ.រ.ម',
+                'tpid' => '552',
+                'pid' => 552,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            50 => 
+            array (
+                'id' => 558,
+                'name' => 'ប្រជុំគណៈអចិន្ត្រៃយ៍ គ.រ.ម',
+                'desp' => 'ប្រជុំគណៈអចិន្ត្រៃយ៍ គ.រ.ម',
+                'tpid' => '552',
+                'pid' => 552,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            51 => 
+            array (
+                'id' => 550,
+                'name' => 'សាល A',
+                'desp' => 'អាគារមិត្តភាព សាល ​A',
                 'tpid' => '547',
                 'pid' => 547,
                 'model' => NULL,
@@ -8254,6 +8299,141 @@ class TagsTableSeeder extends Seeder
                 'record_index' => NULL,
                 'created_at' => NULL,
                 'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            52 => 
+            array (
+                'id' => 551,
+                'name' => 'សាល B',
+                'desp' => 'អាគារមិត្តភាព សាល B',
+                'tpid' => '547',
+                'pid' => 547,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            53 => 
+            array (
+                'id' => 560,
+                'name' => 'សាល៧-០៨ ជាន់ទី៧',
+                'desp' => 'អាគាកម្ពុជាក្រោម សាល៧-០៨ ជាន់ទី៧',
+                'tpid' => '547',
+                'pid' => 547,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            54 => 
+            array (
+                'id' => 561,
+                'name' => 'ប្រជុំផ្សេងៗ',
+                'desp' => 'ប្រជុំផ្សេងៗ',
+                'tpid' => '552',
+                'pid' => 552,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            55 => 
+            array (
+                'id' => 562,
+                'name' => 'មជ្ឈមណ្ឌលតម្កល់ឯកសារច្បាប់ពាក់ព័ន្ធនឹងអង្គជំនុំជម្រះវិសាមញ្ញក្នុងតុលាការកម្ពុជា',
+                'desp' => 'មជ្ឈមណ្ឌលតម្កល់ឯកសារច្បាប់ពាក់ព័ន្ធនឹងអង្គជំនុំជម្រះវិសាមញ្ញក្នុងតុលាការកម្ពុជា',
+                'tpid' => '163:164',
+                'pid' => 164,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => '',
+                'record_index' => NULL,
+                'created_at' => '2023-09-16 03:18:52',
+                'updated_at' => '2023-09-16 03:18:52',
+                'deleted_at' => NULL,
+            ),
+            56 => 
+            array (
+                'id' => 563,
+                'name' => 'ប្រធានមជ្ឈមណ្ឌល',
+                'desp' => 'ប្រធានមជ្ឈមណ្ឌល',
+                'tpid' => '489',
+                'pid' => 489,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            57 => 
+            array (
+                'id' => 564,
+                'name' => 'អនុប្រធានមជ្ឈមណ្ឌល',
+                'desp' => 'អនុប្រធានមជ្ឈមណ្ឌល',
+                'tpid' => '489',
+                'pid' => 489,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            58 => 
+            array (
+                'id' => 549,
+                'name' => 'សាល ៦-០១ ជាន់ទី៦',
+                'desp' => 'អាគារកម្ពុជាក្រោម សាល៦-០១ ជាន់ទី៦',
+                'tpid' => '547',
+                'pid' => 547,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            59 => 
+            array (
+                'id' => 548,
+                'name' => 'សាល ៧-០១ ជាន់ទី៧',
+                'desp' => 'អាគារកម្ពុជាក្រោម សាល៧-០១ ជាន់៧',
+                'tpid' => '547',
+                'pid' => 547,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => NULL,
+                'created_at' => NULL,
+                'updated_at' => NULL,
+                'deleted_at' => NULL,
+            ),
+            60 => 
+            array (
+                'id' => 164,
+                'name' => 'ទីស្តីការគណៈរដ្ឋមន្ត្រី',
+                'desp' => 'ឧបកនាយករដ្ឋមន្ត្រី វង្សី វិសុត្ស។',
+                'tpid' => '163',
+                'pid' => 163,
+                'model' => NULL,
+                'cids' => NULL,
+                'image' => NULL,
+                'record_index' => 1,
+                'created_at' => NULL,
+                'updated_at' => '2024-02-01 14:07:10',
                 'deleted_at' => NULL,
             ),
         ));

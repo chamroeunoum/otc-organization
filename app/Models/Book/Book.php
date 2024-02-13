@@ -134,34 +134,34 @@ class Book extends Model
     | MUTATORS
     |--------------------------------------------------------------------------
     */
-    public function setCoverAttribute($value)
-    {
-        $attribute_name = "cover";
-        $disk = "public";
-        $destination_path = "uploads/book_covers";
+    // public function setCoverAttribute($value)
+    // {
+    //     $attribute_name = "cover";
+    //     $disk = "public";
+    //     $destination_path = "uploads/book_covers";
 
-        // if the image was erased
-        if ($value==null) {
-            // delete the image from disk
-            \Storage::disk($disk)->delete($this->{$attribute_name});
+    //     // if the image was erased
+    //     if ($value==null) {
+    //         // delete the image from disk
+    //         \Storage::disk($disk)->delete($this->{$attribute_name});
 
-            // set null in the database column
-            $this->attributes[$attribute_name] = null;
-        }
+    //         // set null in the database column
+    //         $this->attributes[$attribute_name] = null;
+    //     }
 
-        // if a base64 was sent, store it in the db
-        if (starts_with($value, 'data:image'))
-        {
-            // 0. Make the image
-            $image = \Image::make($value);
-            // 1. Generate a filename.
-            $filename = md5($value.time()).'.jpg';
-            // 2. Store the image on disk.
-            \Storage::disk($disk)->put($destination_path.'/'.$filename, $image->stream());
-            // 3. Save the path to the database
-            $this->attributes[$attribute_name] = $destination_path.'/'.$filename;
-        }
-    }
+    //     // if a base64 was sent, store it in the db
+    //     if (starts_with($value, 'data:image'))
+    //     {
+    //         // 0. Make the image
+    //         $image = \Image::make($value);
+    //         // 1. Generate a filename.
+    //         $filename = md5($value.time()).'.jpg';
+    //         // 2. Store the image on disk.
+    //         \Storage::disk($disk)->put($destination_path.'/'.$filename, $image->stream());
+    //         // 3. Save the path to the database
+    //         $this->attributes[$attribute_name] = $destination_path.'/'.$filename;
+    //     }
+    // }
     public static function boot()
     {
         parent::boot();
@@ -180,12 +180,12 @@ class Book extends Model
         });
     }
 
-    public function setPdfAttribute($value)
-    {
-        $attribute_name = "pdf";
-        $disk = "uploads";
-        $destination_path = "uploads/book/pdf";
+    // public function setPdfAttribute($value)
+    // {
+    //     $attribute_name = "pdf";
+    //     $disk = "uploads";
+    //     $destination_path = "uploads/book/pdf";
 
-        $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
-    }
+    //     // $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
+    // }
 }

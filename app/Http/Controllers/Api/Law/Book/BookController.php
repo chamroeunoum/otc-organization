@@ -318,14 +318,14 @@ class BookController extends Controller
         if (($user = $request->user()) !== null) {
             $this->selectedFields[] = 'pdfs' ;
             $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
-            $crud->setRelationshipFunctions([
-                'units' => false ,
-                'matikas' => [ 'id' , 'number' , 'title' ]
-            ]);
+            // $crud->setRelationshipFunctions([
+            //     'units' => false ,
+            //     'kunties' => ['id','title','number']
+            // ]);
             if (($record = $crud->read()) !== false) {
-                $record = $crud->formatRecord($record);
+                // $record = $crud->formatRecord($record);
                 return response()->json([
-                    'records' => $record,
+                    'records' => $record->matikas,
                     'ok' => true ,
                     'message' => __("crud.read.success")
                 ]);
@@ -340,7 +340,118 @@ class BookController extends Controller
             'message' => __("crud.auth.failed")
         ], 401);
     }
-    
+    /** Get chapters of the Regulator */
+    public function chapters(Request $request)
+    {
+        if (($user = $request->user()) !== null) {
+            $this->selectedFields[] = 'pdfs' ;
+            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
+            // $crud->setRelationshipFunctions([
+            //     'units' => false ,
+            //     'kunties' => ['id','title','number']
+            // ]);
+            if (($record = $crud->read()) !== false) {
+                // $record = $crud->formatRecord($record);
+                return response()->json([
+                    'records' => $record->chapters,
+                    'ok' => true ,
+                    'message' => __("crud.read.success")
+                ]);
+            }
+            return response()->json([
+                'ok' => false,
+                'message' => __("crud.read.failed")
+            ]);
+        }
+        return response()->json([
+            'records' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    /** Get parts of the Regulator */
+    public function parts(Request $request)
+    {
+        if (($user = $request->user()) !== null) {
+            $this->selectedFields[] = 'pdfs' ;
+            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
+            // $crud->setRelationshipFunctions([
+            //     'units' => false ,
+            //     'kunties' => ['id','title','number']
+            // ]);
+            if (($record = $crud->read()) !== false) {
+                // $record = $crud->formatRecord($record);
+                return response()->json([
+                    'records' => $record->parts,
+                    'ok' => true ,
+                    'message' => __("crud.read.success")
+                ]);
+            }
+            return response()->json([
+                'ok' => false,
+                'message' => __("crud.read.failed")
+            ]);
+        }
+        return response()->json([
+            'records' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    /** Get sections of the Regulator */
+    public function sections(Request $request)
+    {
+        if (($user = $request->user()) !== null) {
+            $this->selectedFields[] = 'pdfs' ;
+            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
+            // $crud->setRelationshipFunctions([
+            //     'units' => false ,
+            //     'kunties' => ['id','title','number']
+            // ]);
+            if (($record = $crud->read()) !== false) {
+                // $record = $crud->formatRecord($record);
+                return response()->json([
+                    'records' => $record->sections,
+                    'ok' => true ,
+                    'message' => __("crud.read.success")
+                ]);
+            }
+            return response()->json([
+                'ok' => false,
+                'message' => __("crud.read.failed")
+            ]);
+        }
+        return response()->json([
+            'records' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    /** Get matras of the Regulator */
+    public function matras(Request $request)
+    {
+        if (($user = $request->user()) !== null) {
+            $this->selectedFields[] = 'pdfs' ;
+            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
+            // $crud->setRelationshipFunctions([
+            //     'units' => false ,
+            //     'kunties' => ['id','title','number']
+            // ]);
+            if (($record = $crud->read()) !== false) {
+                // $record = $crud->formatRecord($record);
+                return response()->json([
+                    'records' => $record->matras,
+                    'ok' => true ,
+                    'message' => __("crud.read.success")
+                ]);
+            }
+            return response()->json([
+                'ok' => false,
+                'message' => __("crud.read.failed")
+            ]);
+        }
+        return response()->json([
+            'records' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
     /** Delete an Regulator */
     public function delete(Request $request)
     {
@@ -527,7 +638,7 @@ class BookController extends Controller
             if ( $Regulator !== null ) {
                 return response()->json([
                     'regulator' => $Regulator ,
-                    'structure' => $Regulator->getStructure() ,
+                    'structure' => $Regulator->getContent($request->id) ,
                     'ok' => true ,
                     'message' => __("crud.read.success")
                 ]);
@@ -541,58 +652,5 @@ class BookController extends Controller
             'record' => null,
             'message' => __("crud.auth.failed")
         ], 401);
-    }
-    /***
-     * Check type of level
-     * kunty
-     * matika
-        chapter
-        part
-        section
-     */
-
-    private function _checkType($type){
-        $model = new Kunty();
-        switch ($type) {
-            case 'kunty':
-                $model = new Kunty();
-                break;
-            case 'matika':
-                $model = new Matika();
-                break;
-            case 'capture':
-                $model = new Capture();
-                break;
-            case 'part':
-                $model = new Part();
-                break;
-            case 'section':
-                $model = new Section();
-                break;
-            default:
-                # code...
-                break;
-        }
-        return $model;
-    }
-    /** Save Structure */
-    public function saveStructure(Request $request,$id){
-        dd($request->all(),$id);
-        $type = $request->get('type',null);
-        $title = $request->get('title',null);
-        $number = $request->get('number',null);
-        $status = 404;
-        $responseData['message'] = __("crud.read.failed");
-        if(!$type)  return response()->json(['message'=>__("crud.read.failed")], 404);
-
-        $model = $this->_checkType($type);
-        $model->archive_id = $id;
-        $model->title = $title;
-        $model->save();
-        if($model){
-            $responseData['message'] = __("crud.read.success");
-            $status = 200;
-        }
-        return response()->json($responseData, $status);
     }
 }

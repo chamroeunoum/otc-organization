@@ -18,9 +18,6 @@ return new class extends Migration
             $table->integer('organization_id')->default(0)->unsigned(); 
 			$table->integer('meeting_id')->unsigned();
             $table->integer('room_id')->unsigned()->comment('The room number');
-            $table->date('date')->nullable(false)->comment('The date of the meeting');
-            $table->string('start',20)->nullable(true)->comment('The start time of the meeting');
-            $table->string('end',20)->nullable(true)->comment('The expected end time of the meeting');
             $table->text('remark')->nullable(true)->comment('The remark of the meeting with the organization that ask for the meeting.');
 			$table->timestamps();
         });

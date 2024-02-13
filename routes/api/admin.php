@@ -15,12 +15,14 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\UserController;
+use App\Http\Controllers\Api\Admin\PeopleController;
 use App\Http\Controllers\Api\Admin\FolderController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\Regulator\RegulatorController;
 use App\Http\Controllers\Api\Admin\Regulator\RegulatorParentController;
 use App\Http\Controllers\Api\Admin\Regulator\TypeController;
 use App\Http\Controllers\Api\Admin\Regulator\OrganizationController;
+use App\Http\Controllers\Api\Admin\Regulator\CountesyController;
 use App\Http\Controllers\Api\Admin\Regulator\PositionController;
 use App\Http\Controllers\Api\Admin\Regulator\SignatureController;
 use App\Http\Controllers\Api\Admin\ProfileController;
@@ -65,6 +67,19 @@ Route::group([
             Route::get('phone/exist',[UserController::class,'checkPhone']);
             Route::get('email/exist',[UserController::class,'checkEmail']);
             Route::post('upload',[UserController::class,'upload']);
+    });
+
+    /** PEOPLE / USER INFORMATION SECTION */
+    Route::group([
+        'prefix' => 'people' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[PeopleController::class,'index']);
+            Route::post('create',[PeopleController::class,'store']);
+            Route::put('update',[PeopleController::class,'update']);
+            Route::get('{id}/read',[PeopleController::class,'read']);
+            Route::delete('{id}/delete',[PeopleController::class,'destroy']);
     });
 
     /** FOLDER SECTION */
@@ -115,6 +130,23 @@ Route::group([
             Route::get('children',[OrganizationController::class,'getChildren']);
             Route::get('regulators',[OrganizationController::class,'getRegulators']);
             Route::get('staffs',[ OrganizationController::class , 'staffs']);
+            Route::get('{id}/people',[ OrganizationController::class , 'people']);
+            Route::put('setleader',[ OrganizationController::class , 'setLeader']);
+            Route::put('addstaff',[ OrganizationController::class , 'addPeopleToOrganization']);
+    });
+
+    /** COUNTESY SECTION */
+    Route::group([
+        'prefix' => 'countesies' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[CountesyController::class,'index']);
+            Route::post('create',[CountesyController::class,'store']);
+            Route::put('update',[CountesyController::class,'update']);
+            Route::get('{id}/read',[CountesyController::class,'read']);
+            Route::delete('{id}/delete',[CountesyController::class,'destroy']);
+            Route::put('activate',[CountesyController::class,'active']);
     });
 
     /** ROLE SECTION */

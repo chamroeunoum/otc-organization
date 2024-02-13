@@ -6,7 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use PDF;
 
-class DataTestOrganizationStaffsAndRegulatorsSeeder extends Seeder
+class TestDataOrganizationStaffsAndRegulatorsSeeder extends Seeder
 {
     /**
      * Seed the application's database.

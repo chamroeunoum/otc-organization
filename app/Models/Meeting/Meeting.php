@@ -17,6 +17,14 @@ class Meeting extends Model
         'other_documents' => 'array'
     ];
 
+    const STATUSES = [
+        0 => 'NEW' ,
+        1 => 'MEETING' ,
+        2 => 'CONTINUE' ,
+        4 => 'CHANGED' ,
+        8 => 'DELAIED' ,
+        16 => 'FINISHED' ,
+    ];
     const STATUS_NEW = 0 , STATUS_MEETING = 1 , STATUS_CONTINUE = 2 , STATUS_CHANGE = 4 , STATUS_DELAY = 8 , STATUS_FINISHED = 16 ;
 
     public function regulators(){
@@ -101,5 +109,21 @@ class Meeting extends Model
     public function ancestor(){
         return $this->belongsTo( Meeting::class , 'pid' , 'id' );
     }
-
+    /**
+     * Functions
+     */
+    /**
+     * Total meeting by its status
+     */
+    public static function getMeetingsByStatus(){
+        return static::selectRaw('status , count(status) as total')->groupby('status')->get()->map(function($meeting){
+            return [
+                'status' => [
+                    'id' => $meeting->status ,
+                    'name' => Meeting::STATUSES[ $meeting->status ] ,
+                ],
+                'total' => $meeting->total 
+            ];
+        });
+    }
 }

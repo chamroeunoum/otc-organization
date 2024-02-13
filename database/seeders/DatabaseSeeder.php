@@ -104,87 +104,101 @@ class DatabaseSeeder extends Seeder
         // $bellamudhita->save();
         // $bellamudhita->assignRole( $client );
 
+        $this->call(TagsTableSeeder::class);
+
         $this->call(RolesTableSeeder::class);
         $this->call(UsersTableSeeder::class);
-        $this->call(PeopleTableSeeder::class);
         $this->call(UserRoleTableSeeder::class);
-        $this->call(TagsTableSeeder::class);
+
+        $this->call(TimeslotsTableSeeder::class);
+        $this->call(UserTimeslotsTableSeeder::class);
+
+        $this->call(PeopleTableSeeder::class);
+        $this->call(PeoplePositionsTableSeeder::class);
+        $this->call(PeopleCountesiesTableSeeder::class);
+        
+        $this->call(OrganizationLeaderTableSeeder::class);
+        $this->call(OrganizationPeopleTableSeeder::class);
+
+        $this->call(MeetingsTableSeeder::class);
+        $this->call(MeetingRoomsTableSeeder::class);
+        $this->call(MeetingOrganizationsTableSeeder::class);
+        $this->call(MeetingMembersTableSeeder::class);
+        $this->call(MeetingAttendantsTableSeeder::class);
+
         $this->call(RegulatorsTableSeeder::class);
         $this->call(RegulatorTypesTableSeeder::class);
         $this->call(RegulatorSignaturesTableSeeder::class);
         $this->call(OrganizationRegulatorsTableSeeder::class);
         $this->call(OrganizationOwnRegulatorsTableSeeder::class);
         $this->call(OrganizationRelatedRegulatorsTableSeeder::class);
-        $this->call(PeoplePositionsTableSeeder::class);
-        $this->call(OrganizationLeaderTableSeeder::class);
-        $this->call(OrganizationPeopleTableSeeder::class);
-        $this->call(TimeslotsTableSeeder::class);
-        $this->call(UserTimeslotsTableSeeder::class);
+
+
+        
         // About the content of the regulator
-        $this->call(BooksTableSeeder::class);
-        $this->call(KuntiesTableSeeder::class);
-        $this->call(MatikasTableSeeder::class);
-        $this->call(ChaptersTableSeeder::class);
-        $this->call(PartsTableSeeder::class);
-        $this->call(SectionsTableSeeder::class);
-        $this->call(MatrasTableSeeder::class);
+        // $this->call(BooksTableSeeder::class);
+        // $this->call(KuntiesTableSeeder::class);
+        // $this->call(MatikasTableSeeder::class);
+        // $this->call(ChaptersTableSeeder::class);
+        // $this->call(PartsTableSeeder::class);
+        // $this->call(SectionsTableSeeder::class);
+        // $this->call(MatrasTableSeeder::class);
         
         
-
-        echo 'RUN INDEXING OF ROLES' . PHP_EOL;
-        \DB::statement("SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles )+1);");
-        echo 'RUN INDEXING OF USERS' . PHP_EOL;
-        \DB::statement("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users )+1);");
-        echo 'RUN INDEXING OF USER ROLE' . PHP_EOL;
-        \DB::statement("SELECT setval('user_role_id_seq', (SELECT MAX(id) FROM user_role )+1);");
-        echo 'RUN INDEXING OF PEOPLE' . PHP_EOL;
-        \DB::statement("SELECT setval('people_id_seq', (SELECT MAX(id) FROM people )+1);");
-        echo 'RUN INDEXING OF TAGS' . PHP_EOL;
-        \DB::statement("SELECT setval('tags_id_seq', (SELECT MAX(id) FROM tags )+1);");
-        echo 'RUN INDEXING OF REGULATORS' . PHP_EOL;
-        \DB::statement("SELECT setval('regulators_id_seq', (SELECT MAX(id) FROM regulators )+1);");
-        echo 'RUN INDEXING OF REGULATOR TYPES' . PHP_EOL;
-        \DB::statement("SELECT setval('regulator_types_id_seq', (SELECT MAX(id) FROM regulator_types )+1);");
-        echo 'RUN INDEXING OF REGULATOR SIGNATURES' . PHP_EOL;
-        \DB::statement("SELECT setval('regulator_signatures_id_seq', (SELECT MAX(id) FROM regulator_signatures )+1);");
-        echo 'RUN INDEXING OF ORGANIZATION REGULATORS' . PHP_EOL;
-        \DB::statement("SELECT setval('organization_regulators_id_seq', (SELECT MAX(id) FROM organization_regulators )+1);");
-        echo 'RUN INDEXING OF ORGANIZATION OWN REGULATORS' . PHP_EOL;
-        \DB::statement("SELECT setval('organization_own_regulators_id_seq', (SELECT MAX(id) FROM organization_own_regulators )+1);");
-        echo 'RUN INDEXING OF ORGANIZATION RELATED REGULATORS' . PHP_EOL;
-        \DB::statement("SELECT setval('organization_related_regulators_id_seq', (SELECT MAX(id) FROM organization_related_regulators )+1);");
-        echo 'RUN INDEXING OF PEOPLE POSITION' . PHP_EOL;
-        \DB::statement("SELECT setval('people_positions_id_seq', (SELECT MAX(id) FROM people_positions )+1);");
-        echo 'RUN INDEXING OF ORGANIZATION PEOPLE ' . PHP_EOL;
-        \DB::statement("SELECT setval('organization_people_id_seq', (SELECT MAX(id) FROM organization_people )+1);");
-        echo 'RUN INDEXING OF ORGANIZATION STAFFS ' . PHP_EOL;
-        \DB::statement("SELECT setval('organization_people_id_seq', (SELECT MAX(id) FROM organization_people )+1);");
-        echo 'RUN INDEXING OF ORGANIZATION LEADERS ' . PHP_EOL;
-        \DB::statement("SELECT setval('organization_leader_id_seq', (SELECT MAX(id) FROM organization_leader )+1);");
-        echo 'RUN INDEXING OF TIMESLOT ' . PHP_EOL;
-        \DB::statement("SELECT setval('timeslots_id_seq', (SELECT MAX(id) FROM timeslots )+1);");
-        echo 'RUN INDEXING OF USER TIMESLOT ' . PHP_EOL;
-        \DB::statement("SELECT setval('user_timeslots_id_seq', (SELECT MAX(id) FROM user_timeslots )+1);");
-
-        echo 'RUN INDEXING OF BOOK ' . PHP_EOL;
-        \DB::statement("SELECT setval('books_id_seq', (SELECT MAX(id) FROM books )+1);");
-
-        echo 'RUN INDEXING OF KUNTY ' . PHP_EOL;
-        \DB::statement("SELECT setval('kunties_id_seq', (SELECT MAX(id) FROM kunties )+1);");
-
-        echo 'RUN INDEXING OF MATIKA ' . PHP_EOL;
-        \DB::statement("SELECT setval('matikas_id_seq', (SELECT MAX(id) FROM matikas )+1);");
-
-        echo 'RUN INDEXING OF CHAPTER ' . PHP_EOL;
-        \DB::statement("SELECT setval('chapters_id_seq', (SELECT MAX(id) FROM chapters )+1);");
-
-        echo 'RUN INDEXING OF PART ' . PHP_EOL;
-        \DB::statement("SELECT setval('parts_id_seq', (SELECT MAX(id) FROM parts )+1);");
         
-        echo 'RUN INDEXING OF SECTION ' . PHP_EOL;
-        \DB::statement("SELECT setval('sections_id_seq', (SELECT MAX(id) FROM sections )+1);");
+        
+        
+        
+        
+        
+        if( env('DB_CONNECTION','mysql') == 'pgsql' ){
+            echo 'RUN INDEXING OF ROLES' . PHP_EOL;
+            \DB::statement("SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles )+1);");
+            echo 'RUN INDEXING OF USERS' . PHP_EOL;
+            \DB::statement("SELECT setval('users_id_seq', (SELECT MAX(id) FROM users )+1);");
+            echo 'RUN INDEXING OF USER ROLE' . PHP_EOL;
+            \DB::statement("SELECT setval('user_role_id_seq', (SELECT MAX(id) FROM user_role )+1);");
+            echo 'RUN INDEXING OF PEOPLE' . PHP_EOL;
+            \DB::statement("SELECT setval('people_id_seq', (SELECT MAX(id) FROM people )+1);");
+            echo 'RUN INDEXING OF TAGS' . PHP_EOL;
+            \DB::statement("SELECT setval('tags_id_seq', (SELECT MAX(id) FROM tags )+1);");
+            echo 'RUN INDEXING OF REGULATORS' . PHP_EOL;
+            \DB::statement("SELECT setval('regulators_id_seq', (SELECT MAX(id) FROM regulators )+1);");
+            echo 'RUN INDEXING OF REGULATOR TYPES' . PHP_EOL;
+            \DB::statement("SELECT setval('regulator_types_id_seq', (SELECT MAX(id) FROM regulator_types )+1);");
+            echo 'RUN INDEXING OF REGULATOR SIGNATURES' . PHP_EOL;
+            \DB::statement("SELECT setval('regulator_signatures_id_seq', (SELECT MAX(id) FROM regulator_signatures )+1);");
+            echo 'RUN INDEXING OF ORGANIZATION REGULATORS' . PHP_EOL;
+            \DB::statement("SELECT setval('organization_regulators_id_seq', (SELECT MAX(id) FROM organization_regulators )+1);");
+            echo 'RUN INDEXING OF ORGANIZATION OWN REGULATORS' . PHP_EOL;
+            \DB::statement("SELECT setval('organization_own_regulators_id_seq', (SELECT MAX(id) FROM organization_own_regulators )+1);");
+            echo 'RUN INDEXING OF ORGANIZATION RELATED REGULATORS' . PHP_EOL;
+            \DB::statement("SELECT setval('organization_related_regulators_id_seq', (SELECT MAX(id) FROM organization_related_regulators )+1);");
+            echo 'RUN INDEXING OF TIMESLOT ' . PHP_EOL;
+            \DB::statement("SELECT setval('timeslots_id_seq', (SELECT MAX(id) FROM timeslots )+1);");
+            echo 'RUN INDEXING OF USER TIMESLOT ' . PHP_EOL;
+            \DB::statement("SELECT setval('user_timeslots_id_seq', (SELECT MAX(id) FROM user_timeslots )+1);");
 
-        echo 'RUN INDEXING OF MATRA ' . PHP_EOL;
-        \DB::statement("SELECT setval('matras_id_seq', (SELECT MAX(id) FROM matras )+1);");
+            // echo 'RUN INDEXING OF BOOK ' . PHP_EOL;
+            // \DB::statement("SELECT setval('books_id_seq', (SELECT MAX(id) FROM books )+1);");
+
+            // echo 'RUN INDEXING OF KUNTY ' . PHP_EOL;
+            // \DB::statement("SELECT setval('kunties_id_seq', (SELECT MAX(id) FROM kunties )+1);");
+
+            // echo 'RUN INDEXING OF MATIKA ' . PHP_EOL;
+            // \DB::statement("SELECT setval('matikas_id_seq', (SELECT MAX(id) FROM matikas )+1);");
+
+            // echo 'RUN INDEXING OF CHAPTER ' . PHP_EOL;
+            // \DB::statement("SELECT setval('chapters_id_seq', (SELECT MAX(id) FROM chapters )+1);");
+
+            // echo 'RUN INDEXING OF PART ' . PHP_EOL;
+            // \DB::statement("SELECT setval('parts_id_seq', (SELECT MAX(id) FROM parts )+1);");
+            
+            // echo 'RUN INDEXING OF SECTION ' . PHP_EOL;
+            // \DB::statement("SELECT setval('sections_id_seq', (SELECT MAX(id) FROM sections )+1);");
+
+            // echo 'RUN INDEXING OF MATRA ' . PHP_EOL;
+            // \DB::statement("SELECT setval('matras_id_seq', (SELECT MAX(id) FROM matras )+1);");
+    }
     }
 }

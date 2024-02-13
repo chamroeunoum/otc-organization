@@ -323,7 +323,7 @@ class CrudController extends Controller {
     public function getRecords($formatRecord=false, $fieldsWithCallback = false){
         return $formatRecord
             ? $this->formatRecords( $this->getListBuilder()->get() )
-            : $this->getListBuilder()->get() ;
+            : $this->getListBuilder()->get();
     }
 
     /**
@@ -446,8 +446,34 @@ class CrudController extends Controller {
                         $customRecord[$functionName] = [] ;
                         foreach( $record->$functionName AS $index => $recordOfFunctionCollection ){
                             $tempRecord = new \StdClass;
-                            foreach ($fields AS $field ) {
-                                 $tempRecord->$field = $recordOfFunctionCollection->$field;
+                            foreach ($fields AS $index => $field ) {
+                                if( is_array( $field ) ){
+                                    if( $recordOfFunctionCollection->$index != null ){
+                                        if( $recordOfFunctionCollection->$index instanceof \Illuminate\Database\Eloquent\Collection ){
+                                            $tempRecord->$index = [] ;
+                                            foreach( $recordOfFunctionCollection->$index AS $rIndex => $rRecord ){
+                                                $rColumns = [] ;
+                                                foreach( $field AS $f ){
+                                                    $rColumns[$f] = $rRecord->$f != null
+                                                        ? $rRecord->$f
+                                                        : null ;
+                                                }
+                                                $tempRecord->$index[] = $rColumns ;
+                                            }
+                                        }else{
+                                            $tempRecord->$index = [] ;
+                                            foreach( $field AS $f ){
+                                                $tempRecord->$index[$f] = $recordOfFunctionCollection->$index->$f != null
+                                                    ? $recordOfFunctionCollection->$index->$f
+                                                    : null ;
+                                            }   
+                                        }
+                                    }else{
+                                        $tempRecord->$field = null ;
+                                    }
+                                }else{
+                                    $tempRecord->$field = $recordOfFunctionCollection->$field ;
+                                }
                             }
                             $customRecord[$functionName][] = $tempRecord;
                         }

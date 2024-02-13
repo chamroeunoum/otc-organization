@@ -16,7 +16,7 @@ class MeetingComment extends Model
     }
 
     public function people(){
-        return $this->belongsTo( \App\Models\Meeting\Meeting::class , 'people_id', 'id');
+        return $this->belongsTo( \App\Models\People\People::class , 'people_id', 'id');
     }
 
     public function createdBy(){
