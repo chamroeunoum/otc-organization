@@ -16,18 +16,19 @@ class TestAttendant extends Seeder
     public function run()
     {
 
+        // User with id <= 118 has been seeding
         // Get all the users/staffs
         echo "START GENERATE ATTENDANT CHECK TIME" . PHP_EOL ;
-        \App\Models\User::where('id','<=',40)->orderby('id','asc')->get()->map(function($user){
-
+        // \App\Models\User::where('id','>',118)->get()->map(function($user){
+        \App\Models\User::orderby('id','asc')->get()->map(function($user){
             /**
              * Assign timeslots to user
              */
             $allTimeslots = \App\Models\Attendant\Timeslot::where('id','<',3)->get()->pluck('id');
             $user->timeslots()->sync( $allTimeslots );
 
-            $start = \Carbon\Carbon::parse('2015-01-01');
-            $end = \Carbon\Carbon::parse('2023-12-13');
+            $start = \Carbon\Carbon::parse('2024-02-13');
+            $end = \Carbon\Carbon::parse('2024-02-14');
             $attendantsOfTheDay = [] ;
             do{
                 echo "USER : " . $user->id . " => DAY : " . $start->format('Y-m-d') . PHP_EOL ;    

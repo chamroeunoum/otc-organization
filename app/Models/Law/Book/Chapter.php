@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Book;
+namespace App\Models\Law\Book;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -51,27 +51,27 @@ class Chapter extends Model
     }
     public function book()
     {
-        return $this->belongsTo(\App\Models\Book\Book::class, 'book_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Book::class, 'book_id', 'id');
     }
     public function kunty()
     {
-        return $this->belongsTo(\App\Models\Book\Kunty::class, 'kunty_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Kunty::class, 'kunty_id', 'id');
     }
     public function matika()
     {
-        return $this->belongsTo(\App\Models\Book\Matika::class,'matika_id','id');
+        return $this->belongsTo(\App\Models\Law\Book\Matika::class,'matika_id','id');
     }
     public function parts()
     {
-        return $this->hasMany(\App\Models\Book\Part::class,'chapter_id','id');
+        return $this->hasMany(\App\Models\Law\Book\Part::class,'chapter_id','id');
     }
     public function sections()
     {
-        return $this->hasMany(\App\Models\Book\Section::class, 'chapter_id', 'id');
+        return $this->hasMany(\App\Models\Law\Book\Section::class, 'chapter_id', 'id');
     }
     public function matras()
     {
-        return $this->hasMany(\App\Models\Book\Matra::class,'chapter_id','id');
+        return $this->hasMany(\App\Models\Law\Book\Matra::class,'chapter_id','id');
     }
     /*
     |--------------------------------------------------------------------------

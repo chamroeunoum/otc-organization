@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Models\Book;
+namespace App\Models\Law\Book;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Favourite extends Model
+class Section extends Model
 {
-
      /*
     |--------------------------------------------------------------------------
     | GLOBAL VARIABLES
     |--------------------------------------------------------------------------
     */
 
-    //protected $table = 'favourites';
+    //protected $table = 'sections';
     //protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
@@ -26,19 +25,42 @@ class Favourite extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    // get the user of the article
-    public function user(){
-        return $this->belongsTo(\App\Model\User::class,'user_id');
+    public function author()
+    {
+        return $this->belongsTo(\App\User::class, 'created_by');
     }
-    // get the details of the matra of the current favourite
-    public function matra(){
-        return $this->belongsTo(\App\Models\Book\Matra::class,'matra_id');
+    public function editor()
+    {
+        return $this->belongsTo(\App\User::class, 'updated_by');
+    }
+    public function book()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Book::class, 'book_id', 'id');
+    }
+    public function kunty()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Kunty::class,'kunty_id','id');
+    }
+    public function matika()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Matika::class, 'matika_id', 'id');
+    }
+    public function chapter()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Chapter::class, 'chapter_id', 'id');
+    }
+    public function part()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Part::class, 'part_id', 'id');
+    }
+    public function matras()
+    {
+        return $this->hasMany(\App\Models\Law\Book\Matra::class, 'section_id', 'id');
     }
     /*
     |--------------------------------------------------------------------------

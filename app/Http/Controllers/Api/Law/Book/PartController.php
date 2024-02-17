@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Api\Law\Book;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Book\Book ;
-use App\Models\Book\Kunty;
-use App\Models\Book\Chapter;
-use App\Models\Book\Matika;
-use App\Models\Book\Part AS RecordModel;
-use App\Models\Book\Section;
+use App\Models\Law\Book\Book ;
+use App\Models\Law\Book\Kunty;
+use App\Models\Law\Book\Chapter;
+use App\Models\Law\Book\Matika;
+use App\Models\Law\Book\Part AS RecordModel;
+use App\Models\Law\Book\Section;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\CrudController;

@@ -462,10 +462,38 @@ class CrudController extends Controller {
                                             }
                                         }else{
                                             $tempRecord->$index = [] ;
-                                            foreach( $field AS $f ){
-                                                $tempRecord->$index[$f] = $recordOfFunctionCollection->$index->$f != null
-                                                    ? $recordOfFunctionCollection->$index->$f
+                                            foreach( $field AS $ssRelationship => $ssFields ){
+                                                if( is_array( $ssFields ) ){
+                                                    if( $recordOfFunctionCollection->$index->$ssRelationship != null ){
+                                                        if( $recordOfFunctionCollection->$index->$ssRelationship instanceof \Illuminate\Database\Eloquent\Collection ){
+                                                            $tempRecord->$index[$ssRelationship] = [] ;
+                                                            foreach( $recordOfFunctionCollection->$index->$ssRelationship AS $ssrIndex => $ssrRecord ){
+                                                                $ssrColumns = [] ;
+                                                                foreach( $ssFields AS $ssf ){
+                                                                    $ssrColumns[$f] = $ssrRecord->$ssf != null
+                                                                        ? $ssrRecord->$ssf
+                                                                        : null ;
+                                                                }
+                                                                $tempRecord->$index[$ssRelationship][] = $ssrColumns ;
+                                                            }
+                                                        }else{
+                                                            $ssrColumns = [] ;
+                                                            foreach( $ssFields AS $ssf ){
+                                                                $ssrColumns[$ssf] = $recordOfFunctionCollection->$index->$ssRelationship->$ssf != null
+                                                                    ? $recordOfFunctionCollection->$index->$ssRelationship->$ssf
+                                                                    : null ;
+                                                            }
+                                                            $tempRecord->$index[$ssRelationship] = $ssrColumns ;
+                                                        }
+                                                    }else{
+                                                        $tempRecord->$index->$ssRelationship = null ;
+                                                    }
+                                                }else{
+                                                    // $tempRecord->$field = $recordOfFunctionCollection->$field ;
+                                                    $tempRecord->$index[$ssFields] = $recordOfFunctionCollection->$index->$ssFields != null
+                                                    ? $recordOfFunctionCollection->$index->$ssFields
                                                     : null ;
+                                                }
                                             }   
                                         }
                                     }else{

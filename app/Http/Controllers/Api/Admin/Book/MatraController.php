@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Book;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Book\Matra AS RecordModel;
+use App\Models\Law\Book\Matra AS RecordModel;
 use Illuminate\Http\File;
 use App\Http\Controllers\CrudController;
 

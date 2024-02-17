@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Book;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Book\Unit AS RecordModel;
+use App\Models\Law\Book\Unit AS RecordModel;
 use App\Http\Controllers\CrudController;
 
 class UnitController extends Controller

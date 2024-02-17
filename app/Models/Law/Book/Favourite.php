@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\Book;
+namespace App\Models\Law\Book;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FolderMatra extends Model
+class Favourite extends Model
 {
 
      /*
@@ -13,10 +13,10 @@ class FolderMatra extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'folder_matras';
+    //protected $table = 'favourites';
     //protected $primaryKey = 'id';
     // public $timestamps = false;
-    // protected $guarded = ['id'];
+    protected $guarded = ['id'];
     // protected $fillable = [];
     // protected $hidden = [];
     // protected $dates = [];
@@ -32,11 +32,13 @@ class FolderMatra extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    public function folder(){
-        return $this->belongsTo(\App\Models\Book\Folder::class,'folder_id','id');
+    // get the user of the article
+    public function user(){
+        return $this->belongsTo(\App\Model\User::class,'user_id');
     }
+    // get the details of the matra of the current favourite
     public function matra(){
-        return $this->belongsTo(\App\Models\Book\Matra::class,'matra_id','id');
+        return $this->belongsTo(\App\Models\Law\Book\Matra::class,'matra_id');
     }
     /*
     |--------------------------------------------------------------------------

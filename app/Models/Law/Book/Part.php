@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\Book;
+namespace App\Models\Law\Book;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Kunty extends Model
+class Part extends Model
 {
 
      /*
@@ -13,7 +13,7 @@ class Kunty extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'kunties';
+    //protected $table = 'parts';
     //protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
@@ -26,23 +26,13 @@ class Kunty extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-    public function getMatikas(){
-        return $this->matikas()->get()->map(function($record){
+    public function getSections(){
+        return $this->sections()->get()->map(function($record){
             return [
                 'id' => $record->id ,
                 'title' => $record->number . " ៖ " . $record->title,
-                'children' => $record->getChapters(),
-                'type' => 'matika'
-            ];
-        });
-    }
-    public function getChapters(){
-        return $this->chapters()->get()->map(function($record){
-            return [
-                'id' => $record->id ,
-                'title' => $record->number . " ៖ " . $record->title,
-                'children' => $record->getParts() ,
-                'type' => 'chapter'
+                'children' => [] ,
+                'type'=>'section'
             ];
         });
     }
@@ -51,34 +41,37 @@ class Kunty extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    public function author(){
-        return $this->belongsTo(\App\User::class,'created_by');
-    }
-    public function editor(){
-        return $this->belongsTo(\App\User::class,'updated_by');
-    }
-    public function book(){
-        return $this->belongsTo(\App\Models\Book\Book::class,'book_id','id');
-    }
-    public function matikas()
+    public function author()
     {
-        return $this->hasMany(\App\Models\Book\Matika::class, 'kunty_id', 'id');
+        return $this->belongsTo(\App\User::class, 'created_by');
     }
-    public function chapters()
+    public function editor()
     {
-        return $this->hasMany(\App\Models\Book\Chapter::class, 'kunty_id', 'id');
+        return $this->belongsTo(\App\User::class, 'updated_by');
     }
-    public function parts()
+    public function book()
     {
-        return $this->hasMany(\App\Models\Book\Part::class, 'kunty_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Book::class, 'book_id', 'id');
+    }
+    public function kunty()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Kunty::class, 'kunty_id', 'id');
+    }
+    public function matika()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Matika::class, 'matika_id', 'id');
+    }
+    public function chapter()
+    {
+        return $this->belongsTo(\App\Models\Law\Book\Chapter::class, 'chapter_id', 'id');
     }
     public function sections()
     {
-        return $this->hasMany(\App\Models\Book\Section::class, 'kunty_id', 'id');
+        return $this->hasMany(\App\Models\Law\Book\Section::class, 'part_id', 'id');
     }
     public function matras()
     {
-        return $this->hasMany(\App\Models\Book\Matra::class,'kunty_id','id');
+        return $this->hasMany(\App\Models\Law\Book\Matra::class, 'part_id', 'id');
     }
     /*
     |--------------------------------------------------------------------------

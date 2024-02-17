@@ -43,22 +43,24 @@ class MeetingController extends Controller
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
         $date = isset( $request->date ) && strlen( $request->date ) > 0 ? \Carbon\Carbon::parse( $request->date ) : \Carbon\Carbon::now() ;
+        $status = isset( $request->status ) && intval( $request->status ) > -1 ? $request->status : false ;
+        $type_id = isset( $request->type_id ) && intval( $request->type_id ) > 0 ? $request->type_id : false ;
 
         $queryString = [
             "where" => [
                 'default' => [
-                    // [
-                    //     'field' => 'date' ,
-                    //     'value' => $date->format('Y-m-d')
-                    // ],
-                    // [
-                    //     'field' => 'pid' ,
-                    //     'value' => null
-                    // ],
-                    // [
-                    //     'field' => 'pid' ,
-                    //     'value' => 0
-                    // ]
+                    $status > -1 ? [
+                        'field' => 'status' ,
+                        'value' => $status
+                    ] : [] ,
+                    $type_id > 0 ? [
+                        'field' => 'type_id' ,
+                        'value' => $type_id
+                    ] : [] ,
+                    [
+                        'field' => 'date' ,
+                        'value' => $date->format('Y-m-d')
+                    ]
                 ],
                 // 'in' => [
                 //     [
@@ -190,7 +192,9 @@ class MeetingController extends Controller
             'listMembers' => [ 'id' , 'people_id' , 'role' , 'group' ,'remark'
                 // Relation within listMembers
                 , 'member' => [ 'id' , 'firstname' , 'lastname' ]
-                , 'attendant' => [ 'id' , 'checktime' , 'remark' , 'people_id' ]
+                , 'attendant' => [ 'id' , 'checktime' , 'remark' , 'people_id' 
+                , 'member' => [ 'id' , 'firstname' , 'lastname' ] 
+            ]
             ] ,
             'regulators' => [ 'id', 'fid' , 'title' , 'objective', 'year' , 'pdf' 
                 // Relation with regulators

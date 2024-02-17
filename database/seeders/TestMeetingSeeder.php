@@ -38,7 +38,7 @@ class TestMeetingSeeder extends Seeder
         \App\Models\User::all()->map(function($user) use( $faker ){
             // Random the number of the meeting for each user
             // $totalMeetings = rand(0,50) ;
-            $totalMeetings = 10;
+            $totalMeetings = 5;
             $start = 0;
             do{
                 $this->createMeetings($user, $faker);
@@ -63,7 +63,8 @@ class TestMeetingSeeder extends Seeder
          * Create meetings
          */
         $timeIndex = rand(0,8);
-        $date = ( rand(1,2) % 2 ) ? Carbon::now()->subMonths(rand(0,12)) : Carbon::now();
+        $date = ( rand(0,1) % 2 ) ? Carbon::now()->subMonths(rand(1,12)) : Carbon::now()->addMonths( rand(0,3) );
+        
         $start = ['8:00','8:30','9:00','9:30','10:00','14:00','14:30','15:00','15:30'];
         $end = ['10:00','10:30','11:00','11:30','12:00','16:00','16:30','17:00','17:30'];
         $meeting = \App\Models\Meeting\Meeting::create([
@@ -107,9 +108,9 @@ class TestMeetingSeeder extends Seeder
         $meeting->members()->toggle( \App\Models\People\People::inRandomOrder()->limit(20)->get()->pluck('id') );
         $meeting->listMembers->each(function($meetingMember){
             // Assign member into Audien Group
-            $meetingMember->group = 'member' ;
+            $meetingMember->group = 'audient' ;
             // Set user as role of the audient
-            $meetingMember->role = 'audient' ;
+            $meetingMember->role = 'member' ;
             $meetingMember->save();
         });
         // Assign member into the Leading group

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Book;
+namespace App\Models\Law\Book;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,9 +11,9 @@ class FolderBook extends Model
     protected $fillable = ['folder_id','book_id'];
 
     public function folder(){
-        return $this->belongsTo(\App\Models\Book\Folder::class,'bid','id');
+        return $this->belongsTo(\App\Models\Law\Book\Folder::class,'bid','id');
     }
     public function book(){
-        return $this->belongsTo(\App\Models\Book\BOok::class,'bid','id');
+        return $this->belongsTo(\App\Models\Law\Book\BOok::class,'bid','id');
     }
 }

@@ -212,6 +212,7 @@ Route::group([
           Route::get('',[MeetingRoomController::class,'index']);
     });
 
+    require('meeting/dashboard.php');
     require('meeting/task.php');
     require('meeting/attendant.php');
 

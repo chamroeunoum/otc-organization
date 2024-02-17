@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\Book;
+namespace App\Models\Law\Book;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Part extends Model
+class Matra extends Model
 {
 
      /*
@@ -13,11 +13,25 @@ class Part extends Model
     |--------------------------------------------------------------------------
     */
 
-    //protected $table = 'parts';
+    //protected $table = 'matras';
     //protected $primaryKey = 'id';
     // public $timestamps = false;
     protected $guarded = ['id'];
-    // protected $fillable = [];
+    protected $fillable = ['number','title','meaning','book_id','kunty_id','matika_id','chapter_id','part_id','section_id','created_by','updated_by','active'];
+    protected $casts = [
+        'number' => 'string' ,
+        'title' => 'string',
+        'meaning' => 'string',
+        'bid' => 'int' ,
+        'kunty_id' => 'int',
+        'matika_id' => 'int',
+        'chapter_id' => 'int',
+        'part_id' => 'int',
+        'section_id' => 'int',
+        'created_by' => 'int',
+        'updated_by' => 'int',
+        'active' => 'int'
+    ];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -26,16 +40,6 @@ class Part extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
-    public function getSections(){
-        return $this->sections()->get()->map(function($record){
-            return [
-                'id' => $record->id ,
-                'title' => $record->number . " ៖ " . $record->title,
-                'children' => [] ,
-                'type'=>'section'
-            ];
-        });
-    }
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
@@ -43,35 +47,40 @@ class Part extends Model
     */
     public function author()
     {
-        return $this->belongsTo(\App\User::class, 'created_by');
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
     public function editor()
     {
-        return $this->belongsTo(\App\User::class, 'updated_by');
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
     }
     public function book()
     {
-        return $this->belongsTo(\App\Models\Book\Book::class, 'book_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Book::class, 'bid', 'id');
     }
     public function kunty()
     {
-        return $this->belongsTo(\App\Models\Book\Kunty::class, 'kunty_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Kunty::class, 'kunty_id', 'id');
     }
     public function matika()
     {
-        return $this->belongsTo(\App\Models\Book\Matika::class, 'matika_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Matika::class, 'matika_id', 'id');
     }
     public function chapter()
     {
-        return $this->belongsTo(\App\Models\Book\Chapter::class, 'chapter_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Chapter::class, 'chapter_id', 'id');
     }
-    public function sections()
+    public function part()
     {
-        return $this->hasMany(\App\Models\Book\Section::class, 'part_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Part::class, 'part_id', 'id');
     }
-    public function matras()
+    public function section()
     {
-        return $this->hasMany(\App\Models\Book\Matra::class, 'part_id', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Section::class, 'section_id', 'id');
+    }
+
+
+    public function folders(){
+        return $this->hasManyThrough(\App\Models\Law\Book\Folder::class,'folder_matras','matra_id','folder_id');
     }
     /*
     |--------------------------------------------------------------------------

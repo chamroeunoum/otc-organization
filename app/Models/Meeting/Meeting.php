@@ -126,4 +126,18 @@ class Meeting extends Model
             ];
         });
     }
+    /**
+     * Total meeting by its type
+     */
+    public static function getMeetingsByType(){
+        return static::selectRaw('type_id , count(type_id) as total')->groupby('type_id')->get()->map(function($meeting){
+            return [
+                'type' => [
+                    'id' => $meeting->type->id ,
+                    'name' => $meeting->type->name ,
+                ],
+                'total' => $meeting->total 
+            ];
+        });
+    }
 }
