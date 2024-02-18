@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\Webapp;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CrudController;
 use Illuminate\Http\Request;
-use App\Models\Document;
-use App\Models\Folder as RecordModel;
+use App\Models\Document\Document;
+use App\Models\Document\Folder as RecordModel;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -227,7 +227,7 @@ class FolderController extends Controller
     public function user(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Folder();
+        $queryBuilder = new \App\Models\Document\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -270,7 +270,7 @@ class FolderController extends Controller
     public function listFolderWithDocumentValidation(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Folder();
+        $queryBuilder = new \App\Models\Document\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -308,7 +308,7 @@ class FolderController extends Controller
         if( $request->name != "" 
         // && Auth::user() != null 
         ){
-            $folder = new \App\Models\Folder();
+            $folder = new \App\Models\Document\Folder();
             $folder->name = $request->name ;
             $folder->user_id = Auth::user() != null ? Auth::user()->id : 0 ;
             $folder->pid = 0 ;
@@ -336,7 +336,6 @@ class FolderController extends Controller
     }
     // Update the folder 
     public function update(Request $request){
-        dd( $request->params );
         if( ( $folder = RecordModel::find($request->id) ) != null && $request->name != "" ){
             $folder->name = $request->name ;
             $folder->save() ;
@@ -365,7 +364,7 @@ class FolderController extends Controller
         if( $request->id != "" 
          // && Auth::user() != null 
         ){
-            $folder = \App\Models\Folder::find($request->id);
+            $folder = \App\Models\Document\Folder::find($request->id);
             if( $folder != null ){
                 $record = $folder ;
                 // Check for the documents within the folder
@@ -408,10 +407,10 @@ class FolderController extends Controller
         if( $request->id > 0 && $request->document_id > 0 
           // && Auth::user() != null 
         ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
+            $documentFolder = \App\Models\Document\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             if( $documentFolder == null ){
-                $documentFolder = new \App\Models\DocumentFolder();
+                $documentFolder = new \App\Models\Document\DocumentFolder();
                 $documentFolder -> folder_id = $request->id ;
                 $documentFolder -> document_id = $request->document_id ;
                 $documentFolder -> created_by = $documentFolder -> modified_by = \Auth::user()->id ;
@@ -447,7 +446,7 @@ class FolderController extends Controller
         if( $request->id > 0 && $request->document_id > 0 
         // && Auth::user() != null 
         ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
+            $documentFolder = \App\Models\Document\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             $message = $documentFolder !== null ? "បានដកឯកសារចេញរួចរាល់។" : "មិនមានឯកសារនេះក្នុងថតឯកសារឡើយ។" ;
             if( $documentFolder != null ) {
@@ -628,7 +627,7 @@ class FolderController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new \App\Models\Document(), $request, [
+        $crud = new CrudController(new \App\Models\Document\Document(), $request, [
             'id',
             'fid' ,
             'title' ,

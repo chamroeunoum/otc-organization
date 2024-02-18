@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Webapp;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Document as RecordModel;
+use App\Models\Document\Document as RecordModel;
 use App\Http\Controllers\CrudController;
 
 
@@ -149,8 +149,6 @@ class SearchController extends Controller
          */
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name'] ,
             'createdBy' => [ 'id' , 'firstname' , 'lastname' ]
         ]);
 
@@ -167,7 +165,7 @@ class SearchController extends Controller
     public function byTypeWithinMinistry($id){
 
         // Create Query Builder 
-        $documentIds = \App\Models\DocumentMinistry::where('ministry_id',$id)->first()->getDocuments();
+        $documentIds = \App\Models\Document\DocumentMinistry::where('ministry_id',$id)->first()->getDocuments();
         $queryBuilder = new Document();
 
         // Get search string

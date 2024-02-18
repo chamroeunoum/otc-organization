@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Document;
-use App\Models\Folder AS RecordModel;
+use App\Models\Document\Document;
+use App\Models\Document\Folder AS RecordModel;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CrudController;
 
@@ -272,7 +272,7 @@ class FolderController extends Controller
     public function user(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Folder();
+        $queryBuilder = new \App\Models\Document\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -315,7 +315,7 @@ class FolderController extends Controller
     public function listFolderWithDocumentValidation(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Folder();
+        $queryBuilder = new \App\Models\Document\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -353,10 +353,10 @@ class FolderController extends Controller
         if( $request->id > 0 && $request->document_id > 0 
           // && Auth::user() != null 
         ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
+            $documentFolder = \App\Models\Document\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             if( $documentFolder == null ){
-                $documentFolder = new \App\Models\DocumentFolder();
+                $documentFolder = new \App\Models\Document\DocumentFolder();
                 $documentFolder -> folder_id = $request->id ;
                 $documentFolder -> document_id = $request->document_id ;
                 $documentFolder -> created_by = $documentFolder -> modified_by = \Auth::user()->id ;
@@ -392,7 +392,7 @@ class FolderController extends Controller
         if( $request->id > 0 && $request->document_id > 0 
         // && Auth::user() != null 
         ){
-            $documentFolder = \App\Models\DocumentFolder::where('folder_id', $request->id )
+            $documentFolder = \App\Models\Document\DocumentFolder::where('folder_id', $request->id )
                 ->where('document_id' , $request->document_id )->first();
             $message = $documentFolder !== null ? "បានដកឯកសារចេញរួចរាល់។" : "មិនមានឯកសារនេះក្នុងថតឯកសារឡើយ។" ;
             if( $documentFolder != null ) {
@@ -551,7 +551,7 @@ class FolderController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new \App\Models\Document(), $request, [
+        $crud = new CrudController(new \App\Models\Document\Document(), $request, [
             'id',
             'fid' ,
             'title' ,
@@ -563,8 +563,6 @@ class FolderController extends Controller
         ]);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "type" => ['id', 'name', 'format', 'color', 'index'] ,
-            "ministries" => ['id', 'name']
         ]);
 
         $builder = $crud->getListBuilder();

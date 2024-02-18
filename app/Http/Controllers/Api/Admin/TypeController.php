@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CrudController;
-use App\Models\DocumentType as RecordModel;
+use App\Models\Document\DocumentType as RecordModel;
 
 
 class TypeController extends Controller

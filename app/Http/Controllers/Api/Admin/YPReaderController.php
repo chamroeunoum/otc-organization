@@ -19,7 +19,7 @@ class YPReaderController extends Controller
             if( $xpathResult == false ) continue;
             foreach($xpathResult as $dlsIndex => $dl ) {
                 $categories[] = $dl ;
-                print_ln( $dl->name );
+                // print_ln( $dl->name );
             //     if( $dl === null ) continue ;
             //     // $category = [
             //     //     'name' => str_replace([" ","\n","•"],[""],$dl->childNodes[1]->textContent ) ,

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Webapp;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CrudController;
-use App\Models\DocumentType as RecordModel;
+use App\Models\Document\DocumentType as RecordModel;
 
 
 class TypeController extends Controller
@@ -79,7 +79,7 @@ class TypeController extends Controller
             ],
         ];
         $request->merge( $queryString );
-        $crud = new CrudController(new RecordModel(), $request, ['id', 'name', 'document_index', 'format' ]);
+        $crud = new CrudController(new \App\Models\Tag\Document\Type(), $request, ['id', 'name', 'document_index', 'format' ]);
         $builder = $crud->getListBuilder();
         $responseData = $crud->pagination(true, $builder);
         $responseData['message'] = __("crud.read.success");

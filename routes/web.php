@@ -42,7 +42,7 @@ Route::get('yp/custom',function(){
     // echo "</table>";
 
     echo "<table>" ;
-    foreach( \App\Models\YPProvince::getDistrictsOfProvinceByCategory() AS $index => $province ){
+    foreach( \App\Models\YellowPage\YPProvince::getDistrictsOfProvinceByCategory() AS $index => $province ){
         dd( $province );
         echo "<tr>";
         echo "<td  >".($index+1)."</td>";

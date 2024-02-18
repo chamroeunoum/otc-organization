@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Document as RecordModel;
+use App\Models\Document\Document as RecordModel;
 use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
@@ -166,7 +166,7 @@ class RegulatorController extends Controller
         /**
          * Get the id of the regulator and its parents to exclude them from searching
          */
-        $regulator = isset( $request->parent_id ) && $request->parent_id > 0 ? \App\Models\Document::find( $request->parent_id ) : false ;
+        $regulator = isset( $request->parent_id ) && $request->parent_id > 0 ? \App\Models\Document\Document::find( $request->parent_id ) : false ;
 
         $queryString = [
             "where" => [
@@ -285,7 +285,7 @@ class RegulatorController extends Controller
     public function byTypeWithinMinistry($id){
 
         // Create Query Builder 
-        $documentIds = \App\Models\DocumentMinistry::where('ministry_id',$id)->first()->getDocuments();
+        $documentIds = \App\Models\Document\DocumentMinistry::where('ministry_id',$id)->first()->getDocuments();
         $queryBuilder = new Document();
 
         // Get search string
@@ -369,7 +369,7 @@ class RegulatorController extends Controller
     public function upload(Request $request){
         $user = \Auth::user();
         if( $user ){
-            if( ( $document = \App\Models\Document::find($request->id) ) !== null ){
+            if( ( $document = \App\Models\Document\Document::find($request->id) ) !== null ){
                 list($year,$month,$day) = explode('-',$document->document_year);
                 $uniqeName = Storage::disk('document')->putFile( 'documents' , new File( $_FILES['files']['tmp_name'] ) );
                 $document->pdf = $uniqeName ;
@@ -529,7 +529,7 @@ class RegulatorController extends Controller
         ],201);
     }
     public function oknha(Request $request){
-        $records = \App\Models\Document::select(['id','fid','objective','document_year'])->where('objective','LIKE','%ឧកញ៉ា%')
+        $records = \App\Models\Document\Document::select(['id','fid','objective','document_year'])->where('objective','LIKE','%ឧកញ៉ា%')
         // ->orWhere('fid','LIKE','%អ្នកឧកញ៉ា%')
         ->whereNot('objective',"LIKE",'%ឥស្សរិយយស%')
         ->whereNotIn('id',[51567, 20014, 19451, 45672, 45673, 45684, 45688, 45693, 45697, 45705, 45716, 45717, 51794, 51453,  45723, 45724, 50355, 45761, 45764, 58693, 56440, 58908, 58458, 57730, 57705, 57692, 57677, 57073, 56265, 56148, 56084, 55414, 54445, 53835, 52968, 52965, 52049, 52036, 52034, 51409, 51408, 51407, 50318, 49856, 49601, 49564, 48893, 46788, 46760 ])
@@ -605,7 +605,7 @@ class RegulatorController extends Controller
      * Add reader(s) of the specific document
      */
     public function addReaders(Request $request){
-        $regulator = \App\Models\Document::find($request->document_id);
+        $regulator = \App\Models\Document\Document::find($request->document_id);
         if( $regulator != null ){
             return response()->json([
                 /**
@@ -624,7 +624,7 @@ class RegulatorController extends Controller
      * Remove reader(s) of the specific document
      */
     public function removeReaders(Request $request){
-        $regulator = \App\Models\Document::find($request->document_id);
+        $regulator = \App\Models\Document\Document::find($request->document_id);
         if( $regulator != null ){
             return response()->json([
                 'record' => $regulator->readers()->toggle([$request->user_id])['detached'] ,
