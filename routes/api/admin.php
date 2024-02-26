@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\Admin\PeopleController;
 use App\Http\Controllers\Api\Admin\FolderController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\Regulator\RegulatorController;
+use App\Http\Controllers\Api\Admin\Regulator\LegalDraftController;
 use App\Http\Controllers\Api\Admin\Regulator\RegulatorParentController;
 use App\Http\Controllers\Api\Admin\Regulator\TypeController;
 use App\Http\Controllers\Api\Admin\Regulator\OrganizationController;
@@ -164,7 +165,7 @@ Route::group([
 
     // I am here , please continue to the below lines
 
-    /** SEARCH SECTION */
+    /** REGULATOR SECTION */
     Route::group([
         'prefix' => 'regulators' ,
         'namespace' => 'Api' ,
@@ -211,6 +212,20 @@ Route::group([
                 }
             );
 
+    });
+
+    /** LEGAL DRAFT SECTION */
+    Route::group([
+        'prefix' => 'legaldrafts' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {;
+            Route::get('',[LegalDraftController::class,'index']);
+            Route::get('read',[LegalDraftController::class,'read']);
+            Route::post('',[LegalDraftController::class,'create']);
+            Route::put('',[LegalDraftController::class,'update']);
+            Route::delete('',[LegalDraftController::class,'destroy']);
+            // Route::post('upload',[LegalDraftController::class,'upload']);
     });
 
     Route::group([
@@ -620,5 +635,6 @@ Route::group([
 
     require( 'admin/attendant.php' );
     require( 'admin/book.php' );
+    require( 'admin/task.php' );
 
 });

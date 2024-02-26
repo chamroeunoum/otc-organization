@@ -5,12 +5,13 @@ namespace App\Models\Meeting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class MeetingMember extends Model
 {
     use HasFactory, SoftDeletes;
 
-    private $meetingMemberGroups = [
+    private $meetingMemberRoles = [
         [
           'label' => 'ប្រធាន' ,
           'value' => 'leader'
@@ -24,7 +25,7 @@ class MeetingMember extends Model
           'value' => 'member'
         ]
     ];
-    private $meetingMemberRoles = [
+    private $meetingMemberGroups = [
         [
           'label' => 'អ្នកដឹកនាំប្រជុំ' ,
           'value' => 'lead_meeting'

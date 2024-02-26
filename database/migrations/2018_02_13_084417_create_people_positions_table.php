@@ -30,7 +30,7 @@ class CreatePeoplePositionsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('organization_staffs');
+		Schema::drop('people_positions');
 	}
 
 }

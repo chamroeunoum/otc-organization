@@ -14,14 +14,15 @@ return new class extends Migration
     public function up()
     {
         Schema::create('meetings', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
+            $table->integer('legal_draft_id')->nullable(true)->comment('The legal draft that the meeting is talking about.');
             $table->text('objective')->nullable(false)->comment('The objective of the meaing or title');
             $table->date('date')->nullable(false)->comment('The date of the meeting');
             $table->string('start',20)->nullable(true)->comment('The start time of the meeting');
             $table->string('end',20)->nullable(true)->comment('The expected end time of the meeting');
             $table->string('actual_start',20)->nullable(true)->comment('The actual start time of the meeting');
             $table->string('actual_end',20)->nullable(true)->comment('The actual expected end time of the meeting');
-            $table->integer('status')->default()->comment('0 => New, 1 => Meeting, 2 => Continue , 4 => Change , 8 => Delayed');
+            $table->integer('status')->default(1)->comment('1 => New, 2 => Meeting, 4 => Continue , 8 => Change , 16 => Delayed, 32 => Finished');
             $table->text('seichdey_preeng')->nullable(true)->comment('The SEICHDEY_PREENG documents of the meeting');
             $table->text('reports')->nullable(true)->comment('The report(s) at the end of the meeting.');
             $table->text('other_documents')->nullable(true)->comment('Another documentst that is/are support the meeting');

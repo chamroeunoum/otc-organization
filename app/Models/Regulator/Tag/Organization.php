@@ -2,6 +2,8 @@
 
 namespace App\Models\Regulator\Tag;
 use App\Models\Regulator\Tag\Tag;
+use App\Models\Meeting\Meeting;
+use App\Models\Meeting\MeetingOrganization;
 
 /**
  * This class is use to identify the organization of the regulator
@@ -32,5 +34,8 @@ class Organization extends Tag
     }
     public function leader(){
         return $this->belongsToMany('\App\Models\People\People','organization_leader','organization_id','people_id');
+    }
+    public function meetings(){
+        return $this->belongsToMany( Meeting::class , MeetingOrganization::class , 'organization_id' , 'meeting_id' );
     }
 }

@@ -9,10 +9,17 @@ use App\Http\Controllers\CrudController;
 
 class TaskController extends Controller
 {
-    private $selectedFields = ['id', 'name','duration', 'start', 'end', 'amount', 'amount_type','created_at','created_by','status','exchange_rate'];
+    private $selectedFields = ['id', 'objective','minutes', 'start', 'end', 'amount', 'amount_type','created_at','created_by','status','exchange_rate'];
     /** Get a list of Archives */
     public function index(Request $request){
 
+        $user = \Auth::user();
+        if( $user == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមចូលប្រើប្រាស់ជាមុនសិន។'
+            ],403);
+        }
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
@@ -24,26 +31,25 @@ class TaskController extends Controller
 
 
         $queryString = [
-            // "where" => [
-            //     'default' => [
-            //         [
-            //             'field' => 'type_id' ,
-            //             'value' => $type === false ? "" : $type
-            //         ]
-            //     ],
-            //     'in' => [] ,
-            //     'not' => [] ,
-            //     'like' => [
-            //         [
-            //             'field' => 'number' ,
-            //             'value' => $number === false ? "" : $number
-            //         ],
-            //         [
-            //             'field' => 'year' ,
-            //             'value' => $date === false ? "" : $date
-            //         ]
-            //     ] ,
-            // ] ,
+            "where" => [
+                'default' => [
+                    $user->hasRole('admin') || $user->hasRole('super')
+                        ? [] 
+                        : (
+                            $user->id > 0 
+                                ? [ 'field' => 'created_by' ,'value' => $user->id ]
+                                : []
+                        )
+                ],
+                // 'in' => [] ,
+                // 'not' => [] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'objective' ,
+                //         'value' => $search
+                //     ]
+                // ] ,
+            ] ,
             // "pivots" => [
             //     $unit ?
             //     [
@@ -55,13 +61,13 @@ class TaskController extends Controller
             //             ],
             //         // "not"=> [
             //         //     [
-            //         //         "field" => 'fieldName' ,
+            //         //         "field" => 'fieldobjective' ,
             //         //         "value"=> 'value'
             //         //     ]
             //         // ],
             //         // "like"=>  [
             //         //     [
-            //         //        "field"=> 'fieldName' ,
+            //         //        "field"=> 'fieldobjective' ,
             //         //        "value"=> 'value'
             //         //     ]
             //         // ]
@@ -76,7 +82,7 @@ class TaskController extends Controller
             "search" => $search === false ? [] : [
                 'value' => $search ,
                 'fields' => [
-                    'name', 'start' , 'end'
+                    'objective', 'start' , 'end' , 'amount'
                 ]
             ],
             "order" => [
@@ -89,8 +95,8 @@ class TaskController extends Controller
 
         $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
         $crud->setRelationshipFunctions([
-            /** relationship name => [ array of fields name to be selected ] */
-            'creator' => ['id', 'firstname', 'lastname' ,'username'] 
+            /** relationship objective => [ array of fields objective to be selected ] */
+            'creator' => ['id', 'firstname', 'lastname' ,'phone', 'avatar_url' ] 
         ]);
         $builder = $crud->getListBuilder();
 
@@ -107,75 +113,77 @@ class TaskController extends Controller
         // }
 
         $responseData = $crud->pagination(true, $builder);
+        $responseData['records'] = $responseData['records']->map(function($task){
+            $task['creator']['avatar_url'] = ( $task['creator']['avatar_url'] != null && $task['creator']['avatar_url'] != "" && \Storage::disk( 'public' )->exists( $task['creator']['avatar_url'] ) )
+                ? \Storage::disk('public')->url( $task['creator']['avatar_url'] ) 
+                : null ;
+            return $task ;
+        });
         $responseData['message'] = __("crud.read.success");
         return response()->json($responseData, 200);
     }
     /** Create a new Archive */
     public function create(Request $request){
-        if( ($user = $request->user() ) !== null ){
-            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields);
-            
-            if (($record = $crud->create([
-                'name' => $request->name ,
-                'duration' => $request->duration ,
-                'amount' => $request->amount ,
-                'amount_type' => $request->amount_type ,
-                'exchange_rate' => $request->exchange_rate ,
-                'created_by' => $user->id
-            ])) !== false) {
-                /** Link the archive to the units */
-                $record = $crud->formatRecord($record);
-                return response()->json([
-                    'record' => $record,
-                    'message' => __("crud.created.success")
-                ], 200);
-            }
+        $user = \Auth::user();
+        if( $user == null ){
             return response()->json([
-                'record' => null,
-                'message' => __("crud.created.failed")
-            ], 201);
+                'ok' => false ,
+                'message' => 'សូមចូលប្រើប្រាស់ជាមុនសិន។'
+            ],403);
+        }        
+
+        /**
+         * Create a meeting under another meeting
+         */
+        $parent = intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : null ;
+
+        if (($record = RecordModel::create([
+            'objective' => $request->objective ,
+            'minutes' => $request->minutes ,
+            'created_by' => $user->id ,
+            'amount' => $request->amount?? 0 ,
+            'amount_type' => $request->amount_type?? 0 ,
+            'exchange_rate' => $request->exchange_rate?? 4000 ,
+            'pid' => $parent != null && $parent->id > 0 ? $parent->id : 0
+        ])) !== false) {
+            /** Link the archive to the units */
+            return response()->json([
+                'record' => $record,
+                'message' => __("crud.created.success")
+            ], 200);
         }
         return response()->json([
             'record' => null,
-            'message' => __("crud.auth.failed")
-        ], 401);
-        
+            'message' => __("crud.created.failed")
+        ], 500);
     }
     /** Updating the archive */
     public function update(Request $request)
     {
-        if (($user = $request->user()) !== null) {
-            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields);
-            $crud->setRelationshipFunctions([
-                'units' => false
-            ]);
-            if ( $crud->update([
-                'name' => $request->name ,
-                'duration' => $request->duration ,
-                'amount' => $request->amount ,
-                'amount_type' => $request->amount_type ,
-                'exchange_rate' => $request->exchange_rate ,
-                'updated_by' => $user->id
-            ]) !== false) {
-                $record = $crud->read();
-                $record = $crud->formatRecord($record);
-                return response()->json([
-                    'ok' => true ,
-                    'record' => $record,
-                    'message' => __("crud.update.success")
-                ], 200);
-            }
+        $user = \Auth::user();
+        if( $user == null ){
             return response()->json([
                 'ok' => false ,
-                'record' => null,
-                'message' => __("crud.update.failed")
-            ], 201);
+                'message' => 'សូមចូលប្រើប្រាស់ជាមុនសិន។'
+            ],403);
+        }
+        $record = RecordModel::find($request->id);
+        if ( $record->update([
+            'objective' => $request->objective ,
+            'minutes' => $request->minutes ,
+            'updated_by' => $user->id
+        ]) ) {
+            return response()->json([
+                'ok' => true ,
+                'record' => $record,
+                'message' => __("crud.update.success")
+            ], 200);
         }
         return response()->json([
             'ok' => false ,
             'record' => null,
-            'message' => __("crud.auth.failed")
-        ], 401);
+            'message' => __("crud.update.failed")
+        ], 201);
     }
     /** Updating the archive */
     public function read(Request $request)
@@ -216,16 +224,19 @@ class TaskController extends Controller
             if (($record = $crud->delete()) !== false) {
                 /** Delete its structure and matras too */
                 return response()->json([
+                    'ok' => true ,
                     'record' => $record,
                     'message' => __("crud.delete.success")
                 ], 200);
             }
             return response()->json([
+                'ok' => false ,
                 'record' => null,
                 'message' => __("crud.delete.failed")
             ], 201);
         }
         return response()->json([
+            'ok' => false ,
             'record' => null,
             'message' => __("crud.auth.failed")
         ], 401);
@@ -237,7 +248,7 @@ class TaskController extends Controller
             $record = $crud->read();
             list($year,$month,$day) = explode('-', \Carbon\Carbon::parse( $record->year )->format('Y-m-d') );
             $path = $record->type_id."/".$year;
-            if (($record = $crud->upload('pdfs',$path, new File($_FILES['files']['tmp_name'][0]),$record->type_id.'-'.$year.$month.$day."-".$record->number.'.pdf' )) !== false) {
+            if (($record = $crud->upload('pdfs',$path, new File($_FILES['files']['tmp_objective'][0]),$record->type_id.'-'.$year.$month.$day."-".$record->number.'.pdf' )) !== false) {
                 // $record = $crud->formatRecord($record);
                 return response()->json([
                     'record' => $record,

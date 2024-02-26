@@ -105,6 +105,7 @@ class UserController extends Controller
             /** relationship name => [ array of fields name to be selected ] */
             "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
             "roles" => ['id','name', 'tag'] ,
+            "countesies" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
             "organizations" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
             "positions" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ]
         ]);
@@ -117,6 +118,7 @@ class UserController extends Controller
             if( $people != null ){
                 $user['person']['organizations'] = $people->organizations;
                 $user['person']['positions'] = $people->positions;
+                $user['person']['countesies'] = $people->countesies;
             }
             return $user;
         });
@@ -167,7 +169,7 @@ class UserController extends Controller
             /**
              * Assign role
              */
-            $backendMemberRole = \App\Models\Role::where('name','Backend member')->first();
+            $backendMemberRole = \App\Models\Role::backend()->first();
             if( $backendMemberRole != null ){
                 $user->assignRole( $backendMemberRole );
             }

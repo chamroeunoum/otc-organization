@@ -14,7 +14,7 @@ class TestOrganizationsAndStaffs extends Seeder
      */
     public function run()
     {
-        $backendMember = \App\Models\Role::where(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
+        $backendMember = \App\Models\Role::where(['name' => 'backend', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
         // dd( $backendMember );
         $organizationModel = new \App\Models\Regulator\Tag\Organization();
         $organization = \App\Models\Regulator\Tag\Organization::where('model', get_class( $organizationModel ) )->first();

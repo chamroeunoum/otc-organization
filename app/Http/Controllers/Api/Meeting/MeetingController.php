@@ -9,6 +9,8 @@ use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\Regulator\LegalDraft;
 
 class MeetingController extends Controller
 {
@@ -43,31 +45,21 @@ class MeetingController extends Controller
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
         $date = isset( $request->date ) && strlen( $request->date ) > 0 ? \Carbon\Carbon::parse( $request->date ) : \Carbon\Carbon::now() ;
-        $status = isset( $request->status ) && intval( $request->status ) > -1 ? $request->status : false ;
-        $type_id = isset( $request->type_id ) && intval( $request->type_id ) > 0 ? $request->type_id : false ;
 
         $queryString = [
             "where" => [
                 'default' => [
-                    $status > -1 ? [
-                        'field' => 'status' ,
-                        'value' => $status
-                    ] : [] ,
-                    $type_id > 0 ? [
-                        'field' => 'type_id' ,
-                        'value' => $type_id
-                    ] : [] ,
                     [
                         'field' => 'date' ,
                         'value' => $date->format('Y-m-d')
                     ]
                 ],
-                // 'in' => [
-                //     [
-                //         'field' => 'created_by' ,
-                //         'value' => [ $user->id ]
-                //     ]
-                // ] ,
+                'in' => [
+                    [
+                        'field' => 'created_by' ,
+                        'value' => [ $user->id ]
+                    ]
+                ] ,
                 // 'not' => [
                 //     [
                 //         'field' => 'type' ,
@@ -193,21 +185,73 @@ class MeetingController extends Controller
                 // Relation within listMembers
                 , 'member' => [ 'id' , 'firstname' , 'lastname' ]
                 , 'attendant' => [ 'id' , 'checktime' , 'remark' , 'people_id' 
-                , 'member' => [ 'id' , 'firstname' , 'lastname' ] 
-            ]
+                    , 'member' => [ 'id' , 'firstname' , 'lastname' ] 
+                ]
             ] ,
             'regulators' => [ 'id', 'fid' , 'title' , 'objective', 'year' , 'pdf' 
                 // Relation with regulators
                 , 'types' => [ 'id' , 'name' , 'desp' ]
             ],
             'type' => [ 'id' , 'name' , 'desp' ] ,
-            'children' => [ 'id' , 'objective' , 'date' , 'start' , 'end' ]
+            'children' => [ 'id' , 'objective' , 'date' , 'start' , 'end' ] ,
+            'legalDraft' => [ 'id' , 'objective' , 'status' , 'pid' ]
         ]);
         /**
          * Filter the meeting to get the top level
          */
-        // $builder->whereNull('pid')->orWhere('pid',0);
-        $responseData = $crud->pagination(true);
+        $builder = $crud->getListBuilder();
+
+        // Filter by type
+        $statuses = isset( $request->statuses ) && strlen( $request->statuses ) > 0 ? explode( ',' , trim( $request->statuses ) ) : [];
+        $statuses = is_array( $statuses ) && !empty( $statuses )
+            ? $statuses
+            : false ;
+        if( $statuses !== false ){
+            $builder->whereIn( 'status' , $statuses );
+        }
+
+        $types = isset( $request->types ) && strlen( $request->types ) > 0 ? explode( ',' , trim( $request->types ) ) : [];
+        $types = is_array( $types ) && !empty( $types )
+            ? $types
+            : false ;
+        if( $types !== false ){
+            $builder->whereIn( 'type_id' , $types );
+        }
+
+        // Filter by room
+        $rooms = isset( $request->rooms ) && strlen( $request->rooms ) > 0 ? explode( ',' , trim( $request->rooms ) ) : [];
+        $rooms = is_array( $rooms ) && !empty( $rooms )
+            ? $rooms
+            : false ;
+        if( $rooms !== false ){
+            $builder->whereHas( 'rooms' , function(Builder $query)use( $rooms ){
+                $query->whereIn('meeting_rooms.room_id',$rooms);
+            } );
+        }
+        
+        // Filter by organizzation
+        $organizations = isset( $request->organizations ) && strlen( $request->organizations ) > 0 ? explode( ',' , trim( $request->organizations ) ) : [];
+        $organizations = is_array( $organizations ) && !empty( $organizations )
+            ? $organizations
+            : false ;
+        if( $organizations !== false ){
+            $builder->whereHas( 'organizations' , function(Builder $query)use( $organizations ){
+                $query->whereIn('meeting_organizations.organization_id',$organizations);
+            } );
+        }
+
+        // Filter by member
+        $members = isset( $request->members ) && strlen( $request->members ) > 0 ? explode( ',' , trim( $request->members ) ) : [];
+        $members = is_array( $members ) && !empty( $members )
+            ? $members
+            : false ;
+        if( $members !== false ){
+            $builder->whereHas( 'members' , function(Builder $query)use( $members ){
+                $query->whereIn('meeting_members.people_id',$members);
+            } );
+        }
+
+        $responseData = $crud->pagination(true,$builder);
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
@@ -227,30 +271,58 @@ class MeetingController extends Controller
         // Pad string
         // Start time
         list($startHour,$startMinute) = explode( ":" , $request->start );
-        $startHour = str_pad( $startHour , 2, '0' , STR_PAD_LEFT );
-        $startMinute = str_pad( $startMinute , 2, '0' , STR_PAD_LEFT );
+        $start = implode(':', [ str_pad( $startHour , 2, '0' , STR_PAD_LEFT ) , str_pad( $startMinute , 2, '0' , STR_PAD_LEFT ) ] ) ;
         // End time
         list($endHour,$endMinute) = explode( ":" , $request->end );
-        $endHour = str_pad( $endHour , 2, '0' , STR_PAD_LEFT );
-        $endMinute = str_pad( $endMinute , 2, '0' , STR_PAD_LEFT );
+        $end = implode( ':' , [ str_pad( $endHour , 2, '0' , STR_PAD_LEFT ) , str_pad( $endMinute , 2, '0' , STR_PAD_LEFT ) ] );
 
         /**
          * Create a meeting under another meeting
          */
-        $parent = intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : null ;
+        $parent = $legalDraft = null ;
+        if( intval( $request->pid ) > 0  ){
+            $parent = RecordModel::find( $request->pid ) ;
+            if( $parent == null ){
+                return response()->json([
+                    'message' => 'រកកិច្ចប្រជុំមិនឃើញ។'
+                ]
+                , 500 );
+            }
+            // Create LegalDraft
+            $legalDraft = $parent->legalDraft;
+        }else{
+            // Create LegalDraft
+            $legalDraft = LegalDraft::create([
+                'title' => $request->objective?? '' ,
+                'objective' => $request->objective?? '' ,
+                'content' => $request->objective?? '' ,
+                'created_by' => $user->id ,
+                'updated_by' => $user->id ,
+                'status' => 0
+            ]);
+        }
 
         $record = RecordModel::create([
+            'legal_draft_id' => $legalDraft->id ,
             'objective' => $request->objective?? '',
             'date' => $request->date?? \Carbon\Carbon::now() ,
-            // str_pad(58749, 8, '0', STR_PAD_LEFT);
-            'start' => strlen( $request->start ) > 0 ?  $startHour . ":" . $startMinute : "9:00" ,
-            'end' =>  strlen( $request->end ) > 0 ?  $endHour . ":" . $endMinute : "12:00" ,
+            'start' => $start?? "9:00" ,
+            'end' =>  $end?? "12:00" ,
             'status' => \App\Models\Meeting\Meeting::STATUS_NEW ,
             'contact_info' => $request->contact_info?? '' ,
             'created_by' => $user->id  ,
             'updated_by' => $user->id  ,
             'type_id' => $request->type_id ,
-            'pid' => $parent != null && $parent->id > 0 ? $parent->id : 0
+            'pid' => $parent != null && $parent->id > 0 
+                ? (
+                    // In case the parent already has its parent
+                    $parent->pid > 0 
+                    // Then choose the top parent as the parent
+                    ? $parent->pid
+                    // But if the parent does not has the parent the choose its id as parent
+                    : $parent->id
+                ) 
+                : 0
         ]);
         /**
          * Reference files
@@ -280,14 +352,21 @@ class MeetingController extends Controller
             ],403);
         }
         if( intval( $request->id ) > 0 && ( $record = RecordModel::find($request->id) ) !== null ){
+            // Pad string
+            // Start time
+            list($startHour,$startMinute) = explode( ":" , $request->start );
+            $start = implode(':', [ str_pad( $startHour , 2, '0' , STR_PAD_LEFT ) , str_pad( $startMinute , 2, '0' , STR_PAD_LEFT ) ] ) ;
+            // End time
+            list($endHour,$endMinute) = explode( ":" , $request->end );
+            $end = implode( ':' , [ str_pad( $endHour , 2, '0' , STR_PAD_LEFT ) , str_pad( $endMinute , 2, '0' , STR_PAD_LEFT ) ] );
             /**
              * Save information of the regulator and its related information
              */
             if( $record->update([
                 'objective' => $request->objective?? '',
                 'date' => $request->date?? \Carbon\Carbon::now() ,
-                'start' => $request->start?? '09:00',
-                'end' => $request->end?? '12:00' ,
+                'start' => $start?? '09:00',
+                'end' => $end?? '12:00' ,
                 'contact_info' => $request->contact_info?? '' ,
                 'updated_by' => $user->id  ,
                 'type_id' => $request->type_id ,
@@ -378,12 +457,12 @@ class MeetingController extends Controller
         $record->rooms = $record->rooms()->get()->map(function($place) use( $record ){
             return [
                 "id" => $place->id ,
-                "organization" => [
+                "organization" => $place->organization == null ? null : [
                     'id' => $place->organization->id ,
                     'name' => $place->organization->name
                 ] ,
-                "room" => $place->room ,
-                "remark" => $place->remark
+                "name" => $place->name ,
+                "desp" => $place->desp
             ];
         });
         return response()->json([
@@ -1619,6 +1698,132 @@ class MeetingController extends Controller
             'record' => $meetingMember->meeting ,
             'ok' => true ,
             'message' => 'ជោគជ័យ។'
+        ],200);
+    }
+
+    public function history(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់។'
+            ],500);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ទិន្នន័យដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],500);
+        }
+        if( $record->legalDraft == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សេចក្ដីព្រាងនៃកិច្ចប្រជុំនេះមិនមានឡើយ។'
+            ],500);
+        }
+        
+        $record->legalDraft->meetings = $record->legalDraft->meetings()->orderby('id','asc')->get()->map(function($record){
+            $record->updateStatus();
+            $record->createdBy ;
+            $record->updatedBy ;
+            $record->type ;
+
+            $record->seichdey_preeng = collect( $record->seichdey_preeng )->map(function($preeng){
+                return strlen($preeng) && Storage::disk('meeting')->exists( $preeng ) ? Storage::disk("meeting")->url( $preeng ) : false ;
+            });
+            $record->reports = collect( $record->reports )->map(function($report){
+                return strlen($report) && Storage::disk('meeting')->exists( $report ) ? Storage::disk("meeting")->url( $report ) : false ;
+            });
+            $record->other_documents = collect( $record->other_documents )->map(function($other){
+                return strlen($other) && Storage::disk('meeting')->exists( $other ) ? Storage::disk("meeting")->url( $other ) : false ;
+            });
+            $record->regulators = $record->regulators()->get()->map(function($regulator){
+                $regulator->pdf = strlen( $regulator->pdf ) > 0 
+                    ? (
+                        \Storage::disk('regulator')->exists( $regulator->pdf )
+                        ? \Storage::disk('regulator')->url( $regulator->pdf )
+                        : (
+                            \Storage::disk('document')->exists( $regulator->pdf )
+                            ? \Storage::disk('document')->url( $regulator->pdf )
+                            : false
+                        )
+                    )
+                    : false ;
+                return [
+                    "id" => $regulator->id ,
+                    "fid" => $regulator->fid ,
+                    "title" => $regulator->title ,
+                    "objective" => $regulator->objective ,
+                    "pdf" => $regulator->pdf ,
+                    "year" => $regulator->year
+                ];
+            });
+            $record->organizations = $record->organizations()->get()->map(function($organization) use( $record ){
+                return [
+                    "id" => $organization->id ,
+                    "name" => $organization->name
+                ];
+            });
+            $record->members = $record->members()->get()->map(function($member) use( $record ){
+                $meetingMember = $record->listMembers()->where('people_id', $member->id)->first();
+                return [
+                    "id" => $member->id ,
+                    "firstname" => $member->firstname ,
+                    "lastname" => $member->lastname ,
+                    "role" => $meetingMember->role ,
+                    "group" => $meetingMember->group ,
+                    "remark" => $meetingMember->remark
+                ];
+            });
+            $record->rooms = $record->rooms()->get()->map(function($place) use( $record ){
+                return [
+                    "id" => $place->id ,
+                    "organization" => $place->organization == null ? null : [
+                        'id' => $place->organization->id ,
+                        'name' => $place->organization->name
+                    ] ,
+                    "name" => $place->name ,
+                    "desp" => $place->desp
+                ];
+            });
+            // List members
+            $record->listMembers = $record->listMembers->map(function($meetingMember){
+                return [
+                    'id' => $meetingMember->id ,
+                    'role' => $meetingMember->role ,
+                    'group' => $meetingMember->group ,
+                    'remark' => $meetingMember->remark ,
+                    'member' => $meetingMember->member == null ? null : [ 
+                        'id' => $meetingMember->member->id , 
+                        'firstname' => $meetingMember->member->firstname , 
+                        'lastname' => $meetingMember->member->lastname
+                    ] ,
+                    'attendant' => $meetingMember->attendant == null ? null :
+                        [ 
+                            'id' => $meetingMember->attendant->id , 
+                            'checktime' => $meetingMember->attendant->checktime , 
+                            'remark' => $meetingMember->attendant->remark , 
+                            'member' => $meetingMember->attendant->member == null ? null : 
+                            [ 
+                                'id' => $meetingMember->attendant->member->id , 
+                                'firstname' => $meetingMember->attendant->member->firstname , 
+                                'lastname' => $meetingMember->attendant->member->lastname
+                            ] 
+                        ]
+                ];
+            });
+            return $record ;
+        });
+        return response()->json([
+            'record' => $record->legalDraft ,
+            'total' => [
+                'types' => RecordModel::getMeetingsByType() ,
+                'statuses' => RecordModel::getMeetingsByStatus() ,
+                'days' => $record->legalDraft->totalSpentDays() ,
+                'time' => $record->legalDraft->totalSpentMinutes()
+            ] ,
+            'ok' => true ,
+            'message' => 'រួចរាល់។'
         ],200);
     }
 }

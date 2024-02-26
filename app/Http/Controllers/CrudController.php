@@ -496,10 +496,12 @@ class CrudController extends Controller {
                                                 }
                                             }   
                                         }
-                                    }else{
-                                        $tempRecord->$field = null ;
                                     }
+                                    // else{
+                                    //     $tempRecord->$field[] = $recordOfFunctionCollection->$field ;
+                                    // }
                                 }else{
+                                    // dd( $recordOfFunctionCollection );
                                     $tempRecord->$field = $recordOfFunctionCollection->$field ;
                                 }
                             }
@@ -508,8 +510,18 @@ class CrudController extends Controller {
                     }
                     /** if the relationship function return object */
                     else{
-                        foreach ($fields AS $field ) {
-                            $customRecord[$functionName][$field] = $record->$functionName->$field;
+                        foreach ($fields AS $index => $field ) {
+                            if( is_array( $field ) ){
+                                if( $record->$index != null ){
+                                    foreach( $field as $sindex => $sfield ){
+                                        $customRecord[$index][$sfield] = $record->$index->$sfield;
+                                    }
+                                }else{
+                                    $customRecord[$index] = null ;
+                                }
+                            }else{
+                                $customRecord[$functionName][$field] = $record->$functionName->$field;
+                            }
                         }
                     }
                 }else{

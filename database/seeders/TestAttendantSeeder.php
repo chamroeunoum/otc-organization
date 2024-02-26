@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon as Carbon;
 
-class TestAttendant extends Seeder
+class TestAttendantSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -27,10 +27,14 @@ class TestAttendant extends Seeder
             $allTimeslots = \App\Models\Attendant\Timeslot::where('id','<',3)->get()->pluck('id');
             $user->timeslots()->sync( $allTimeslots );
 
-            $start = \Carbon\Carbon::parse('2024-02-13');
-            $end = \Carbon\Carbon::parse('2024-02-14');
+            $start = \Carbon\Carbon::parse('2023-01-01');
+            $end = \Carbon\Carbon::parse('2024-02-25');
             $attendantsOfTheDay = [] ;
             do{
+                if( $start->isSaturday() || $start->isSunday() ) {
+                    $start->addDay();
+                    continue;
+                }
                 echo "USER : " . $user->id . " => DAY : " . $start->format('Y-m-d') . PHP_EOL ;    
 
                 $attendant = \App\Models\Attendant\Attendant::create([

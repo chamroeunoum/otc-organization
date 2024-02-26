@@ -22,7 +22,7 @@ class RolesTableSeeder extends Seeder
             0 => 
             array (
                 'id' => 1,
-                'name' => 'Super Administrator',
+                'name' => 'super',
                 'guard_name' => 'api',
                 'created_at' => '2023-09-10 06:44:28',
                 'updated_at' => '2023-09-10 06:44:28',
@@ -31,7 +31,7 @@ class RolesTableSeeder extends Seeder
             1 => 
             array (
                 'id' => 2,
-                'name' => 'Administrator',
+                'name' => 'admin',
                 'guard_name' => 'api',
                 'created_at' => '2023-09-10 06:44:28',
                 'updated_at' => '2023-09-10 06:44:28',
@@ -40,7 +40,7 @@ class RolesTableSeeder extends Seeder
             2 => 
             array (
                 'id' => 3,
-                'name' => 'Backend member',
+                'name' => 'backend',
                 'guard_name' => 'api',
                 'created_at' => '2023-09-10 06:44:28',
                 'updated_at' => '2023-09-10 06:44:28',
@@ -49,11 +49,11 @@ class RolesTableSeeder extends Seeder
             3 => 
             array (
                 'id' => 4,
-                'name' => 'Client',
+                'name' => 'client',
                 'guard_name' => 'api',
                 'created_at' => '2023-09-10 06:44:28',
                 'updated_at' => '2023-09-10 06:44:28',
-                'tag' => 'webapp',
+                'tag' => 'client_service',
             ),
         ));
         

@@ -178,7 +178,7 @@ class PeopleController extends Controller
             /**
              * Assign role
              */
-            $backendMemberRole = \App\Models\Role::where('name','Backend member')->first();
+            $backendMemberRole = \App\Models\Role::where('name','backend')->first();
             if( $backendMemberRole != null ){
                 $user->assignRole( $backendMemberRole );
             }

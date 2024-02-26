@@ -49,6 +49,12 @@ return [
             'url' => env('APP_URL').'/storage/documents',
             'throw' => true ,
         ],
+        'legaldraft' => [
+            'driver' => 'local',
+            'root' => storage_path('data/legaldrafts') ,
+            'url' => env('APP_URL').'/storage/legaldrafts',
+            'throw' => true ,
+        ],
         'regulator' => [
             'driver' => 'local',
             'root' => storage_path('data/regulators') ,

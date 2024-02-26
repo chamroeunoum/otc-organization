@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->integer('meeting_id')->comment('The id of meeting table');
             $table->integer('people_id')->nullable(false)->comment('The id of people table');
-            $table->string('role',191)->nullable(true)->default('audient')->comment('The role name of the member to join the meeting.');
-            $table->string('group',191)->nullable(true)->default('member')->comment('The group name of the member to join the meeting.');
+            $table->string('role',191)->nullable(true)->default('member')->comment('The role name of the member to join the meeting.');
+            $table->string('group',191)->nullable(true)->default('audient')->comment('The group name of the member to join the meeting.');
             $table->text('remark')->nullable(true)->comment('The remark');
             $table->timestamps();
             $table->softDeletes();

@@ -58,7 +58,7 @@ class Type extends Tag
         return $this->hasMany('\App\Models\Meeting\Meeting','type_id','id');
     }
     // Static function of the Type (Singleton)
-    public static function getMeetingsByType(){
+    public static function getTotalMeetingsByTypes(){
         return static::getInstance()->children()->get()->map(function($type){
             return [
                 'id' => $type->id ,

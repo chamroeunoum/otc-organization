@@ -3,6 +3,7 @@ use App\Http\Controllers\Api\Meeting\MeetingController;
 use App\Http\Controllers\Api\Meeting\AuthController;
 use App\Http\Controllers\Api\Meeting\UserController;
 use App\Http\Controllers\Api\Meeting\ProfileController;
+use App\Http\Controllers\Api\Meeting\LegalDraftController;
 use App\Http\Controllers\Api\Meeting\Organization\OrganizationController;
 use App\Http\Controllers\Api\Meeting\Position\PositionController;
 use App\Http\Controllers\Api\Meeting\Type\TypeController;
@@ -64,6 +65,20 @@ Route::group([
             Route::post('picture/upload',[ProfileController::class,'upload']);
     });
 
+    /** LEGAL DRAFT SECTION */
+    Route::group([
+      'prefix' => 'legaldrafts' ,
+      'namespace' => 'Api' ,
+      'middleware' => 'auth:api'
+      ], function() {;
+          Route::get('',[LegalDraftController::class,'index']);
+          Route::get('read',[LegalDraftController::class,'read']);
+          Route::post('',[LegalDraftController::class,'create']);
+          Route::put('',[LegalDraftController::class,'update']);
+          Route::delete('',[LegalDraftController::class,'destroy']);
+          // Route::post('upload',[LegalDraftController::class,'upload']);
+    });
+
     /**
      * Methods to apply for each of the CRUD operations
      * Create => POST
@@ -85,6 +100,10 @@ Route::group([
       Route::delete('{id}/delete',[MeetingController::class,'destroy']);
       Route::put('start',[MeetingController::class,'start']);
       Route::put('end',[MeetingController::class,'end']);
+      /**
+       * Meeting history
+       */
+      Route::get('{id}/history',[MeetingController::class,'history']);
       /**
        * Status
        */

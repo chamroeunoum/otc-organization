@@ -2,6 +2,7 @@
 namespace App\Models\Regulator;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Regulator\LegalDraft;
 
 class Regulator extends Model
 {
@@ -42,6 +43,16 @@ class Regulator extends Model
         return $this->belongsTo('App\Models\User', 'created_by');
     }
 
+    /**
+     * Get all of the legal drafts for the Regulator
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function legalDrafts(): HasMany
+    {
+        return $this->hasMany(LegalDraft::class, 'regulator_id', 'id');
+    }
+    
     public function updater()
     {
         return $this->belongsTo('App\Models\User', 'updated_by');

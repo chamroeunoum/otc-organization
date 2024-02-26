@@ -111,7 +111,6 @@ class AuthController extends Controller
                  * Account does exist but the password might miss type
                  */
                 return response()->json([
-                    'user' => \App\Models\User::where('email', $request->email)->first() ,
                     'message' => 'សូមពិនិត្យពាក្យសម្ងាត់របស់អ្នក !'
                 ], 401);
             }else{
@@ -143,12 +142,18 @@ class AuthController extends Controller
         /**
          * Check roles
          */
-        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core_service')->pluck('id')->toArray() ) ) ){
+        if( empty( array_intersect( 
+            // Retreive all the roles that authenticated user has
+            $user->roles->pluck('id')->toArray() 
+            // Retreive allowed roles
+            , \App\Models\Role::backend()->pluck('id')->toArray() ) 
+            ) 
+        ){
             /**
              * User seem does not have any right to login into backend / core service
              */
             return response()->json([
-                'message' => "គណនីនេះមិនមានសិទ្ធិគ្រប់គ្រាន់។"
+                'message' => "គណនីនេះមិនមានសិទ្ធិប្រើប្រព័ន្ធឡើយ។"
             ],403);
         }
 

@@ -143,7 +143,7 @@ class UserController extends Controller
             /**
              * Assign role to user
              */
-            $backendMemberRole = \App\Models\Role::where('name','Backend member')->where('tag','core_service')->first();
+            $backendMemberRole = \App\Models\Role::where('name','backend')->where('tag','core_service')->first();
             if( $backendMemberRole != null ){
                 $user->assignRole( $backendMemberRole );
             }

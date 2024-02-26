@@ -24,12 +24,12 @@ class TestDataOrganizationStaffsAndRegulatorsSeeder extends Seeder
 
         // $super = \App\Models\Role::create(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
         // $administrator = \App\Models\Role::create(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        // $backendMember = \App\Models\Role::create(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        // $backendMember = \App\Models\Role::create(['name' => 'backend', 'guard_name' => 'api' , 'tag' => 'core_service']);
         // $client = \App\Models\Role::create(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp']);
 
         $super = \App\Models\Role::where(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
         $administrator = \App\Models\Role::where(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
-        $backendMember = \App\Models\Role::where(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
+        $backendMember = \App\Models\Role::where(['name' => 'backend', 'guard_name' => 'api' , 'tag' => 'core_service'])->first();
         $client = \App\Models\Role::where(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp'])->first();
 
         /**
@@ -217,7 +217,7 @@ class TestDataOrganizationStaffsAndRegulatorsSeeder extends Seeder
         //  */
         // $super = \App\Models\Role::create(['name' => 'Super Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
         // $administrator = \App\Models\Role::create(['name' => 'Administrator', 'guard_name' => 'api' , 'tag' => 'core_service']);
-        // $backendMember = \App\Models\Role::create(['name' => 'Backend member', 'guard_name' => 'api' , 'tag' => 'core_service']);
+        // $backendMember = \App\Models\Role::create(['name' => 'backend', 'guard_name' => 'api' , 'tag' => 'core_service']);
         // $client = \App\Models\Role::create(['name' => 'Client', 'guard_name' => 'api' , 'tag' => 'webapp']);
 
         // /**
@@ -265,7 +265,7 @@ class TestDataOrganizationStaffsAndRegulatorsSeeder extends Seeder
         // echo 'RUN INDEXING OF POSITION USERS' . PHP_EOL;
         // \DB::statement("SELECT setval('position_users_id_seq', (SELECT MAX(id) FROM position_users )+1);");
         // echo 'RUN INDEXING OF ORGANIZATION STAFFS ' . PHP_EOL;
-        // \DB::statement("SELECT setval('organization_staffs_id_seq', (SELECT MAX(id) FROM organization_staffs )+1);");
+        // \DB::statement("SELECT setval('organization_people_id_seq', (SELECT MAX(id) FROM organization_people )+1);");
 
 
         /**

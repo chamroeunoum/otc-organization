@@ -13,10 +13,10 @@ class Task extends Model
         'objective' => 'string' ,
         'start' => 'datetime',
         'end' => 'datetime',
-        'earn' => 'double',
-        'spent' => 'double',
+        'amount' => 'double',
+        'amount_type' => 'int',
         'active' => 'int',
-        'pdfs' => 'array',
+        'pdfs' => 'array'
     ];
     protected $date=['created_at','updated_at','deleted_at'];
 

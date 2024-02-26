@@ -142,7 +142,7 @@ class AuthController extends Controller
         }
         /**
          * Check roles
-         * Allow Backend member and webapp member to be logged in
+         * Allow backend and webapp member to be logged in
          */
         if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','webapp')->orWhere('tag','core_service')->pluck('id')->toArray() ) ) ){
             /**
