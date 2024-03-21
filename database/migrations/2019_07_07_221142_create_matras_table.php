@@ -18,15 +18,15 @@ class CreateMatrasTable extends Migration {
 			$table->text('number');
 			$table->text('title');
 			$table->text('meaning');
-			$table->integer('book_id');
-			$table->integer('kunty_id')->nullable()->default(0);
-			$table->integer('matika_id')->nullable()->default(0);
-			$table->integer('chapter_id')->nullable()->default(0);
-			$table->integer('part_id')->nullable()->default(0);
-			$table->integer('section_id')->nullable()->default(0);
+			$table->integer('book_id')->default(0);
+			$table->integer('kunty_id')->default(0);
+			$table->integer('matika_id')->default(0);
+			$table->integer('chapter_id')->default(0);
+			$table->integer('part_id')->default(0);
+			$table->integer('section_id')->default(0);
 			$table->integer('created_by');
 			$table->integer('updated_by');
-			$table->integer('active')->nullable()->default(0);
+			$table->integer('active')->default(0);
 			$table->timestamps();
 		});
 	}

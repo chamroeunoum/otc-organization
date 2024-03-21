@@ -158,6 +158,24 @@ class MemberController extends Controller
                 if( intval( $request->organization ) ){
                     $person->organizations()->sync([ $request->organization ]);
                 }
+
+                /**
+                 * Create default account for this people
+                 */
+                \App\Models\User::create([
+                    'people_id' => $person->id ,
+                    'model' => get_class( $person ) ,
+                    'firstname' => $person->firstname ,
+                    'lastname' => $person->lastname ,
+                    'phone' => $person->mobile_phone ,
+                    'email' => $person->email ,
+                    'username' => $person->email ,
+                    'password' => bcrypt( 
+                        $person->mobile_phone != null && strlen( $person->mobile_phone ) > 0 ? $person->mobile_phone : '123456'
+                    ),
+                    'active' => 0 // disabled this account for now
+                ]);
+
                 return response()->json([
                     'record' => $person ,
                     'ok' => true ,

@@ -604,17 +604,6 @@ class AttendantController extends Controller
             'message' => 'មានបញ្ហាក្នុងការលុបទិន្ន័យ។'
         ],201);
     }
-    public function oknha(Request $request){
-        $records = \App\Models\Regulator\Regulator::select(['id','fid','objective','year'])->where('objective','LIKE','%ឧកញ៉ា%')
-        // ->orWhere('fid','LIKE','%អ្នកឧកញ៉ា%')
-        ->whereNot('objective',"LIKE",'%ឥស្សរិយយស%')
-        ->whereNotIn('id',[51567, 20014, 19451, 45672, 45673, 45684, 45688, 45693, 45697, 45705, 45716, 45717, 51794, 51453,  45723, 45724, 50355, 45761, 45764, 58693, 56440, 58908, 58458, 57730, 57705, 57692, 57677, 57073, 56265, 56148, 56084, 55414, 54445, 53835, 52968, 52965, 52049, 52036, 52034, 51409, 51408, 51407, 50318, 49856, 49601, 49564, 48893, 46788, 46760 ])
-        ->get()->map(function($r){
-            $r->objective = trim( str_replace( [ 'ព្រះរាជក្រឹត្យស្ដីពីការតែងតាំង' ,'ព្រះរាជក្រឹត្យស្ដីពីការត្រាស់បង្គាប់តែងតាំង' , 'ព្រះរាជក្រឹត្យស្ដីពីតែងតាំង' , 'ព្រះរាជក្រឹត្យស្ដីពីការត្រាស់បង្គាប់' , 'ផ្ដល់គោរមងារ' , '&nbsp;' , 'ផ្ដល់គោរមងា' , 'ព្រះរាជក្រឹត្យស្ដីពីការត្រាសបង្គាប់', 'ព្រះរាជក្រឹត្យស្ដីពីកាផ្តល់គោរមងារ' , 'រះរាជក្រឹត្យស្ដីពីការត្រាស់បង្គាប់' , 'ផ្ដល់គោរពងារ' , 'ផ្តល់គោរម្យងារ' , 'គោរមងារ' ],[ '' ],strip_tags( $r->objective ) ) );
-            return $r;
-        });
-        return view( 'oknha' , ['data' => $records] );
-    }
     public function activate(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
             return response()->json([
@@ -656,61 +645,6 @@ class AttendantController extends Controller
             'ok' => $record->update(['active'=>0]) ,
             'message' => 'បានបើកឯកសាររួចរាល់។'
         ],200);
-    }
-    public function accessibility(Request $request){
-        if( !isset( $request->id ) || $request->id < 0 ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
-            ],422);
-        }
-        $record = RecordModel::find($request->id);
-        if( $record == null ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
-            ],423);
-        }
-        $result = in_array( intVal( $request->mode ) , [ 0 , 1 , 2 , 4 ] ) != false ? $record->update(['accessibility'=> intVal( $request->mode ) ] ) : false ;
-        return response()->json([
-            'record' => $result == false ? null : $record ,
-            'ok' =>  $result == false ? false : true ,
-            'message' => $result == false ? "មានបញ្ហាក្នុងការកែប្រែ។" : 'បានកែរួចរាល់។'
-        ], $result == false ? 422 : 200 );
-    }
-    /**
-     * Add reader(s) of the specific document
-     */
-    public function addReaders(Request $request){
-        $regulator = \App\Models\Regulator\Regulator::find($request->document_id);
-        if( $regulator != null ){
-            return response()->json([
-                /**
-                 * It will return in the following format : [ attached => [] , detached => [] ]
-                 */
-                'result' => $regulator->readers()->toggle([$request->user_id])['attached'] ,
-                'message' => 'បញ្ចូលអ្នកអានរួចរាល់។'
-            ],200);
-        }
-        return response()->json([
-            'message' => 'មានបញ្ហាក្នុងការបញ្ចូលអ្នកអានឯកសារនេះ។'
-        ],422);
-    }
-
-    /**
-     * Remove reader(s) of the specific document
-     */
-    public function removeReaders(Request $request){
-        $regulator = \App\Models\Regulator\Regulator::find($request->document_id);
-        if( $regulator != null ){
-            return response()->json([
-                'record' => $regulator->readers()->toggle([$request->user_id])['detached'] ,
-                'message' => 'ដកអ្នកអានរួចរាល់។'
-            ],200);
-        }
-        return response()->json([
-            'message' => 'មានបញ្ហាក្នុងការដកអ្នកអានឯកសារនេះ។'
-        ],422);
     }
 
     public function userAttendants(Request $request){

@@ -18,7 +18,7 @@ class CreateBooksTable extends Migration {
 			$table->text('title', 65535)->comment('The title of the book');
 			$table->text('description', 65535)->nullable();
 			$table->string('color', 191)->default('#FAFAFA')->comment('The color of the book');
-			$table->string('cover', 191)->nullable()->comment('The cover of the book');
+			$table->string('cover', 191)->nullable(true)->comment('The cover of the book');
 			$table->integer('complete')->default(0)->comment('the status identify that the book has been finished the data entry or not');
 			$table->integer('active')->default(0)->comment('the status identify that the book has been published');
 			$table->integer('created_by')->nullable();

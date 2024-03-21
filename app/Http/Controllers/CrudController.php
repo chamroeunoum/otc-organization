@@ -40,11 +40,11 @@ class CrudController extends Controller {
     /**
      * File fields
      */
-    private $fileFields = [ 'file' , 'files' , 'photo' , 'photos' , 'pdf' , 'pdfs' , 'image' , 'images' , 'avatar' , 'avatar_url' ] ;
+    private $fileFields = [ 'file' , 'files' , 'photo' , 'photos' , 'pdf' , 'pdfs' , 'image' , 'images' , 'avatar' , 'avatar_url' , 'image' ] ;
     /**
      * Fields that except from Saving or Updating
      */
-    private $exceptFields = [ 'file' , 'files' , 'photo' , 'photos' , 'pdf' , 'pdfs' , 'image' , 'images' , 'avatar' , 'avatar_url' ] ;
+    private $exceptFields = [ 'file' , 'files' , 'photo' , 'photos' , 'pdf' , 'pdfs' , 'image' , 'images' , 'avatar' , 'avatar_url' , 'image' ] ;
     /**
      * Set the storage driver
      */

@@ -33,7 +33,10 @@ Route::group([
      * Delete a record
      */
     Route::delete('{id}/delete',[TaskController::class,'delete'])->name("taskDelete");
-
+    /**
+     * Get assignees
+     */
+    Route::get('assignees',[TaskController::class,'getAssignees'])->name("assigneesRead");
     /**
      * Activate, Deactivate account
      */

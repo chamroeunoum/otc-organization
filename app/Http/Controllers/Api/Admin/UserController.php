@@ -25,7 +25,11 @@ class UserController extends Controller
         'active' ,
         'avatar_url' ,
         'avatar' ,
-        'people_id'
+        'people_id' ,
+        'last_login' ,
+        'login_count' ,
+        'ip' ,
+        'created_at'
     ];
     /**
      * Listing function
@@ -35,6 +39,13 @@ class UserController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+
+        $positions = isset( $request->positions ) && strlen( $request->positions ) > 0
+            ? array_filter( explode( ',' , $request->positions ) , function($item ){ return intval( $item ) > 0 ; } )
+            : false ;
+        $organizations = isset( $request->organizations ) && strlen( $request->organizations ) > 0
+            ? array_filter( explode( ',' , $request->organizations ) , function($item ){ return intval( $item ) > 0 ; } )
+            : false ;
 
         $queryString = [
             // "where" => [
@@ -57,31 +68,31 @@ class UserController extends Controller
             //         ]
             //     ] ,
             // ] ,
-            // "pivots" => [
-            //     $unit ?
-            //     [
-            //         "relationship" => 'units',
-            //         "where" => [
-            //             "in" => [
-            //                 "field" => "id",
-            //                 "value" => [$request->unit]
-            //             ],
-            //         // "not"=> [
-            //         //     [
-            //         //         "field" => 'fieldName' ,
-            //         //         "value"=> 'value'
-            //         //     ]
-            //         // ],
-            //         // "like"=>  [
-            //         //     [
-            //         //        "field"=> 'fieldName' ,
-            //         //        "value"=> 'value'
-            //         //     ]
-            //         // ]
-            //         ]
-            //     ]
-            //     : []
-            // ],
+            "pivots" => [
+                // $unit ?
+                // [
+                //     "relationship" => 'units',
+                //     "where" => [
+                //         "in" => [
+                //             "field" => "id",
+                //             "value" => [$request->unit]
+                //         ],
+                //         "not"=> [
+                //             [
+                //                 "field" => 'fieldName' ,
+                //                 "value"=> 'value'
+                //             ]
+                //         ],
+                //         "like"=>  [
+                //             [
+                //             "field"=> 'fieldName' ,
+                //             "value"=> 'value'
+                //             ]
+                //         ]
+                //     ]
+                // ]
+                // : []
+            ],
             "pagination" => [
                 'perPage' => $perPage,
                 'page' => $page
@@ -103,18 +114,37 @@ class UserController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
-            "roles" => ['id','name', 'tag'] ,
-            "countesies" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
-            "organizations" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
-            "positions" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ]
+            "person" => [ 'id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' , 'mobile_phone' , 'office_phone' , 'nid' , 'email' , 'marry_status' ] ,
+            "roles" => ['id','name', 'tag']
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
 
+        /**
+         * Positions filter
+         */
+        if( $positions ){
+            $builder->whereHas('person',function( $query ) use($positions) {
+                $query->whereHas('positions',function($query) use( $positions ){
+                    $query->whereIn('position_id',$positions);
+                });
+            });
+        }
+
+        /**
+         * Organization filter
+         */
+        if( $organizations ){
+            $builder->whereHas('person',function( $query ) use($organizations) {
+                $query->whereHas('organizations',function($query) use( $organizations ){
+                    $query->whereIn('organization_id',$organizations);
+                });
+            });
+        }
+
         $responseData = $crud->pagination(true, $builder);
         $responseData['records'] = $responseData['records']->map(function($user){
-            $people = $user['person']['id'] > 0 ? \App\Models\People\People::find( $user['person']['id'] ) : null ;
+            $people = isset( $user['person'] ) && $user['person']['id'] > 0 ? \App\Models\People\People::find( $user['person']['id'] ) : null ;
             if( $people != null ){
                 $user['person']['organizations'] = $people->organizations;
                 $user['person']['positions'] = $people->positions;
@@ -124,6 +154,8 @@ class UserController extends Controller
         });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
+        $responseData['positions'] = $positions;
+        $responseData['organizations'] = $organizations;
         return response()->json($responseData, 200);
     }
     /**
@@ -148,7 +180,7 @@ class UserController extends Controller
                 'active' => $request->active == true || $request->active == 1 ? 1 : 0 ,
                 'password' => bcrypt($request->password) ,
                 'phone' => $request->phone ,
-                'username' => $request->username
+                'username' => $request->username != null && strlen( $request->username ) > 0 ? $request->username : $request->email 
             ]);
 
             /**
@@ -157,14 +189,24 @@ class UserController extends Controller
             $person = \App\Models\People\People::create([
                 'firstname' => $user->firstname , 
                 'lastname' => $user->lastname , 
-                'gender' => $user->gender , 
-                'dob' => $user->dob , 
-                'mobile_phone' => $user->mobile_phone , 
+                'gender' => $user->gender != null && strlen( $user->gender ) > 0 ? $user->gender : 1  , 
+                'dob' => $user->dob != null && strlen( $user->dob ) > 0 ? $user->dob : \Carbon\Carbon::now()->format('Y-m-d')  , 
+                'mobile_phone' => $user->phone , 
                 'email' => $user->email , 
                 'image' => $user->avatar_url , 
             ]);
             $user->people_id = $person->id ;
             $user->save();
+
+            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
+                $user->person->organizations()->sync( $request->organizations );
+            }
+            if( isset( $request->positions ) && !empty( $request->positions ) ){
+                $user->person->positions()->sync( $request->positions );
+            }
+            if( isset( $request->countesies ) && !empty( $request->countesies ) ){
+                $user->person->countesies()->sync( $request->countesies );
+            }
 
             /**
              * Assign role
@@ -176,25 +218,20 @@ class UserController extends Controller
             
             $user->save();
 
-            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
-                $user->person->organizations()->sync( $request->organizations );
-            }
-            if( isset( $request->positions ) && !empty( $request->positions ) ){
-                $user->person->positions()->sync( $request->positions );
-            }
-
             if( $user ){
                 
                 return response()->json([
-                    'user' => \App\Models\User::find( $user->id ) ,
+                    'record' => $user ,
+                    'ok' => true ,
                     'message' => 'គណនីបង្កើតបានជោគជ័យ !'
                 ], 200);
 
             }else {
                 return response()->json([
                     'user' => null ,
+                    'ok' => false ,
                     'message' => 'បរាជ័យក្នុងការបង្កើតគណនី !'
-                ], 201);
+                ], 500);
             }
         }
     }
@@ -202,8 +239,8 @@ class UserController extends Controller
      * Create an account
      */
     public function update(Request $request){
-        $user = isset( $request->id ) && $request->id > 0 ? \App\Models\User::find($request->id) : (
-            isset( $request->email ) && $request->email != "" ? \App\Models\User::where('email',$request->email)->first() : null
+        $user = isset( $request->id ) && $request->id > 0 ? RecordModel::find($request->id) : (
+            isset( $request->email ) && $request->email != "" ? RecordModel::where('email',$request->email)->first() : null
         );
         if( $user && $user->update([
             'firstname' => $request->firstname ,
@@ -211,7 +248,24 @@ class UserController extends Controller
             'email' => $request->email ,
             'username' => $request->username ,
             'phone' => $request->phone
-        ]) == true ){;
+        ]) == true ){
+            
+            if( $user->person == null ){
+                /**
+                 * Create detail information of the owner of the account
+                 */
+                $person = \App\Models\People\People::create([
+                    'firstname' => $user->firstname , 
+                    'lastname' => $user->lastname , 
+                    'gender' => 1 , 
+                    'mobile_phone' => $user->phone , 
+                    'email' => $user->email , 
+                    'image' => $user->avatar_url
+                ]);
+                $user->people_id = $person->id;
+                $user->save();
+                $user = RecordModel::find( $user->id );
+            }
             if( isset( $request->organizations ) && is_array( $request->organizations ) ){
                 $user->person->organizations()->sync( $request->organizations );
                 // $user->organizations()->sync( $request->organizations );
@@ -219,15 +273,18 @@ class UserController extends Controller
             if( isset( $request->positions ) && is_array( $request->positions ) ){
                 $user->person->positions()->sync( $request->positions );
             }
+            if( isset( $request->countesies ) && !empty( $request->countesies ) ){
+                $user->person->countesies()->sync( $request->countesies );
+            }
             return response()->json([
-                'user' => $user ,
+                'record' => $user ,
                 'message' => 'កែប្រែព័ត៌មានរួចរាល់ !' ,
                 'ok' => true
             ], 200);
         }else{
             // អ្នកប្រើប្រាស់មិនមាន
             return response([
-                'user' => null ,
+                'record' => null ,
                 'message' => 'គណនីដែលអ្នកចង់កែប្រែព័ត៌មាន មិនមានឡើយ។' ,
                 'ok' => false
             ], 403);
@@ -292,6 +349,9 @@ class UserController extends Controller
     public function destroy(Request $request){
         $user = \App\Models\User::find($request->id) ;
         if( $user ){
+            if( $user->person != null ){
+                $user->person->delete();
+            }
             $user->active = 0 ;
             $user->deleted_at = \Carbon\Carbon::now() ;
             $user->save();

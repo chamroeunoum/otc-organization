@@ -22,6 +22,9 @@ class AttendantCheckTime extends Model
     public function checkout(){
         return $this->hasOne( \App\Models\Attendant\AttendantChecktime::class , 'parent_checktime_id' , 'id' );
     }
+    public function organization(){
+        return $this->belongsTo( \App\Models\Regulator\Tag\Organization::class , 'organization_id' , 'id' );
+    }
     /**
      * Check whether this holiday is the sunday
      */

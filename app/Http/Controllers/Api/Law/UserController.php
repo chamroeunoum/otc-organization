@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Law;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Notifications\Webapp\PasswordResetRequest;
+use App\Notifications\client\PasswordResetRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Models\User as RecordModel ;

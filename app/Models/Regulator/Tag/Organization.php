@@ -38,4 +38,7 @@ class Organization extends Tag
     public function meetings(){
         return $this->belongsToMany( Meeting::class , MeetingOrganization::class , 'organization_id' , 'meeting_id' );
     }
+    public function attendantChecktimes(){
+        return $this->hasMany( App\Models\Attendant\AttendantCheckTime::class,'organization_id','id');
+    }
 }

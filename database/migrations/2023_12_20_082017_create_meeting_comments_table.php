@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('meeting_comments', function (Blueprint $table) {
             $table->id();
             $table->integer('meeting_id')->comment('The id of meeting table');
-            $table->integer('people_id')->nullable(false)->comment('The id of regulator table');
+            $table->integer('people_id')->comment('The id of commentor table');
             $table->text('comment')->nullable(true)->comment('The comment of the meeting member');
             $table->text('pdfs')->nullable(true)->comment('The pdf file attached with the comment');
             $table->integer('created_by')->nullable(true)->comment("Creater of the record");

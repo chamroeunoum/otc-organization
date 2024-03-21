@@ -81,7 +81,7 @@ class PositionController extends Controller
         $root->parentId = null ;
 
         $responseData = $crud->pagination(true , $builder );
-        $responseData['records'] = $responseData['records']->prepend( $root );
+        $responseData['records'] = $responseData['records']; // ->prepend( $root );
         $responseData['records'] = $responseData['records']->map(function($organization){
             $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
             $organization['staffs'] = $org != null ? $org->organizationStaffs : [] ;

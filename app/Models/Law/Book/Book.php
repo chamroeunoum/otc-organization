@@ -86,7 +86,129 @@ class Book extends Model
     }
     public static function getContent($id){
         $book = Book::getBook($id,['id','title','cover','color','pdf'])->first();
-        foreach( $book->kunties AS $kunty ) return $kunty->chapters ;
+        if( $book->kunties()->count() ){
+            $book->kunties = $book->kunties->map(function($k){
+                $k->type = "kunty" ;
+                if( $k->matikas()->count() ){
+                    $k->matikas = $k->matikas->map(function($matika){
+                        $matika->type = "matika" ;
+                        $matika->chapters = $matika->chapters->map(function($c){
+                            $c->type = "chapter" ;
+                            $c->parts = $c->parts->map(function($p){
+                                $p->type = "part" ;
+                                $p->sections = $p->sections->map(function($s){
+                                    $s->type = "section" ;
+                                    // $s->matras;
+                                    return $s;
+                                });
+                                // $p->matras;
+                                return $p;
+                            });
+                            // $c->matras;
+                            return $c;
+                        }); 
+                        // $matika->matras;
+                        return $matika;
+                    });
+                }
+                if( $k->chapters()->count() ){
+                    $k->chapters = $k->chapters->map(function($c){
+                        $c->type = "chapter" ;
+                        $c->parts = $c->parts->map(function($p){
+                            $p->type = "part" ;
+                            $p->sections = $p->sections->map(function($s){
+                                $s->type = "section" ;
+                                // $s->matras;
+                                return $s;
+                            });
+                            // $p->matras;
+                            return $p;
+                        });
+                        // $c->matras;
+                        return $c;
+                    }); 
+                }
+                // $k->matras;
+                return $k;
+            });
+        }
+        if( $book->matikas()
+            ->where(function($query){
+                $query->whereNull('kunty_id')->orWhere('kunty_id',0);
+            })->count()
+        ){
+            $book->matikas = $book->matikas()
+            ->where(function($query){
+                $query->whereNull('kunty_id')->orWhere('kunty_id',0);
+            })->get()->map(function($matika){
+                $matika->type = "matika" ;
+                $matika->chapters = $matika->chapters->map(function($c){
+                    $c->type = "chapter" ;
+                    $c->parts = $c->parts->map(function($p){
+                        $p->type="part";
+                        $p->sections = $p->sections->map(function($s){
+                            $s->type="section";
+                            // $s->matras;
+                            return $s;
+                        });
+                        // $p->matras;
+                        return $p;
+                    });
+                    // $c->matras;
+                    return $c;
+                }); 
+                // $matika->matras;
+                return $matika;
+            });
+        }
+        if( $book->chapters()
+            ->where(function($query){
+                $query->whereNull('kunty_id')->orWhere('kunty_id',0);
+            })->where(function($query){
+                $query->whereNull('matika_id')->orWhere('matika_id',0);
+            })->count() 
+         ){
+            $book->chapters = $book->chapters()
+            ->where(function($query){
+                $query->whereNull('kunty_id')->orWhere('kunty_id',0);
+            })->where(function($query){
+                $query->whereNull('matika_id')->orWhere('matika_id',0);
+            })->get()->map(function($c){
+                $c->type = "chapter" ;
+                $c->parts = $c->parts->map(function($p){
+                    $p->type="part";
+                    $p->sections = $p->sections->map(function($s){
+                        $s->type="section";
+                        // $s->matras;
+                        return $s;
+                    });
+                    // $p->matras;
+                    return $p;
+                });
+                // $c->matras;
+                return $c;
+            });
+        }
+        // else if( $book->parts != null && $book->parts->isNotEmpty() ){
+        //     $book->parts = $book->parts->map(function($p){
+        //         $p->sections = $p->sections->map(function($s){
+        //             // $s->matras;
+        //             return $s;
+        //         });
+        //         // $p->matras;
+        //         return $p;
+        //     });
+        // }
+        // else if( $book->sections != null && $book->sections->isNotEmpty() ){
+        //     $book->sections = $book->sections->map(function($s){
+        //         // $s->matras;
+        //         return $s;
+        //     });
+        // }
+        // if( $book->matras != null && $book->matras->isNotEmpty() ){
+        //     $book->matras;
+        // }
+        return $book;
     }
     /*
     |--------------------------------------------------------------------------
@@ -100,22 +222,22 @@ class Book extends Model
         return $this->belongsTo(\App\Models\User::class,'updated_by');
     }
     public function kunties(){
-        return $this->hasMany(Kunty::class,'book_id');
+        return $this->hasMany(Kunty::class,'book_id','id');
     }
     public function matikas(){
-        return $this->hasMany(Matika::class,'book_id');
+        return $this->hasMany(Matika::class,'book_id','id');
     }
     public function chapters(){
-        return $this->hasMany(Chapter::class,'book_id');
+        return $this->hasMany(Chapter::class,'book_id','id');
     }
     public function parts(){
-        return $this->hasMany(Part::class,'book_id');
+        return $this->hasMany(Part::class,'book_id','id');
     }
     public function sections(){
-        return $this->hasMany(Section::class,'book_id');
+        return $this->hasMany(Section::class,'book_id','id');
     }
     public function matras(){
-        return $this->hasMany(Matra::class,'book_id');
+        return $this->hasMany(Matra::class,'book_id','id');
     }
     /*
     |--------------------------------------------------------------------------

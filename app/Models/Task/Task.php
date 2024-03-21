@@ -5,6 +5,9 @@ namespace App\Models\Task;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
+use App\Models\Task\TaskAssignment;
+use App\Models\Task\TaskComment;
+use App\Models\People\People;
 class Task extends Model
 {
     use SoftDeletes;
@@ -202,16 +205,46 @@ class Task extends Model
     }
 
     /**
-     * Get children
+     * Get children at first level of this record
      */
     public function children(){
         return $this->hasMany( Task::class , 'pid' , 'id' );
+    }
+    /**
+     * Get children of all level of this record
+     */
+    public function childrenAllLevels(){
+        return $this->hasMany( Task::class , 'tpid' , 'id' );
     }
     /**
      * Get parent
      */
     public function ancestor(){
         return $this->belongsTo( Task::class , 'pid' , 'id' );
+    }
+    /**
+     * The assignees of the task
+     */
+    public function assignees(){
+        return $this->belongsToMany( People::class, 'task_assignments', 'task_id', 'assignee_id');
+    }
+    /**
+     * The assignors of the task
+     */
+    public function assignors(){
+        return $this->belongsToMany( People::class, 'task_assignments', 'task_id', 'assignor_id');
+    }
+    /**
+     * The Task assignments
+     */
+    public function assignments(){
+        return $this->hasMany( TaskAssignment::class , 'task_id' , 'id' );
+    }
+    /**
+     * The Task comments
+     */
+    public function comments(){
+        return $this->hasMany( TaskComment::class , 'task_id' , 'id' );
     }
     
 }

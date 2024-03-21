@@ -19,7 +19,8 @@ return [
         // 'api/*' ,
         // , 'sanctum/csrf-cookie'
         'api/admin/*' ,
-        'api/webapp/*' ,
+        'api/attendant/*' ,
+        'api/client/*' ,
         'api/mobile/*' ,
         'api/meeting/*'
     ],

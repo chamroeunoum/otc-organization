@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications\Webapp;
+namespace App\Notifications\client;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;

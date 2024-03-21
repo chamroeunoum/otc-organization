@@ -29,6 +29,11 @@ Route::group([
     Route::post('checkout/finger',[AttendantController::class,'fingerCheckout']);
     Route::post('checkout/finger',[AttendantController::class,'finterCheckout']);
     /**
+     * Check in & Check out within the staff ID
+     */
+    Route::post('checkin/staffid',[AttendantController::class,'staffCheckin']);
+    Route::post('checkout/staffid',[AttendantController::class,'staffCheckout']);
+    /**
      * Get the attendants of user
      */
     Route::get('{date}/month/{userId}/user',[AttendantController::class,'userAttendants']);

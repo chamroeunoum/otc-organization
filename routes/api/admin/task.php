@@ -35,6 +35,10 @@ Route::group([
     Route::delete('{id}/delete',[TaskController::class,'delete'])->name("taskDelete");
 
     /**
+     * Toggle Assignee
+     */
+    Route::put('toggle/assignee',[TaskController::class,'toggleAssignee'])->name("toggleAssignee");
+    /**
      * Activate, Deactivate account
      */
     Route::put('activate',[TaskController::class,'activate'])->name('taskActivate');

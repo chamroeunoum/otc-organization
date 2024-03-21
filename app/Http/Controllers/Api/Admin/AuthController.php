@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Notifications\Webapp\SignupActivate;
+use App\Notifications\client\SignupActivate;
 use App\Http\Controllers\Controller;
 use Avatar;
 use Storage;
@@ -121,6 +121,26 @@ class AuthController extends Controller
         $user = $request->user();
 
         /**
+         * Update some information to keep track the user authentiation
+         */
+        $user->update(
+            [
+                'login_count' => intval( $user->login_count ) + 1 ,
+                'last_login' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                'ip' => // if user from the share internet   
+                !empty($_SERVER['HTTP_CLIENT_IP'])
+                    ? $_SERVER['HTTP_CLIENT_IP']
+                    : ( 
+                        //if user is from the proxy   
+                        !empty($_SERVER['HTTP_X_FORWARDED_FOR'])
+                            ? $_SERVER['HTTP_X_FORWARDED_FOR']
+                            //if user is from the remote address
+                            : $_SERVER['REMOTE_ADDR']
+                    )
+            ]
+        );
+
+        /**
          * Check disability
          */
         if( $user->active <= 0 ) {
@@ -185,6 +205,24 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        /**
+         * Update some information to keep track the user authentiation
+         */
+        $request->user()->update(
+            [
+                'last_logout' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                'ip' => // if user from the share internet   
+                !empty($_SERVER['HTTP_CLIENT_IP'])
+                    ? $_SERVER['HTTP_CLIENT_IP']
+                    : ( 
+                        //if user is from the proxy   
+                        !empty($_SERVER['HTTP_X_FORWARDED_FOR'])
+                            ? $_SERVER['HTTP_X_FORWARDED_FOR']
+                            //if user is from the remote address
+                            : $_SERVER['REMOTE_ADDR']
+                    )
+            ]
+        );
         $request->user()->token()->revoke();
         return response()->json([
             'message' => 'អ្នកបានចាកចេញដោយជោគជ័យ !'

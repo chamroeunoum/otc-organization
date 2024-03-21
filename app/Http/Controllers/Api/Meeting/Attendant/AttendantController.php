@@ -189,7 +189,7 @@ class AttendantController extends Controller
     /**
      * Checkin with timeslot
      */
-    public function systemCheckin(Request $request){
+    public function authenticatedCheckin(Request $request){
         $user = \Auth::user();
         
         if( $user == null ){
@@ -255,7 +255,7 @@ class AttendantController extends Controller
     /**
      * Checkout with timeslot
      */
-    public function systemCheckout(Request $request){
+    public function authenticatedCheckout(Request $request){
         $user = \Auth::user();
         
         if( $user == null ){

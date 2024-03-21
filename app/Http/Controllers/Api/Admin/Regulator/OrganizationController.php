@@ -24,8 +24,8 @@ class OrganizationController extends Controller
     public function index(Request $request){
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
-        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
-        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? intval( $request->perPage ) : 50 ;
+        $page = isset( $request->page ) && $request->page !== "" ? intval( $request->page ) : 1 ;
         $id = intval( $request->id ) > 0 ? intval( $request->id ) : 164 ; // 164 ទីស្ដីការគៈណរដ្ឋនមន្ត្រី
         $root = $id > 0 
             ? RecordModel::where('id',$id)->first()
@@ -77,29 +77,62 @@ class OrganizationController extends Controller
         $request->merge( $queryString );
 
         $crud = new CrudController(new RecordModel(), $request, $this->fields , false , $this->renameFields );
+
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            'leader' => [ 
+                'id' , 'firstname' , 'lastname' , 'image' 
+                , 'organizations' => [ 'id' , 'name', 'desp' ]
+                , 'positions' => [ 'id' , 'name', 'desp' ]
+                , 'countesies' => [ 'id' , 'name', 'desp' ]
+            ] ,
+            'staffs' => [ 
+                'id' , 'firstname' , 'lastname' , 'image' 
+                , 'organizations' => [ 'id' , 'name', 'desp' ]
+                , 'positions' => [ 'id' , 'name', 'desp' ]
+                , 'countesies' => [ 'id' , 'name', 'desp' ]
+            ]
+        ]);
+
         $builder = $crud->getListBuilder();
         
         $builder = $builder->where('tpid', "LIKE" , ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%");
         $root->parentId = null ;
 
-        $responseData = $crud->pagination(true , $builder );
-        $responseData['records'] = $responseData['records']->prepend( $root );
-        $responseData['records'] = $responseData['records']->map(function($organization){
-            $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
-            $organization['staffs'] = $org != null ? $org->staffs->map(function($staff){
-                $staff->organizations;
-                $staff->positions;
-                $staff->countesies;
-                return $staff ;
-            }) : [] ;
-            $organization['leader'] = $org != null ? $org->leader->map(function($leader){
+        $root->leader = $root->leader != null
+            ? $root->leader->map(function($leader){
                 $leader->organizations;
                 $leader->positions;
                 $leader->countesies;
                 return $leader ;
             }) : [] ;
-            return $organization;
-        });
+
+        $root->staffs = $root->staffs != null
+        ? $root->staffs->map(function($staff){
+            $staff->organizations;
+            $staff->positions;
+            $staff->countesies;
+            return $staff ;
+        }) : [] ;
+
+        $responseData = $crud->pagination(true , $builder );
+        $responseData['records'] = $responseData['records']->prepend( $root );
+        // $responseData['records'] = $responseData['records']->map(function($organization){
+        //     $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
+        //     $organization['staffs'] = $org != null ? $org->staffs->map(function($staff){
+        //         $staff->organizations;
+        //         $staff->positions;
+        //         $staff->countesies;
+        //         return $staff ;
+        //     }) : [] ;
+        //     $organization['leader'] = $org != null ? $org->leader->map(function($leader){
+        //         $leader->organizations;
+        //         $leader->positions;
+        //         $leader->countesies;
+        //         return $leader ;
+        //     }) : [] ;
+        //     return $organization;
+        // });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
@@ -158,6 +191,26 @@ class OrganizationController extends Controller
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
+    }
+    public function read(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់។'
+            ],201);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'មិនមានព័ត៌មាននេះឡើយ។'
+            ],201);
+        }
+        return response()->json([
+            'record' => $record ,
+            'ok' => true ,
+            'message' => 'រួចរាល់'
+        ],200);
     }
     /**
      * Create an account

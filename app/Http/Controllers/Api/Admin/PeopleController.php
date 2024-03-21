@@ -38,7 +38,7 @@ class PeopleController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-
+        
         $queryString = [
             // "where" => [
             //     'default' => [
@@ -117,20 +117,136 @@ class PeopleController extends Controller
             "countesies" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
             "organizations" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
             "positions" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
-            'user' => [ 'id' , 'username' , 'phone' , 'email' ]
+            'user' => [ 'id' , 'username' , 'phone' , 'email' , 'avatar_url' , 'firstname' , 'lastname' ]
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
 
         $responseData = $crud->pagination(true, $builder);
-        // $responseData['records'] = $responseData['records']->map(function($user){
-        //     $people = $user['person']['id'] > 0 ? \App\Models\People\People::find( $user['person']['id'] ) : null ;
-        //     if( $people != null ){
-        //         $user['person']['organizations'] = $people->organizations;
-        //         $user['person']['positions'] = $people->positions;
-        //     }
-        //     return $user;
-        // });
+        $responseData['records'] = $responseData['records']->map(function($people){
+            $people['image'] = $people['image'] != null && \Storage::disk('public')->exists( $people['image'] )
+                ? \Storage::disk('public')->url( $people['image'] )
+                : (
+                    isset( $people['user'] ) && $people['user']['avatar_url'] != null && \Storage::disk('public')->exists( $people['user']['avatar_url'] )
+                    ? \Storage::disk('public')->url( $people['user']['avatar_url'] )
+                    : false
+                );
+            return $people;
+        });
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        return response()->json($responseData, 200);
+    }
+    /**
+     * Read people without any conditions
+     */
+    public function getPeopleByIds(Request $request){
+        /** Format from query string */
+        $ids = isset( $request->ids ) && $request->ids !== "" && strlen( $request->ids ) > 0 ? explode( ',' , $request->ids ) : false ;
+        if( !is_array( $ids ) && empty( $ids ) ){
+            return response()->json([
+                'message' => 'សូមបញ្ជាក់លេខសម្គាល់។'
+            ],500);
+        }
+        $queryString = [
+            "where" => [
+                // 'default' => [
+                //     [
+                //         'field' => 'type_id' ,
+                //         'value' => $type === false ? "" : $type
+                //     ]
+                // ],
+                'in' => [
+                    is_array( $ids )
+                        ? [
+                            'field' => 'id' ,
+                            'value' => $ids
+                        ] : []
+                ] ,
+                // 'not' => [] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'number' ,
+                //         'value' => $number === false ? "" : $number
+                //     ],
+                //     [
+                //         'field' => 'year' ,
+                //         'value' => $date === false ? "" : $date
+                //     ]
+                // ] ,
+            ] ,
+            // "pivots" => [
+            //     $unit ?
+            //     [
+            //         "relationship" => 'units',
+            //         "where" => [
+            //             "in" => [
+            //                 "field" => "id",
+            //                 "value" => [$request->unit]
+            //             ],
+            //         // "not"=> [
+            //         //     [
+            //         //         "field" => 'fieldName' ,
+            //         //         "value"=> 'value'
+            //         //     ]
+            //         // ],
+            //         // "like"=>  [
+            //         //     [
+            //         //        "field"=> 'fieldName' ,
+            //         //        "value"=> 'value'
+            //         //     ]
+            //         // ]
+            //         ]
+            //     ]
+            //     : []
+            // ],
+            "pagination" => [
+                'perPage' => 20,
+                'page' => 1
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'firstname' ,
+                    'lastname' ,
+                    'dob' ,
+                    'mobile_phone' ,
+                    'office_phone' ,
+                    'email',
+                    'nid'
+                ]
+            ],
+            "order" => [
+                'field' => 'id' ,
+                'by' => 'desc'
+            ],
+        ];
+
+        $request->merge( $queryString );
+
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+        $crud->setRelationshipFunctions([
+            "countesies" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
+            "organizations" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
+            "positions" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
+            'user' => [ 'id' , 'username' , 'phone' , 'email' , 'avatar_url' ]
+        ]);
+
+        $builder = $crud->getListBuilder()
+        ->whereNull('deleted_at')
+        ->whereIn('id', $ids );
+
+        $responseData = $crud->pagination(true, $builder);
+        $responseData['records'] = $responseData['records']->map(function($people){
+            $people['image'] = $people['image'] != null && \Storage::disk('public')->exists( $people['image'] )
+                ? \Storage::disk('public')->url( $people['image'] )
+                : (
+                    $people['user']['avatar_url'] != null && \Storage::disk('public')->exists( $people['user']['avatar_url'] )
+                    ? \Storage::disk('public')->url( $people['user']['avatar_url'] )
+                    : false
+                );
+            return $people;
+        });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
@@ -146,7 +262,7 @@ class PeopleController extends Controller
                 'user' => $user ,
                 'message' => 'គណនី '.$user->name.' មានក្នុងប្រព័ន្ធរួចហើយ ។' . (
                     $user->active ? " ហើយកំពុងបើកដំណើរការជាធម្មតា !" : " កំពុងត្រូវបានបិទដំណើរការ !"
-                )],201
+                )],500
             );
         }else{
             // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
@@ -154,26 +270,42 @@ class PeopleController extends Controller
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
                 'email' => $request->email,
-                'active' => $request->active == true || $request->active == 1 ? 1 : 0 ,
-                'password' => bcrypt($request->password) ,
-                'phone' => $request->phone ,
-                'username' => $request->username
+                'username' => $request->email,
+                'active' => 0 ,
+                'phone' => $request->mobile_phone ,
+                'password' => bcrypt( 
+                    $request->mobile_phone != null && strlen( $request->mobile_phone ) > 0 ? $request->mobile_phone : '123456'
+                ),
             ]);
+
 
             /**
              * Create detail information of the owner of the account
              */
             $person = \App\Models\People\People::create([
-                'firstname' => $user->firstname , 
-                'lastname' => $user->lastname , 
-                'gender' => $user->gender , 
-                'dob' => $user->dob , 
-                'mobile_phone' => $user->mobile_phone , 
-                'email' => $user->email , 
-                'image' => $user->avatar_url , 
+                'firstname' => $request->firstname , 
+                'lastname' => $request->lastname , 
+                'gender' => $request->gender , 
+                'dob' => $request->dob , 
+                'nid' => $request->nid , 
+                'marry_status' => $request->marry_status , 
+                'mobile_phone' => $request->mobile_phone , 
+                'office_phone' => $request->office_phone , 
+                'email' => $request->email
             ]);
             $user->people_id = $person->id ;
             $user->save();
+
+            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
+                $user->person->organizations()->sync( $request->organizations );
+            }
+            if( isset( $request->positions ) && !empty( $request->positions ) ){
+                $user->person->positions()->sync( $request->positions );
+            }
+
+            if( isset( $request->countesies ) && !empty( $request->countesies ) ){
+                $user->person->countesies()->sync( $request->countesies );
+            }
 
             /**
              * Assign role
@@ -185,25 +317,23 @@ class PeopleController extends Controller
             
             $user->save();
 
-            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
-                $user->person->organizations()->sync( $request->organizations );
-            }
-            if( isset( $request->positions ) && !empty( $request->positions ) ){
-                $user->person->positions()->sync( $request->positions );
-            }
-
             if( $user ){
-                
+                $person->user ;
+                $person->organizations;
+                $person->countesies;
+                $person->positions;
                 return response()->json([
-                    'user' => \App\Models\User::find( $user->id ) ,
+                    'record' => $person ,
+                    'ok' => true ,
                     'message' => 'គណនីបង្កើតបានជោគជ័យ !'
                 ], 200);
 
             }else {
                 return response()->json([
-                    'user' => null ,
+                    'record' => null ,
+                    'ok' => false ,
                     'message' => 'បរាជ័យក្នុងការបង្កើតគណនី !'
-                ], 201);
+                ], 500);
             }
         }
     }
@@ -220,17 +350,18 @@ class PeopleController extends Controller
             'gender' => intval($request->gender) >= 0 ? $request->gender :  1 ,
             'email' => $request->email ,
             'dob' => $request->dob ,
+            'nid' => $request->nid ,
             'mobile_phone' => $request->mobile_phone ,
             'office_phone' => $request->office_phone ,
             'marry_status' => $request->marry_status != null && $request->marry_status != '' ? $request->marry_status : 'single'
         ]) == true ){;
-            if( isset( $request->organizations ) && is_array( $request->organizations ) ){
+            if( isset( $request->organizations ) && is_array( $request->organizations ) && $person->organizations != null ){
                 $person->organizations()->sync( $request->organizations );
             }
-            if( isset( $request->positions ) && is_array( $request->positions ) ){
+            if( isset( $request->positions ) && is_array( $request->positions ) && $person->positions != null ){
                 $person->positions()->sync( $request->positions );
             }
-            if( isset( $request->countesies ) && is_array( $request->countesies ) ){
+            if( isset( $request->countesies ) && is_array( $request->countesies && $person->countesies != null  ) ){
                 $person->countesies()->sync( $request->countesies );
             }
             return response()->json([
@@ -278,16 +409,18 @@ class PeopleController extends Controller
      * Function delete an account
      */
     public function destroy(Request $request){
-        $user = RecordModel::find($request->id) ;
-        if( $user ){
-            $user->active = 0 ;
-            $user->deleted_at = \Carbon\Carbon::now() ;
-            $user->save();
+        $people = RecordModel::find($request->id) ;
+        if( $people ){
+            if( $people->user != null ){
+                $people->user->delete();
+            }
+            $people->deleted_at = \Carbon\Carbon::now() ;
+            $people->save();
             // User does exists
             return response([
                 'ok' => true ,
-                'user' => $user ,
-                'message' => 'គណនី '.$user->name.' បានលុបដោយជោគជ័យ !' ,
+                'user' => $people ,
+                'message' => 'គណនី '.$people->lastname . ' ' . $people->firstname .' បានលុបដោយជោគជ័យ !' ,
                 'ok' => true 
                 ],
                 200

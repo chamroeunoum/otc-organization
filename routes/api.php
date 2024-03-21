@@ -38,7 +38,23 @@ Route::group([
   Route::put('update',[ErrorDetailsController::class,'update']);
 });
 
-require('api/webapp.php');
+/**
+ * API for the adimnistrator of the core system
+ */
 require('api/admin.php');
+/**
+ * API for public client
+ */
+require('api/client.php');
+/**
+ * API for meeting module
+ */
 require('api/meeting.php');
+/**
+ * Api for isolated attendant system
+ */
+require('api/attendant.php');
+/**
+ * API for Details of the regulator
+ */
 require('api/law.php');

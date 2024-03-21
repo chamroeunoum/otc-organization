@@ -9,7 +9,7 @@ use App\Http\Controllers\CrudController;
 
 class TaskController extends Controller
 {
-    private $selectedFields = ['id', 'objective','minutes', 'start', 'end', 'amount', 'amount_type','created_at','created_by','status','exchange_rate'];
+    private $selectedFields = ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'];
     /** Get a list of Archives */
     public function index(Request $request){
 
@@ -31,22 +31,22 @@ class TaskController extends Controller
 
 
         $queryString = [
-            "where" => [
-                'default' => [
-                    [
-                        'field' => 'created_by' ,
-                        'value' => $user->id
-                    ]
-                ],
-                // 'in' => [] ,
-                // 'not' => [] ,
-                // 'like' => [
-                //     [
-                //         'field' => 'objective' ,
-                //         'value' => $search
-                //     ]
-                // ] ,
-            ] ,
+            // "where" => [
+            //     // 'default' => [
+            //     //     [
+            //     //         'field' => 'created_by' ,
+            //     //         'value' => $user->id
+            //     //     ]
+            //     // ],
+            //     // 'in' => [] ,
+            //     // 'not' => [] ,
+            //     // 'like' => [
+            //     //     [
+            //     //         'field' => 'objective' ,
+            //     //         'value' => $search
+            //     //     ]
+            //     // ] ,
+            // ] ,
             // "pivots" => [
             //     $unit ?
             //     [
@@ -93,11 +93,19 @@ class TaskController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
         $crud->setRelationshipFunctions([
             /** relationship objective => [ array of fields objective to be selected ] */
-            'creator' => ['id', 'firstobjective', 'lastobjective' ,'userobjective'] 
+            'creator' => ['id', 'firstname', 'lastname' ,'phone', 'avatar_url' ]  ,
+            'ancestor' => ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'] ,
+            'children' => ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'] ,
+            'childrenAllLevels' => ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'] ,
+            'assignees' => ['id', 'firstname', 'lastname' ,'phone', 'image' ] ,
+            'assignors' => ['id', 'firstname', 'lastname' ,'phone', 'image' ] 
         ]);
         $builder = $crud->getListBuilder();
-
-        $builder->whereNull('pid');
+        $builder->where('created_by',$user->id)
+        ->orWhereHas('assignees',function($query) use($user) {
+            $query->whereIn('assignee_id',[$user->id]);
+        });
+        
 
         /** Filter the record by the user role */
         // if( ( $user = $request->user() ) !== null ){
@@ -112,8 +120,41 @@ class TaskController extends Controller
         // }
 
         $responseData = $crud->pagination(true, $builder);
+        $responseData['records'] = $responseData['records']->map(function($task){
+            $task['creator']['avatar_url'] = ( $task['creator']['avatar_url'] != null && $task['creator']['avatar_url'] != "" && \Storage::disk( 'public' )->exists( $task['creator']['avatar_url'] ) )
+                ? \Storage::disk('public')->url( $task['creator']['avatar_url'] ) 
+                : null ;
+            return $task ;
+        });
         $responseData['message'] = __("crud.read.success");
         return response()->json($responseData, 200);
+    }
+    public function getAssignees(Request $request){
+        $task = intval( $request->id ) > 0 ? RecordModel::find( $request->id ) : false ;
+        if( $task === false ){
+            return response()->json(['message'=>'សូមបញ្ជាក់លេខសម្គាល់។'],500);
+        }
+        if( $task === null ){
+            return response()->json(['message'=>'មិនមានកិច្ចការនេះឡើយ។'],500);
+        }
+        $task->assignees = $task->assignees->map(function( $assignee ){
+            $assignee->image = $assignee->image != null && \Storage::disk('public')->exists( $assignee->image )
+                ? \Storage::disk('public')->url( $assignee->image )
+                : (
+                    $assignee->user->avatar_url != null && \Storage::disk('public')->exists( $assignee->user->avatar_url )
+                    ? \Storage::disk('public')->url( $assignee->user->avatar_url )
+                    : "No"
+                );
+            $assignee->countesies;
+            $assignee->organizations;
+            $assignee->positions;
+            return $assignee; 
+        });
+        return response()->json([
+            'records' => $task->assignees ,
+            'ok' => true ,
+            'message'=>'រួចរាល់'
+        ],200);
     }
     /** Create a new Archive */
     public function create(Request $request){
@@ -134,10 +175,8 @@ class TaskController extends Controller
             'objective' => $request->objective ,
             'minutes' => $request->minutes ,
             'created_by' => $user->id ,
-            // 'amount' => $request->amount ,
-            // 'amount_type' => $request->amount_type ,
-            // 'exchange_rate' => $request->exchange_rate
-            'pid' => $parent != null && $parent->id > 0 ? $parent->id : 0
+            'pid' => $parent != null && $parent->id > 0 ? $parent->id : 0 ,
+            'tpid' => $parent != null && $parent->tpid > 0 ? $parent->tpid : 0
         ])) !== false) {
             /** Link the archive to the units */
             return response()->json([

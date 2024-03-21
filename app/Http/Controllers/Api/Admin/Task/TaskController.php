@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api\Admin\Task;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Task\Task AS RecordModel;
+use App\Models\Task\TaskAssignment;
 use Illuminate\Http\File;
 use App\Http\Controllers\CrudController;
 
 class TaskController extends Controller
 {
-    private $selectedFields = ['id', 'objective','minutes', 'start', 'end', 'amount', 'amount_type','created_at','created_by','status','exchange_rate'];
+    private $selectedFields = ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'];
     /** Get a list of Archives */
     public function index(Request $request){
 
@@ -82,7 +83,7 @@ class TaskController extends Controller
             "search" => $search === false ? [] : [
                 'value' => $search ,
                 'fields' => [
-                    'objective', 'start' , 'end' , 'amount'
+                    'objective', 'start' , 'end'
                 ]
             ],
             "order" => [
@@ -96,7 +97,12 @@ class TaskController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
         $crud->setRelationshipFunctions([
             /** relationship objective => [ array of fields objective to be selected ] */
-            'creator' => ['id', 'firstname', 'lastname' ,'phone', 'avatar_url' ] 
+            'creator' => ['id', 'firstname', 'lastname' ,'phone', 'avatar_url' ] ,
+            'assignees' => ['id', 'firstname', 'lastname' ,'phone', 'image' ] ,
+            'assignors' => ['id', 'firstname', 'lastname' ,'phone', 'image' ] ,
+            'ancestor' => ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'] ,
+            'children' => ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'] ,
+            'childrenAllLevels' => ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'] 
         ]);
         $builder = $crud->getListBuilder();
 
@@ -141,10 +147,8 @@ class TaskController extends Controller
             'objective' => $request->objective ,
             'minutes' => $request->minutes ,
             'created_by' => $user->id ,
-            'amount' => $request->amount?? 0 ,
-            'amount_type' => $request->amount_type?? 0 ,
-            'exchange_rate' => $request->exchange_rate?? 4000 ,
-            'pid' => $parent != null && $parent->id > 0 ? $parent->id : 0
+            'pid' => $parent != null && $parent->id > 0 ? $parent->id : 0 ,
+            'tpid' => $parent != null && $parent->tpid > 0 ? $parent->tpid : 0
         ])) !== false) {
             /** Link the archive to the units */
             return response()->json([
@@ -499,5 +503,91 @@ class TaskController extends Controller
             'record' => null,
             'message' => __("crud.auth.failed")
         ], 401);
+    }
+    public function toggleAssignee(Request $request){
+        $user = \Auth::user();
+        if( $user == null ){
+            return response()->json([
+                'message' => 'សូមចូលប្រើប្រាស់ជាមុនសិន។'
+            ],403);
+        }
+        if( intval( $request->task_id ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ចាក់លេខសម្គាល់ការងារ។'
+            ],500);
+        }
+        $task = RecordModel::find( $request->task_id );
+        if( $task == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'រកការងារមិនមានឡើយ។'
+            ],500);
+        }
+        if( intval( $request->assignee_id ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់លេខសម្គាល់សមាជិក។'
+            ],500);
+        }
+        $assignee = \App\Models\People\People::find( $request->assignee_id );
+        if( $assignee == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សមាជិកនេះមិនមានឡើយ។'
+            ],500);
+        }
+
+        /**
+         * Check the existen of the record with the same information
+         */
+        $taskAssignment = TaskAssignment::where([ 'task_id' => $task->id , 'assignee_id' => $assignee->id ])->first();
+        if( $taskAssignment == null ){
+            $assigneeInformation = [ 
+                $assignee->id => [
+                    'assignor_id' => $user->person->id ,
+                    'completion_percentage' => 0 ,
+                    'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                    'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                    'created_by' => $user->id ,
+                    'updated_by' => $user->id
+                ]
+            ];
+        }else{
+            $assigneeInformation = [ 
+                $assignee->id => [
+                    'completion_percentage' => 0 ,
+                    'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                    'updated_by' => $user->id
+                ]
+            ];
+        }
+
+        /**
+         * Remove the members of the meeting
+         */
+        $result = $task->assignees()->toggle( $assigneeInformation );
+        // foreach( $result['detached'] AS $index => $assigneeId ){
+        //     /**
+        //      * if There is something any class related to the assignments then work on it here
+        //      */
+            
+        // }
+
+        $task->assignees = $task->assignees->map(function( $assignee ){ 
+            $assignee->image = $assignee->image != null && \Storage::disk('public')->exists( $assignee->image )
+            ? \Storage::disk('public')->url( $assignee->image )
+            : (
+                $assignee->user->avatar_url != null && \Storage::disk('public')->exists( $assignee->user->avatar_url )
+                ? \Storage::disk('public')->url( $assignee->user->avatar_url )
+                : false
+            );
+            return $assignee; 
+        });
+        return response()->json([
+            'record' => $task ,
+            'ok' => true ,
+            'message' => 'ជោគជ័យ។'
+        ],200);
     }
 }

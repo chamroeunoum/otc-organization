@@ -23,6 +23,7 @@ class CreateTagsTable extends Migration
             $table->text('cids')->nullable(true)->comment('Children IDs will be store here.');
             $table->string('image',191)->nullable(true);
             $table->integer('record_index')->nullable()->comment('The index of the record');
+            $table->integer('active')->nullable()->comment('The activation of the record');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -549,7 +549,7 @@ class RegulatorController extends Controller
             'record' => $regulator ,
             'ok' => true ,
             'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
-        ],201);
+        ],200);
     }
 
     public function destroy(Request $request){

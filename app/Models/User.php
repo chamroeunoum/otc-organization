@@ -28,7 +28,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'firstname', 'lastname', 'email', 'password','phone', 'active', 'activation_token', 'avatar' , 'avatar_url' , 'username' 
+        'firstname', 'lastname', 'email', 'password','phone', 'active', 'activation_token', 'avatar' , 'avatar_url' , 'username' , 'login_count' , 'last_login' , 'last_logout' , 'ip' , 'mac_address' , 'authenip' , 'authy_id' , 'people_id'
     ];
 
     /**
@@ -90,10 +90,6 @@ class User extends Authenticatable
     public function userTimeslots(){
       return $this->hasMany( \App\Models\Attendant\UserTimeslot::class , 'user_id' , 'id' );
     }
-    public function organizations()
-    {
-        return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_people','people_id','organization_id');
-    }
     public function organizationLeader()
     {
         return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_leader','people_id','organization_id');
@@ -109,9 +105,6 @@ class User extends Authenticatable
     }
     public function favorites(){
       return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_favorites','people_id','regulator_id');
-    }
-    public function positions(){
-      return $this->belongsToMany('\App\Models\Regulator\Tag\Position','people_positions','people_id','position_id');
     }
     public function signatures(){
       return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','user_signatures','people_id','signature_id');

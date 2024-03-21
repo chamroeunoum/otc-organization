@@ -43,11 +43,11 @@ class Part extends Model
     */
     public function author()
     {
-        return $this->belongsTo(\App\User::class, 'created_by');
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
     public function editor()
     {
-        return $this->belongsTo(\App\User::class, 'updated_by');
+        return $this->belongsTo(\App\Models\User::class, 'updated_by');
     }
     public function book()
     {

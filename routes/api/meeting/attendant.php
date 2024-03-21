@@ -22,8 +22,8 @@ Route::group([
     /**
      * Check in & Check out within the system
      */
-    Route::post('checkin/system',[AttendantController::class,'systemCheckin']);
-    Route::post('checkout/system',[AttendantController::class,'systemCheckout']);
+    Route::post('checkin/system',[AttendantController::class,'authenticatedCheckin']);
+    Route::post('checkout/system',[AttendantController::class,'authenticatedCheckout']);
     /**
      * Check in & Check out with face reconigtion device
      */
