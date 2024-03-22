@@ -241,22 +241,22 @@ class DatabaseSeeder extends Seeder
         /**
          * Restart all tables with new incremental
          */
-        $schemaSequences = DB::select( 
-            DB::raw("
+        $schemaSequences = \DB::select( 
+            \DB::raw("
                 SELECT sequence_name, sequence_schema
                 FROM information_schema.sequences 
                 ORDER BY sequence_schema
             ")
         );
         foreach( $schemaSequences as $index => $schemaSequence ){
-            // $sequence = DB::select(
-            //     DB::raw('SELECT last_value FROM '.$schemaSequence->sequence_name.';')
+            // $sequence = \DB::select(
+            //     \DB::raw('SELECT last_value FROM '.$schemaSequence->sequence_name.';')
             // );
             if( !in_array( str_replace( '_id_seq' , '' , $schemaSequence->sequence_name ) , [ 
                 'migrations' , 'oauth_clients' , 'oauth_access_tokens' , 'oauth_auth_codes' , 'oauth_clients' , 'oauth_personal_access_clientsoauth_refresh_tokens'
             ]) ){
                 // DB::statement('ALTER SEQUENCE '.$schemaSequence->sequence_name.' RESTART WITH '.($sequence[0]->last_value).';');
-                DB::statement("SELECT SETVAL( '".$schemaSequence->sequence_name."' , (SELECT MAX(id) FROM ".str_replace('_id_seq','',$schemaSequence->sequence_name).") , true );");
+                \DB::statement("SELECT SETVAL( '".$schemaSequence->sequence_name."' , (SELECT MAX(id) FROM ".str_replace('_id_seq','',$schemaSequence->sequence_name).") , true );");
                 echo $index . " : SET SEQUENCE VALUE TO '" . $schemaSequence->sequence_name . PHP_EOL;
             }
         }
@@ -267,7 +267,7 @@ class DatabaseSeeder extends Seeder
          * Seeding all the tables
          */
         $schemas = array_filter( DB::select( 
-            DB::raw(" SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name ; ")
+            \DB::raw(" SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name ; ")
         ) , function($table){
             if( \DB::table( $table->table_name )->count() 
                 && !in_array( $table->table_name , [ 
