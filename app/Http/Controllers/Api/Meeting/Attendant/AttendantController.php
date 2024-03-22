@@ -294,7 +294,7 @@ class AttendantController extends Controller
             ]);
         }
 
-        $checktimeIn = \App\Models\Attendant\AttendantChecktime::find( $request->checktime_id );
+        $checktimeIn = \App\Models\Attendant\AttendantCheckTime::find( $request->checktime_id );
 
         if( $checktimeIn == null ){
             return response()->json([
