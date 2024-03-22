@@ -166,7 +166,7 @@ class AuthController extends Controller
             // Retreive all the roles that authenticated user has
             $user->roles->pluck('id')->toArray() 
             // Retreive allowed roles
-            , \App\Models\Role::backend()->pluck('id')->toArray()->push(1) ) 
+            , \App\Models\Role::backend()->pluck('id')->push(1)->toArray() ) 
             ) 
         ){
             /**
