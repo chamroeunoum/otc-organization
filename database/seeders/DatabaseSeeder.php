@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $chamroeunoum->people_id = $people->id ;
         $chamroeunoum->save();
-        $chamroeunoum->assignRole( $supser );
+        $chamroeunoum->assignRole( $super );
 
         /**
          * Create admin user for development purpose
