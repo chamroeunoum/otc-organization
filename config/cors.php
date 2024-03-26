@@ -30,7 +30,7 @@ return [
     ],
 
     'allowed_origins' => [ 
-        // '*'
+        '*' ,
         env("ADMIN_URL", "http://127.0.0.1:3000" ) ,
         env("CLIENT_URL", "http://127.0.0.1:3001" ),
         env("MEETING_URL", "http://127.0.0.1:3002" ),
@@ -39,9 +39,7 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => [
-        '*'
-    ],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 
