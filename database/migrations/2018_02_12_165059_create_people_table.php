@@ -15,7 +15,6 @@ class CreatePeopleTable extends Migration {
 		Schema::create('people', function(Blueprint $table)
 		{
 			$table->integer('id', true);
-			$table->integer('countesy_id')->nullable();
 			$table->string('firstname', 50);
 			$table->string('lastname', 191);
 			$table->integer('gender')->nullable()->comment('0 is Female');
@@ -28,6 +27,7 @@ class CreatePeopleTable extends Migration {
 			$table->string('marry_status', 191)->nullable();
 			$table->string('father', 191)->nullable();
 			$table->string('mother', 191)->nullable();
+			$table->string('model', 191)->nullable()->comment('The model path that differentiate the row data');
 			$table->timestamps();
 			$table->string('deleted_at', 191)->nullable();
 			$table->string('created_by', 191)->nullable();
