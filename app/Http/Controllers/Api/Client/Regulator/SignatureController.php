@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\client\Regulator;
+namespace App\Http\Controllers\Api\Client\Regulator;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

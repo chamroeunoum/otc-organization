@@ -33,7 +33,7 @@ class RegulatorFolder extends Model
     |--------------------------------------------------------------------------
     */
     public function folders(){
-        return $this->belongsToMany('\App\Models\Folder','id','folder_id');
+        return $this->belongsToMany('\App\Models\Folder\Folder','id','folder_id');
     }
     public function regulator(){
         return $this->hasOne('\App\Models\Regulator','id','regulator_id');

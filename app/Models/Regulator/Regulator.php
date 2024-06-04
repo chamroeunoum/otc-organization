@@ -32,7 +32,7 @@ class Regulator extends Model
     */
 
     public function folders(){
-      return $this->belongsToMany('\App\Models\Regulator\Folder','regulator_folders','regulator_id','folder_id');
+      return $this->belongsToMany('\App\Models\Folder\Folder','regulator_folders','regulator_id','folder_id');
     }
     public function favorites(){
       return $this->belongsToMany('\App\Models\Regulator\Favorite','regulator_favorites','regulator_id','user_id');

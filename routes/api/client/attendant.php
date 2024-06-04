@@ -1,5 +1,5 @@
 <?php 
-use App\Http\Controllers\Api\client\Attendant\AttendantController;
+use App\Http\Controllers\Api\Client\Attendant\AttendantController;
 /** Task SECTION */
 Route::group([
   'prefix' => 'attendants' ,

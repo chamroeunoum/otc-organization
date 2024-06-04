@@ -87,16 +87,16 @@ class Book extends Model
     public static function getContent($id){
         $book = Book::getBook($id,['id','title','cover','color','pdf'])->first();
         if( $book->kunties()->count() ){
-            $book->kunties = $book->kunties->map(function($k){
+            $book->kunties = $book->kunties()->select(['id','number','title'])->get()->map(function($k){
                 $k->type = "kunty" ;
                 if( $k->matikas()->count() ){
-                    $k->matikas = $k->matikas->map(function($matika){
+                    $k->matikas = $k->matikas()->select(['id','number','title'])->get()->map(function($matika){
                         $matika->type = "matika" ;
-                        $matika->chapters = $matika->chapters->map(function($c){
+                        $matika->chapters = $matika->chapters()->select(['id','number','title'])->get()->map(function($c){
                             $c->type = "chapter" ;
-                            $c->parts = $c->parts->map(function($p){
+                            $c->parts = $c->parts()->select(['id','number','title'])->get()->map(function($p){
                                 $p->type = "part" ;
-                                $p->sections = $p->sections->map(function($s){
+                                $p->sections = $p->sections()->select(['id','number','title'])->get()->map(function($s){
                                     $s->type = "section" ;
                                     // $s->matras;
                                     return $s;
@@ -112,11 +112,11 @@ class Book extends Model
                     });
                 }
                 if( $k->chapters()->count() ){
-                    $k->chapters = $k->chapters->map(function($c){
+                    $k->chapters = $k->chapters()->select(['id','number','title'])->get()->map(function($c){
                         $c->type = "chapter" ;
-                        $c->parts = $c->parts->map(function($p){
+                        $c->parts = $c->parts()->select(['id','number','title'])->get()->map(function($p){
                             $p->type = "part" ;
-                            $p->sections = $p->sections->map(function($s){
+                            $p->sections = $p->sections()->select(['id','number','title'])->get()->map(function($s){
                                 $s->type = "section" ;
                                 // $s->matras;
                                 return $s;
@@ -140,13 +140,13 @@ class Book extends Model
             $book->matikas = $book->matikas()
             ->where(function($query){
                 $query->whereNull('kunty_id')->orWhere('kunty_id',0);
-            })->get()->map(function($matika){
+            })->select(['id','number','title'])->get()->map(function($matika){
                 $matika->type = "matika" ;
-                $matika->chapters = $matika->chapters->map(function($c){
+                $matika->chapters = $matika->chapters()->select(['id','number','title'])->get()->map(function($c){
                     $c->type = "chapter" ;
-                    $c->parts = $c->parts->map(function($p){
+                    $c->parts = $c->parts()->select(['id','number','title'])->get()->map(function($p){
                         $p->type="part";
-                        $p->sections = $p->sections->map(function($s){
+                        $p->sections = $p->sections()->select(['id','number','title'])->get()->map(function($s){
                             $s->type="section";
                             // $s->matras;
                             return $s;
@@ -173,7 +173,7 @@ class Book extends Model
                 $query->whereNull('kunty_id')->orWhere('kunty_id',0);
             })->where(function($query){
                 $query->whereNull('matika_id')->orWhere('matika_id',0);
-            })->get()->map(function($c){
+            })->select(['id','number','title'])->get()->map(function($c){
                 $c->type = "chapter" ;
                 $c->parts = $c->parts->map(function($p){
                     $p->type="part";

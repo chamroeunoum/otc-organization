@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\client;
+namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Notifications\client\SignupActivate;
+use App\Notifications\Client\SignupActivate;
 use Illuminate\Support\Str;
 use Avatar;
 use Illuminate\Http\File;
@@ -60,7 +60,7 @@ class AuthController extends Controller
             'lastname' => $user->lastname , 
             'gender' => $user->gender , 
             'dob' => $user->dob , 
-            'mobile_phone' => $user->mobile_phone , 
+            'mobile_phone' => $user->phone , 
             'email' => $user->email , 
             'image' => $user->avatar_url , 
         ]);
@@ -70,7 +70,7 @@ class AuthController extends Controller
         /**
          * Assign role to user
          */
-        $clientClientRole = \App\Models\Role::where('name','Client')->first();
+        $clientClientRole = \App\Models\Role::client()->first();
         if( $clientClientRole != null ){
             $user->assignRole( $clientClientRole );
         }
@@ -164,11 +164,12 @@ class AuthController extends Controller
          * Check roles
          * Allow backend and client member to be logged in
          */
-        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','client')->orWhere('tag','core_service')->pluck('id')->toArray() ) ) ){
+        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::client()->pluck('id')->toArray() ) ) ){
             /**
              * User seem does not have any right to login into backend / core service
              */
             return response()->json([
+                'user' => $user ,
                 'message' => "គណនីនេះមិនមានសិទ្ធិគ្រប់គ្រាន់។"
             ],403);
         }

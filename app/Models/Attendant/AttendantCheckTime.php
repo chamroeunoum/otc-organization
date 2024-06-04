@@ -51,4 +51,5 @@ class AttendantCheckTime extends Model
         }
         return null ;
     }
+    
 }

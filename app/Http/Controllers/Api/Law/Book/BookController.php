@@ -436,8 +436,40 @@ class BookController extends Controller
             // ]);
             if (($record = $crud->read()) !== false) {
                 // $record = $crud->formatRecord($record);
+                // Enable search
+                $search = isset( $request->search ) 
+                    ? (
+                        strlen( trim( $request->search ) ) > 0
+                            ?  trim( $request->search )
+                            : false
+                    )
+                    : false ;
+                $searchTerms = $search != false ? explode( ' ' , $search ) : [] ;
+
+                $queryBuilder = $record->matras();
+                foreach( $searchTerms as $key => $term ){
+                    strlen( $term ) > 0 
+                        ? (
+                            $key > 0
+                            ? $queryBuilder->orWhere(function($query) use( $term ) {
+                                $query->where('title', 'LIKE', "%" . $term . "%" ) 
+                                ->orWhere('meaning', 'LIKE', "%" . $term . "%" ) 
+                                ->orWhere('number', 'LIKE', "%" . $term . "%" ) ;
+                            })
+                            : $queryBuilder->where(function($query) use( $term ) {
+                                $query->where('title', 'LIKE', "%" . $term . "%" ) 
+                                ->orWhere('meaning', 'LIKE', "%" . $term . "%" ) 
+                                ->orWhere('number', 'LIKE', "%" . $term . "%" ) ;
+                            })
+                        )
+                        : false ;
+                }
+
                 return response()->json([
-                    'records' => $record->matras,
+                    'records' => $queryBuilder->select(['id','number','title','meaning'])
+                    // ->where('active',1)
+                    ->get()
+                    ,
                     'ok' => true ,
                     'message' => __("crud.read.success")
                 ]);
@@ -634,11 +666,11 @@ class BookController extends Controller
     }
     public function structure(Request $request){
         if (($user = $request->user()) !== null) {
-            $Regulator = RecordModel::select(['id','title','description'])->where('id',$request->id)->first();
-            if ( $Regulator !== null ) {
+            $regulator = RecordModel::select(['id','title','description'])->where('id',$request->id)->first();
+            if ( $regulator !== null ) {
                 return response()->json([
-                    'regulator' => $Regulator ,
-                    'structure' => $Regulator->getContent($request->id) ,
+                    'regulator' => $regulator ,
+                    'structure' => $regulator->getContent($request->id) ,
                     'ok' => true ,
                     'message' => __("crud.read.success")
                 ]);

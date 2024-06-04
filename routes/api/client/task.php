@@ -1,5 +1,5 @@
 <?php 
-use App\Http\Controllers\Api\client\Task\TaskController;
+use App\Http\Controllers\Api\Client\Task\TaskController;
 /** Task SECTION */
 Route::group([
   'prefix' => 'tasks' ,

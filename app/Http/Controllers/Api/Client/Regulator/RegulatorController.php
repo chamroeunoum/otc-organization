@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\client\Regulator;
+namespace App\Http\Controllers\Api\Client\Regulator;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -346,6 +346,10 @@ class RegulatorController extends Controller
             //   $user_id= Auth::user()->id;
             //   $current_date = date('Y-m-d H:i:s');
             //   DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
+            \App\Models\Log\Log::regulator([
+                'user_id' => Auth::user()->id ,
+                'regulator_id' => $document->id
+            ]);
 
             if(is_file($path)) {
                 $pdfBase64 = base64_encode( file_get_contents($path) );

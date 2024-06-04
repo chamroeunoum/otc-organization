@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Regulator\Regulator;
-use App\Models\Regulator\Folder AS RecordModel;
+use App\Models\Folder\Folder AS RecordModel;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CrudController;
 
@@ -272,7 +272,7 @@ class FolderController extends Controller
     public function user(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Regulator\Folder();
+        $queryBuilder = new \App\Models\Folder\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -315,7 +315,7 @@ class FolderController extends Controller
     public function listFolderWithRegulatorValidation(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Regulator\Folder();
+        $queryBuilder = new \App\Models\Folder\Folder();
 
         // Get search string
         if( $request->search != "" ){

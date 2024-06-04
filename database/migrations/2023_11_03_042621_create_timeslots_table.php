@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('end',50)->default('00:00')->comment('The start time of slot');
             $table->string('effective_day',191)->default('1,2,3,4,5,6')->comment('The days of week that timeslot will be used. 1 -> Mon , 2 -> Tue ...');
             $table->integer('active')->default(1)->comment('The status of the record is in active or unactive');
+            $table->float('rest_duration')->default(0)->comment('The duration in minutes for resting within the timeslot');
             $table->timestamps();
             $table->softDeletes();
         });

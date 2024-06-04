@@ -122,6 +122,17 @@ class PeopleController extends Controller
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
 
+        /**
+         * Roles filter
+         */
+        if( true ){
+            $builder->whereHas('user',function( $query ) {
+                $query->whereHas('roles',function($q){
+                    $q->whereIn('role_id',[3,4]);
+                });
+            });
+        }
+
         $responseData = $crud->pagination(true, $builder);
         $responseData['records'] = $responseData['records']->map(function($people){
             $people['image'] = $people['image'] != null && \Storage::disk('public')->exists( $people['image'] )

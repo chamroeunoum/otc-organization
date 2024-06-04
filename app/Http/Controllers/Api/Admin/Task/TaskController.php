@@ -352,7 +352,45 @@ class TaskController extends Controller
         $responseData['message'] = __("crud.read.success");
         return response()->json($responseData, 200);
     }
-    public function startTask(Request $request){
+    public function markAsNew(Request $request){
+        if (($user = $request->user()) !== null) {
+            $record = RecordModel::find( $request->id );
+            if( $record == null ){
+                return response(
+                    [
+                        'ok' => false ,
+                        'record' => null,
+                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់ដាក់ជាការងារថ្មី។'
+                    ],
+                    350
+                );
+            }
+            if( $record->markAsNew() ){
+                return response(
+                    [
+                        'ok' => true ,
+                        'record' => $record,
+                        'message' => 'បានជោគជ័យ។'
+                    ],
+                    200
+                );
+            }else{
+                return response(
+                    [
+                        'ok' => false ,
+                        'record' => null,
+                        'message' => 'មានបញ្ហាក្នុងការដាក់ការងារជាការងារថ្មី។'
+                    ],
+                    350
+                );
+            }
+        }
+        return response()->json([
+            'record' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    public function start(Request $request){
         if (($user = $request->user()) !== null) {
             $record = RecordModel::find( $request->id );
             if( $record == null ){
@@ -390,7 +428,7 @@ class TaskController extends Controller
             'message' => __("crud.auth.failed")
         ], 401);
     }
-    public function continueTask(Request $request){
+    public function continue(Request $request){
         if (($user = $request->user()) !== null) {
             $record = RecordModel::find( $request->id );
             if( $record == null ){
@@ -398,7 +436,7 @@ class TaskController extends Controller
                     [
                         'ok' => false ,
                         'record' => null,
-                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់ចាប់ផ្ដើម។'
+                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់ដាក់ក្នុងការដំណើរការ។'
                     ],
                     350
                 );
@@ -408,7 +446,7 @@ class TaskController extends Controller
                     [
                         'ok' => true ,
                         'record' => $record,
-                        'message' => 'ចាប់ផ្ដើមបន្តការងាររួចរាល់។'
+                        'message' => 'ដាក់ការងារបានជោគជ័យ'
                     ],
                     200
                 );
@@ -417,7 +455,7 @@ class TaskController extends Controller
                     [
                         'ok' => false ,
                         'record' => null,
-                        'message' => 'មានបញ្ហាក្នុងការ ចាប់ផ្ដើមបន្តការងារ។'
+                        'message' => 'មានបញ្ហាក្នុងការ ដាក់ការក្នុងការដំណើរការ'
                     ],
                     350
                 );
@@ -428,7 +466,7 @@ class TaskController extends Controller
             'message' => __("crud.auth.failed")
         ], 401);
     }
-    public function pendingTask(Request $request){
+    public function pending(Request $request){
         if (($user = $request->user()) !== null) {
             $record = RecordModel::find( $request->id );
             if( $record == null ){
@@ -436,7 +474,7 @@ class TaskController extends Controller
                     [
                         'ok' => false ,
                         'record' => null,
-                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់ចាប់ផ្ដើម។'
+                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់ដាក់ពន្យាពេល។'
                     ],
                     350
                 );
@@ -466,7 +504,7 @@ class TaskController extends Controller
             'message' => __("crud.auth.failed")
         ], 401);
     }
-    public function endTask(Request $request){
+    public function end(Request $request){
         if (($user = $request->user()) !== null) {
             $record = RecordModel::find( $request->id );
             if( $record == null ){
@@ -474,7 +512,7 @@ class TaskController extends Controller
                     [
                         'ok' => false ,
                         'record' => null,
-                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់ចាប់ផ្ដើម។'
+                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់បញ្ចប់។'
                     ],
                     350
                 );
@@ -494,6 +532,82 @@ class TaskController extends Controller
                         'ok' => false ,
                         'record' => null,
                         'message' => 'មានបញ្ហាក្នុងការ បញ្ចប់ការងារ'
+                    ],
+                    350
+                );
+            }
+        }
+        return response()->json([
+            'record' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    public function cancel(Request $request){
+        if (($user = $request->user()) !== null) {
+            $record = RecordModel::find( $request->id );
+            if( $record == null ){
+                return response(
+                    [
+                        'ok' => false ,
+                        'record' => null,
+                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់បដិសេធ៍។'
+                    ],
+                    350
+                );
+            }
+            if( $record->markAsCancel() ){
+                return response(
+                    [
+                        'ok' => true ,
+                        'record' => $record,
+                        'message' => 'បដិសេធ៍ការងារ។'
+                    ],
+                    200
+                );
+            }else{
+                return response(
+                    [
+                        'ok' => false ,
+                        'record' => null,
+                        'message' => 'មានបញ្ហាក្នុងការ បដិសេធ៍ការងារ។'
+                    ],
+                    350
+                );
+            }
+        }
+        return response()->json([
+            'record' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    public function close(Request $request){
+        if (($user = $request->user()) !== null) {
+            $record = RecordModel::find( $request->id );
+            if( $record == null ){
+                return response(
+                    [
+                        'ok' => false ,
+                        'record' => null,
+                        'message' => 'សូមបញ្ជាក់លេខសម្គាល់របស់ការងារដែលអ្នកចង់បិទ។'
+                    ],
+                    350
+                );
+            }
+            if( $record->markAsClosed() ){
+                return response(
+                    [
+                        'ok' => true ,
+                        'record' => $record,
+                        'message' => 'បិទការងារ។'
+                    ],
+                    200
+                );
+            }else{
+                return response(
+                    [
+                        'ok' => false ,
+                        'record' => null,
+                        'message' => 'មានបញ្ហាក្នុងការ បិទការងារ។'
                     ],
                     350
                 );

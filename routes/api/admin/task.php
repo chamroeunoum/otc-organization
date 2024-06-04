@@ -44,10 +44,12 @@ Route::group([
     Route::put('activate',[TaskController::class,'activate'])->name('taskActivate');
     Route::put('deactivate',[TaskController::class,'deactivate'])->name('taskDeactivate');
 
-    Route::put('start',[TaskController::class,'startTask'])->name('taskStart');
-    Route::put('end',[TaskController::class,'endTask'])->name('taskEnd');
-    Route::put('pending',[TaskController::class,'pendingTask'])->name('taskPending');
-    Route::put('continue',[TaskController::class,'continueTask'])->name('taskContinue');
+    Route::put('new',[TaskController::class,'markAsNew'])->name('taskNew');
+    Route::put('start',[TaskController::class,'start'])->name('taskStart');
+    Route::put('end',[TaskController::class,'end'])->name('taskEnd');
+    Route::put('pending',[TaskController::class,'pending'])->name('taskPending');
+    Route::put('close',[TaskController::class,'close'])->name('taskClose');
+    Route::put('cancel',[TaskController::class,'cancel'])->name('taskCancel');
     /**
      * Get number of the tasks base on it status
      */

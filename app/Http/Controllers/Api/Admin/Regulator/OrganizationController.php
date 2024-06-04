@@ -30,6 +30,7 @@ class OrganizationController extends Controller
         $root = $id > 0 
             ? RecordModel::where('id',$id)->first()
             : RecordModel::where('model', get_class( $this->model ) )->first();
+        $root->totalChilds = $root->totalChildNodesOfAllLevels();
 
         $queryString = [
             "where" => [
@@ -76,7 +77,11 @@ class OrganizationController extends Controller
         ];
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->fields , false , $this->renameFields );
+        $crud = new CrudController(new RecordModel(), $request, $this->fields , false , $this->renameFields , [
+            'totalChilds' => function($record){
+                return $record->totalChildNodesOfAllLevels();
+            }
+        ] );
 
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
@@ -187,7 +192,7 @@ class OrganizationController extends Controller
         ];
         $request->merge( $queryString );
         $crud = new CrudController(new RecordModel(), $request, $this->fields );
-        $responseData = $crud->pagination(true, $this->model->children()->orderby('record_index','asc') );
+        $responseData = $crud->pagination(true, $this->model->childNodes()->orderby('record_index','asc') );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
@@ -247,50 +252,23 @@ class OrganizationController extends Controller
         $parent = intval( $request->pid ) > 0 
             ? RecordModel::find($request->pid) 
             : null ;
-        if( $parent == null ){
+        $child = intval( $request->cid ) > 0 
+            ? RecordModel::find($request->cid) 
+            : null ;
+        if( $parent == null || $child == null ){
             return response()->json([
                 'ok' => false ,
-                'message' => "សូមជ្រើសរើសមេជាមុនសិន។"
+                'message' => "សូមជ្រើសរើស អង្គភាពមេ និង អង្គភាពចំណុះ។"
             ],350);
         }
-        /**
-         * In case the child that is going to be added is the child of the govenment
-         */
-        $root = null ;
-        if( $parent->tpid == null || $parent->tpid <=0 ){
-            $root = RecordModel::where('model', get_class( new RecordModel ) )->first();
-        }
-        // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
-        $record = new RecordModel();
-        $record->name = $request->name ;
-        $record->desp = $request->desp;
-        $record->image = '' ;
-        $record->pid = $parent->id ;
-        $record->save();
-        // $record = RecordModel::create([
-        //     'name' => $request->name,
-        //     'desp' => $request->desp ,
-        //     'image' => $request->image ,
-        //     'pid' => $parent->id ,
-        //     'tpid' => ''
-        // ]);
-        $record->tpid = ( $parent->tpid != "" ? $parent->tpid : $parent->pid ).":".$parent->id;
-        $record->save();
-
-        if( $record ){
-            return response()->json([
-                'record' => $record ,
-                'ok' => true ,
-                'message' => 'បង្កើតបានរួចរាល់'
-            ], 200);
-
-        }else {
-            return response()->json([
-                'user' => null ,
-                'ok' => false ,
-                'message' => 'មានបញ្ហា។'
-            ], 201);
-        }
+        $child->pid = $parent->id ;
+        $child->save();
+        return response()->json([
+            'child' => $child ,
+            'parent' => $parent ,
+            'ok' => true ,
+            'message' => 'បានភ្ជាប់អង្គភាបចំណុះរួចរាល់។'
+        ], 200);
     }
     /**
      * Update an account
@@ -407,7 +385,7 @@ class OrganizationController extends Controller
     public function staffs(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Regulator\Folder();
+        $queryBuilder = new \App\Models\Folder\Folder();
 
         // Get search string
         if( $request->search != "" ){

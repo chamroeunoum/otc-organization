@@ -160,7 +160,7 @@ class User extends Authenticatable
     }
 
     public function folders(){
-      return $this->hasMany('\App\Models\Regulator\Folder','people_id','id');
+      return $this->hasMany('\App\Models\Folder\Folder','people_id','id');
     }
 
     public function getIsAdminAttribute()

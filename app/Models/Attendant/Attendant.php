@@ -42,13 +42,14 @@ class Attendant extends Model
      * Calculate the working hour within the responseible timeslots
      */
     public function calculateWorkingTime(){
+        $userTimeslots = $this->user->totalActualWorkingHoursOfTimeslots();
         $total = [
             'timeslots' => [] ,
             'checkingIn' => 0 , 
             'checkingOut' => 0 ,
             'lateOrEarly' => 0 , 
             'workedTime' => 0 ,
-            'duration' => 0 ,
+            'duration' => $userTimeslots->sum('minutes') - $userTimeslots->sum('rest_duration') ,
             'overtime' => 0 
         ] ;
         $checkTimes = $this->checktimes()->where('check_status',\App\Models\Attendant\AttendantChecktime::CHECK_STATUS_IN)->get()->map(function($checkin) use( &$total ){
@@ -60,7 +61,7 @@ class Attendant extends Model
             //     'check_status'=> \App\Models\Attendant\AttendantChecktime::CHECK_STATUS_OUT
             // ])->first()
             ;
-            $calculateTime = $checkin->timeslot->calculateChecktime($checkin,$checkout);
+            $calculateTime = $checkin->timeslot->calculateChecktime($checkin,$checkout,$this->date);
             $total['timeslots'][] = [
                 'id' => $checkin->timeslot->id ,
                 'title'  => $checkin->timeslot->title ,
@@ -72,7 +73,6 @@ class Attendant extends Model
             $total['checkingOut'] += $calculateTime['checkingOut'];
             $total['lateOrEarly'] += $calculateTime['lateOrEarly'];
             $total['workedTime'] += $calculateTime['workedTime'];
-            $total['duration'] += $calculateTime['duration'];
             return $calculateTime ;
         });
         $total['overtime'] = $total['lateOrEarly'] > 0 ? $total['lateOrEarly'] : 0 ;
@@ -95,5 +95,18 @@ class Attendant extends Model
     public function isHoliday(){
         return false ;
         // return $this->date != null ? Carbon::parse( $this->date )->isSunday() : false ;
+    }
+
+    /**
+     * Attendant without specifying checkin or checkout
+     */
+    public function getWorkingHours(){
+        $checkin = $this->checktimes()->orderby('checktime','asc')->first();
+        $checkout = $this->checktimes()->orderby('checktime','desc')->first();
+        $this->userTimeslot == null ? null
+            : $this->userTimeslot->search(function( $userTimeslot, $key ) use( $checkin, $checkout){
+                \Carbon\Carbon::parse( $userTimeslot->start ) ;
+                // return $userTimeslot->
+            });
     }
 }

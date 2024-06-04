@@ -46,7 +46,6 @@ class TestMeetingSeeder extends Seeder
             }while( $start < $totalMeetings);
         });
         
-
         if( env('DB_CONNECTION', '') == 'pgsql' ){
             array_map(
                 function( $table ){

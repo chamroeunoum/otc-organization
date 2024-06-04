@@ -269,14 +269,6 @@ class AttendantController extends Controller
         if( ( isset( $request->day ) && isset( $request->time ) ) && ( strlen( $request->day ) >= 6 && strlen( $request->time ) >= 4 ) ){
             $datetime = \Carbon\Carbon::parse( $request->day . ' ' . $request->time );
         }
-        $timeslot = intval( $request->timeslot_id ) > 0 ? $user->timeslots()->find( $request->timeslot_id ) : \App\Models\Attendant\Timeslot::getTimeslot( $datetime ) ;
-
-        if( !$timeslot ){
-            return response()->json([
-                "ok" => false ,
-                "message" => "មិនបានបញ្ជាក់អំពី វេនធ្វើការ។"
-            ],500);
-        }
 
         /**
          * Check whether the attendant has been registered once already
@@ -303,12 +295,22 @@ class AttendantController extends Controller
             ],500);
         }
 
+        $timeslot = intval( $request->timeslot_id ) > 0 ? $user->timeslots()->find( $request->timeslot_id ) : \App\Models\Attendant\Timeslot::getTimeslot( $datetime ) ;
+
+        // Allow to checkout without timeslot
+        // if( !$timeslot ){
+        //     return response()->json([
+        //         "ok" => false ,
+        //         "message" => "មិនបានបញ្ជាក់អំពី វេនធ្វើការ។"
+        //     ],500);
+        // }
+
         /**
          * Create checktime of the attendant
          */
         $checktime = $attendant->checktimes()->create([
             'attendant_id' => $attendant->id ,
-            'timeslot_id' => $timeslot->id ,
+            'timeslot_id' => $timeslot == null ? 0 : $timeslot->id ,
             'date' => $datetime->format('Y-m-d') ,
             'checktime' => $datetime->format('H:i') ,
             'checktype' => \App\Models\Attendant\AttendantCheckTime::CHECK_TYPE_DEFAULT ,

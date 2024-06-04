@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\client\Regulator;
+namespace App\Http\Controllers\Api\Client\Regulator;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -341,7 +341,7 @@ class OrganizationController extends Controller
     public function staffs(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Regulator\Folder();
+        $queryBuilder = new \App\Models\Folder\Folder();
 
         // Get search string
         if( $request->search != "" ){

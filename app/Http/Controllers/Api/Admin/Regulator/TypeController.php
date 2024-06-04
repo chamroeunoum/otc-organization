@@ -75,7 +75,7 @@ class TypeController extends Controller
         ];
         $request->merge( $queryString );
         $crud = new CrudController(new RecordModel(), $request, $this->fields );
-        $responseData = $crud->pagination(true, $this->model->children()->orderby('record_index','asc') );
+        $responseData = $crud->pagination(true, $this->model->childNodes()->orderby('record_index','asc') );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);

@@ -87,6 +87,19 @@ class User extends Authenticatable
     public function timeslots(){
       return $this->belongsToMany(\App\Models\Attendant\Timeslot::class,'user_timeslots','user_id','timeslot_id');
     }
+    /**
+     * The actual working time as minutes exclude the rest period
+     */
+    public function totalActualWorkingHoursOfTimeslots(){
+      return $this->timeslots->map(function($ts){ 
+        return [
+          'id' => $ts->id ,
+          'title' => $ts->title ,
+          'rest_duration' => intval( $ts->rest_duration ) ,
+          'minutes' => $ts->getMinutes() 
+        ];
+      });
+    }
     public function userTimeslots(){
       return $this->hasMany( \App\Models\Attendant\UserTimeslot::class , 'user_id' , 'id' );
     }
@@ -153,7 +166,7 @@ class User extends Authenticatable
     }
 
     public function folders(){
-      return $this->hasMany('\App\Models\Regulator\Folder','people_id','id');
+      return $this->hasMany('\App\Models\Folder\Folder','people_id','id');
     }
 
     public function getIsAdminAttribute()

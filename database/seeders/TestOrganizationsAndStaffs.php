@@ -22,7 +22,7 @@ class TestOrganizationsAndStaffs extends Seeder
         $positionModel = new \App\Models\Regulator\Tag\Position();
         $position = \App\Models\Regulator\Tag\Position::where('model', get_class( $positionModel ) )->first();
 
-        // Position        
+        // Position
         // 490 => "នាយករដ្ឋមន្ត្រី"
         // 491 => "ឧបនាយករដ្ឋមន្ត្រី"
         // 492 => "ទេសរដ្ឋមន្ត្រី"
@@ -60,15 +60,16 @@ class TestOrganizationsAndStaffs extends Seeder
             'mobile_phone' => $account->phone , 
             'email' => $account->email
         ]);
+        // Set people as a staff of an organization
+        $people->organizations()->sync( [$officeOfCouncil->id]  );
+        // Set people as a leader of an organization
+        $people->organizationLeader()->sync( [$officeOfCouncil->id]  );
+        // Set the position of a people
+        $people->positions()->sync( [ 491 ] );
+
         $account->people_id = $people->id ;
         $account->save();
         $account->assignRole( $backendMember );
-        // Set user as a staff of an organization
-        $account->organizations()->sync( [$officeOfCouncil->id]  );
-        // Set user as a leader of an organization
-        $account->organizationLeader()->sync( [$officeOfCouncil->id]  );
-        // Set the position of a user
-        $account->positions()->sync( [ 491 ] );
         
 
 
@@ -93,13 +94,14 @@ class TestOrganizationsAndStaffs extends Seeder
                 'mobile_phone' => $account->phone , 
                 'email' => $account->email
             ]);
+            $people->organizations()->sync( [$gid]  );
+            // Set user as a leader of an organization
+            $people->organizationLeader()->sync( [$gid]  );
+            $people->positions()->sync( [ 496 ] );
+
             $account->people_id = $people->id ;
             $account->save();
             $account->assignRole( $backendMember );
-            $account->organizations()->sync( [$gid]  );
-            // Set user as a leader of an organization
-            $account->organizationLeader()->sync( [$gid]  );
-            $account->positions()->sync( [ 496 ] );
 
             // Department
             foreach( $organization->find( $gid )->childNodes->pluck('name','id') AS $did => $dname ){
@@ -122,13 +124,14 @@ class TestOrganizationsAndStaffs extends Seeder
                     'mobile_phone' => $account->phone , 
                     'email' => $account->email
                 ]);
+                $people->organizations()->sync( [$did]  );
+                // Set user as a leader of an organization
+                $people->organizationLeader()->sync( [$did]  );
+                $people->positions()->sync( [ 498 ] );
+
                 $account->people_id = $people->id ;
                 $account->save();
                 $account->assignRole( $backendMember );
-                $account->organizations()->sync( [$did]  );
-                // Set user as a leader of an organization
-                $account->organizationLeader()->sync( [$did]  );
-                $account->positions()->sync( [ 498 ] );
 
                 // Office 
                 // foreach( $organization->find( $did )->childNodes->pluck('name','id') AS $oid => $oname ){
@@ -176,11 +179,11 @@ class TestOrganizationsAndStaffs extends Seeder
                             'mobile_phone' => $account->phone , 
                             'email' => $account->email
                         ]);
+                        $people->organizations()->sync( [$did]  );
+                        $people->positions()->sync( [ 502 ] );
                         $account->people_id = $people->id ;
                         $account->save();
                         $account->assignRole( $backendMember );
-                        $account->organizations()->sync( [$did]  );
-                        $account->positions()->sync( [ 502 ] );
                     }
                 // }
             }

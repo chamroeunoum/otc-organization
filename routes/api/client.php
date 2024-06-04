@@ -2,16 +2,16 @@
 
 use \App\Models\TrackPerformance;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Api\client\AuthController;
-use App\Http\Controllers\Api\client\UserController;
-use App\Http\Controllers\Api\client\ProfileController;
-use App\Http\Controllers\Api\client\FolderController;
-use App\Http\Controllers\Api\client\Regulator\SearchController;
-use App\Http\Controllers\Api\client\Regulator\RegulatorController;
-use App\Http\Controllers\Api\client\Regulator\TypeController;
-use App\Http\Controllers\Api\client\Regulator\OrganizationController;
-use App\Http\Controllers\Api\client\Regulator\SignatureController;
-use App\Http\Controllers\Api\client\Attendant\AttendantController;
+use App\Http\Controllers\Api\Client\AuthController;
+use App\Http\Controllers\Api\Client\UserController;
+use App\Http\Controllers\Api\Client\ProfileController;
+use App\Http\Controllers\Api\Client\FolderController;
+use App\Http\Controllers\Api\Client\Regulator\SearchController;
+use App\Http\Controllers\Api\Client\Regulator\RegulatorController;
+use App\Http\Controllers\Api\Client\Regulator\TypeController;
+use App\Http\Controllers\Api\Client\Regulator\OrganizationController;
+use App\Http\Controllers\Api\Client\Regulator\SignatureController;
+use App\Http\Controllers\Api\Client\Attendant\AttendantController;
 
 Route::group([
   'prefix' => 'client' ,
@@ -26,17 +26,17 @@ Route::group([
     Route::put('signup/activate', [AuthController::class,'signupActivate']);
 
     /**
-         * Facebook authentication
-         */
-        Route::post('facebook',"AuthenticationController@facebookAuthentication")->name("gacebookAuthentication");
-        /**
-         * Google authentication
-         */
-        Route::post('google',"AuthenticationController@googleAuthentication")->name("googleAuthentication");
-        /**
-         * Apple authentication
-         */
-        Route::post('apple',"AuthenticationController@appleAuthentication")->name("appleAuthentication");
+     * Facebook authentication
+     */
+    Route::post('facebook',"AuthenticationController@facebookAuthentication")->name("gacebookAuthentication");
+    /**
+     * Google authentication
+     */
+    Route::post('google',"AuthenticationController@googleAuthentication")->name("googleAuthentication");
+    /**
+     * Apple authentication
+     */
+    Route::post('apple',"AuthenticationController@appleAuthentication")->name("appleAuthentication");
         
     Route::group([
       'middleware' => 'auth:api'
@@ -111,7 +111,7 @@ Route::group([
   Route::group([
     'prefix' => 'regulators' ,
     'namespace' => 'Api' ,
-    'middleware' => 'authapi'
+    'middleware' => 'auth:api'
     ], function() {
       // Route::get('',[RegulatorController::class,'index']);
       Route::post('',[RegulatorController::class,'create']);
@@ -125,7 +125,8 @@ Route::group([
       Route::put('removereader',[RegulatorController::class,'removeReaders']);
       Route::put('{id}/accessibility',[RegulatorController::class,'accessibility']);
 
-      // Route::get('pdf',[RegulatorController::class,'pdf']);
+      Route::get('pdf',[RegulatorController::class,'pdf']);
+
       // Route::group([
       //     'prefix' => 'types' ,
       //     ], function() {
@@ -168,32 +169,6 @@ Route::group([
       });
   });
 
-  /** ATTENDANT SECTION */
-  Route::group([
-    'prefix' => 'attendants' ,
-    'namespace' => 'Api' ,
-    'middleware' => 'auth:api'
-    ], function() {
-        Route::get('',[AttendantController::class,'index']);
-        Route::put('update',[AttendantController::class,'update']);
-        Route::get('{id}/read',[AttendantController::class,'read']);
-        Route::delete('{id}/delete',[AttendantController::class,'destroy']);
-        Route::post('checkin/face',[AttendantController::class,'checkin']);
-        Route::post('checkin/finger',[AttendantController::class,'checkin']);
-        Route::post('checkin/system',[AttendantController::class,'checkin']);
-        Route::post('checkout/face',[AttendantController::class,'checkout']);
-        Route::post('checkout/finger',[AttendantController::class,'checkout']);
-        Route::post('checkout/system',[AttendantController::class,'checkout']);
-  });
-
-  Route::group([
-    'prefix' => 'regulators' ,
-    'namespace' => 'Api' ,
-    'middleware' => 'auth:api'
-    ], function() {;
-        Route::get('pdf',[RegulatorController::class,'pdf']);
-  });
-
   /** FOLDER SECTION */
   Route::group([
     'prefix' => 'folders' ,
@@ -223,6 +198,24 @@ Route::group([
       Route::get('regulators',[ FolderController::class , 'regulators']);
       Route::get('global',[ FolderController::class , 'globalFolder']);
         
+  });
+
+  /** ATTENDANT SECTION */
+  Route::group([
+    'prefix' => 'attendants' ,
+    'namespace' => 'Api' ,
+    'middleware' => 'auth:api'
+    ], function() {
+        Route::get('',[AttendantController::class,'index']);
+        Route::put('update',[AttendantController::class,'update']);
+        Route::get('{id}/read',[AttendantController::class,'read']);
+        Route::delete('{id}/delete',[AttendantController::class,'destroy']);
+        Route::post('checkin/face',[AttendantController::class,'checkin']);
+        Route::post('checkin/finger',[AttendantController::class,'checkin']);
+        Route::post('checkin/system',[AttendantController::class,'checkin']);
+        Route::post('checkout/face',[AttendantController::class,'checkout']);
+        Route::post('checkout/finger',[AttendantController::class,'checkout']);
+        Route::post('checkout/system',[AttendantController::class,'checkout']);
   });
   
   require('client/task.php');

@@ -28,7 +28,7 @@ class TestAttendantSeeder extends Seeder
             $user->timeslots()->sync( $allTimeslots );
 
             $start = \Carbon\Carbon::parse('2023-01-01');
-            $end = \Carbon\Carbon::parse('2024-02-29');
+            $end = \Carbon\Carbon::parse('2024-04-02');
             $attendantsOfTheDay = [] ;
             do{
                 if( $start->isSaturday() || $start->isSunday() ) {

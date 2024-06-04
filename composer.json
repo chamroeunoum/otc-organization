@@ -10,6 +10,7 @@
         "binarystash/pdf-watermarker": "^1.1",
         "doctrine/dbal": "^4.0",
         "guzzlehttp/guzzle": "^7.2",
+        "irazasyed/telegram-bot-sdk": "^3.14",
         "laravel-notification-channels/authy": "10",
         "laravel-notification-channels/telegram": "3",
         "laravel/framework": "^9.19",

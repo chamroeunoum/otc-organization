@@ -124,8 +124,8 @@ class Timeslot extends Model
      * @param $checkInTime $checkOutTime
      * @return Array
      */
-    public function calculateChecktime( $checkTimeIn , $checkTimeOut ){
-        $duration = $this->getMinutes();
+    public function calculateChecktime( $checkTimeIn , $checkTimeOut = null , $date = null ){
+        $duration = $this->getMinutes() - intval( $this->rest_duration );
         $workingTime = [
             'checkin_id' => $checkTimeIn->id ,
             'checkout_id' => $checkTimeOut != null ? $checkTimeOut->id : null ,
@@ -140,17 +140,28 @@ class Timeslot extends Model
             'date' => $checkTimeIn->attendant->date ,
             'day_of_week' => \Carbon\Carbon::parse( $checkTimeIn->attendant->date )->dayOfWeek ,
             'checkin' => $checkTimeIn->checktime ,
-            'checkout' => $checkTimeOut != null ? $checkTimeOut->checktime : null ,
+            'checkout' => $checkTimeOut != null 
+                ? $checkTimeOut->checktime 
+                // Assign the end time of the timeslot
+                : ( $this->end != null ? (
+                    \Carbon\Carbon::parse( $date )->isToday()
+                    ? null : $this->end
+                ) : null ) ,
             'checkingIn' => $this->checkIn( $checkTimeIn->checktime ) ,
-            'checkingOut' => $checkTimeOut != null ? $this->checkOut( $checkTimeOut->checktime ) : null ,
+            'checkingOut' => $checkTimeOut != null 
+                ? $this->checkOut( $checkTimeOut->checktime ) 
+                : ( $this->end != null ? (
+                    \Carbon\Carbon::parse( $date )->isToday()
+                    ? null : $this->checkOut( $this->end )
+                ) : null ),
             'lateOrEarly' => 0 ,
             'workedTime' => 0 ,
             'duration' => $duration ,
             'overtime' => 0 
         ];
-        $workingTime['lateOrEarly'] = $checkTimeIn != null && $checkTimeOut != null ? $workingTime['checkingIn'] + $workingTime['checkingOut'] : 0 ;
-        $workingTime['workedTime'] = $checkTimeIn != null && $checkTimeOut != null ? $duration + $workingTime['lateOrEarly'] : 0 ;
-        $workingTime['overtime'] = $checkTimeIn != null && $checkTimeOut != null ? ( $workingTime['lateOrEarly'] > 0 ? $workingTime['lateOrEarly'] : 0 ) : 0 ;
+        $workingTime['lateOrEarly'] = $checkTimeIn != null ? ( floatval( $workingTime['checkingIn'] ) + floatval( $workingTime['checkingOut'] ) ) : floatval( $workingTime['checkingIn'] ) ;
+        $workingTime['workedTime'] = $checkTimeIn != null && $checkTimeOut != null ? floatval( $duration ) + floatval( $workingTime['lateOrEarly'] ) : 0 ;
+        $workingTime['overtime'] = $checkTimeIn != null ? ( $workingTime['lateOrEarly'] > 0 ? $workingTime['lateOrEarly'] : 0 ) : 0 ;
         return $workingTime;
     }
     public static function getTimeslot($datetime){
@@ -164,4 +175,5 @@ class Timeslot extends Model
         }
         return null ;
     }
+    
 }

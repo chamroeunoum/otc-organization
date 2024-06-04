@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Meeting\AuthController;
 use App\Http\Controllers\Api\Meeting\UserController;
 use App\Http\Controllers\Api\Meeting\ProfileController;
 use App\Http\Controllers\Api\Law\Book\BookController;
+use App\Http\Controllers\Api\Law\Book\TelegramController;
 
 
 
@@ -52,6 +53,13 @@ Route::group([
       Route::get('{id}/sections',[BookController::class,'sections']);
       Route::get('{id}/matras',[BookController::class,'matras']);
       Route::get('{id}/structure',[BookController::class,'structure']);
-      
+    });
+
+    Route::group([
+      'prefix' => 'telegram' ,
+      'middleware' => 'auth:api'
+    ],function(){
+      // Route::post('webhook', 'TelegramController@handle');
+      Route::get('getupdates',[TelegramController::class,'getUpdates']);
     });
 });

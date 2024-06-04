@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\client;
+namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CrudController;
 use Illuminate\Http\Request;
 use App\Models\Regulator\Regulator;
-use App\Models\Regulator\Folder as RecordModel;
+use App\Models\Folder\Folder as RecordModel;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -227,7 +227,7 @@ class FolderController extends Controller
     public function user(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Regulator\Folder();
+        $queryBuilder = new \App\Models\Folder\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -270,7 +270,7 @@ class FolderController extends Controller
     public function listFolderWithRegulatorValidation(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Regulator\Folder();
+        $queryBuilder = new \App\Models\Folder\Folder();
 
         // Get search string
         if( $request->search != "" ){
@@ -308,7 +308,7 @@ class FolderController extends Controller
         if( $request->name != "" 
         // && Auth::user() != null 
         ){
-            $folder = new \App\Models\Regulator\Folder();
+            $folder = new \App\Models\Folder\Folder();
             $folder->name = $request->name ;
             $folder->user_id = Auth::user() != null ? Auth::user()->id : 0 ;
             $folder->pid = 0 ;
@@ -364,7 +364,7 @@ class FolderController extends Controller
         if( $request->id != "" 
          // && Auth::user() != null 
         ){
-            $folder = \App\Models\Regulator\Folder::find($request->id);
+            $folder = \App\Models\Folder\Folder::find($request->id);
             if( $folder != null ){
                 $record = $folder ;
                 // Check for the regulators within the folder

@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Api\client\Task;
+namespace App\Http\Controllers\Api\Client\Task;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->text('name')->nullable(false)->comment('The file name');
             $table->text('meta')->nullable(true)->comment('The file metadata');
+            $table->text('tags')->nullable(true)->comment('The tags of file');
             $table->integer('created_by')->default(0)->comment('The creator of the file, the id of the people table ');
             $table->integer('updated_by')->default(0)->comment('The updater of the file, the id of the people table ');
             $table->string('model',191)->nullable(true)->comment('The model path used to differentiate file');

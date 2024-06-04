@@ -260,5 +260,36 @@ class AuthController extends Controller
             ],200);
     }
 
+    /**
+     * Validate user with code (offcer code)
+     */
+    public function withOfficerCode(Request $request)
+    {
+        
+    }
+
+    /**
+     * Validate user with google authenticator
+     */
+    public function withGoogleAuthenticator(Request $request)
+    {
+        
+    }
+
+    /**
+     * Validate user with email
+     */
+    public function withEmail(Request $request)
+    {
+        
+    }
+    /**
+     * Validate user with phone sms
+     */
+    public function withPhoneSMS(Request $request)
+    {
+        
+    }
+
 
 }

@@ -121,6 +121,14 @@ class UserController extends Controller
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
 
         /**
+         * Roles filter
+         */
+        if( true ){
+            $builder->whereHas('roles',function( $query ) {
+                $query->whereIn('role_id',[3,4]);
+            });
+        }
+        /**
          * Positions filter
          */
         if( $positions ){

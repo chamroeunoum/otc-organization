@@ -138,7 +138,7 @@ class CountesyController extends Controller
         ];
         $request->merge( $queryString );
         $crud = new CrudController(new RecordModel(), $request, $this->fields );
-        $responseData = $crud->pagination(true, $this->model->children()->orderby('record_index','asc') );
+        $responseData = $crud->pagination(true, $this->model->childNodes()->orderby('record_index','asc') );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
@@ -338,7 +338,7 @@ class CountesyController extends Controller
     public function staffs(Request $request){
 
         // Create Query Builder 
-        $queryBuilder = new \App\Models\Regulator\Folder();
+        $queryBuilder = new \App\Models\Folder\Folder();
 
         // Get search string
         if( $request->search != "" ){

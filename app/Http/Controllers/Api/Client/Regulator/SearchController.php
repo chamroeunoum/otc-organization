@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\client\Regulator;
+namespace App\Http\Controllers\Api\Client\Regulator;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -265,8 +265,12 @@ class SearchController extends Controller
             
             /**   Log the access of the user */
             if( \Auth::user() !== null ){
-                $current_date = date('Y-m-d H:i:s');
-                DB::insert('insert into regulator_view_logs (user_id, regulator_id, date) values (?,?,?)', [\Auth::user()->id, $regulator->id, $current_date]);
+                \App\Models\Log\Log::regulator([
+                    'user_id' => \Auth::user()->id ,
+                    'regulator_id' => $regulator->id
+                ]);
+                // $current_date = date('Y-m-d H:i:s');
+                // DB::insert('insert into regulator_view_logs (user_id, regulator_id, date) values (?,?,?)', [\Auth::user()->id, $regulator->id, $current_date]);
             }
 
             if(is_file($path)) {

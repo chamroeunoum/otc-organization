@@ -1,4 +1,5 @@
 <?php 
+use \App\Models\TrackPerformance;
 use App\Http\Controllers\Api\Meeting\MeetingController;
 use App\Http\Controllers\Api\Meeting\AuthController;
 use App\Http\Controllers\Api\Meeting\UserController;
@@ -6,12 +7,16 @@ use App\Http\Controllers\Api\Meeting\ProfileController;
 use App\Http\Controllers\Api\Meeting\LegalDraftController;
 use App\Http\Controllers\Api\Meeting\Organization\OrganizationController;
 use App\Http\Controllers\Api\Meeting\Position\PositionController;
+use App\Http\Controllers\Api\Client\FolderController;
+use App\Http\Controllers\Api\Client\Regulator\SearchController;
+use App\Http\Controllers\Api\Client\Regulator\SignatureController;
+use App\Http\Controllers\Api\Meeting\Regulator\RegulatorController;
 use App\Http\Controllers\Api\Meeting\Type\TypeController;
 use App\Http\Controllers\Api\Meeting\Countesy\CountesyController;
 use App\Http\Controllers\Api\Meeting\Room\RoomController;
 use App\Http\Controllers\Api\Meeting\Room\MeetingRoomController;
-use App\Http\Controllers\Api\Meeting\Regulator\RegulatorController;
 use App\Http\Controllers\Api\Meeting\Member\MemberController;
+
 /** MEETING SECTION */
 Route::group([
   'prefix' => 'meeting' ,
@@ -189,7 +194,117 @@ Route::group([
       ], function() {
           Route::get('',[RegulatorController::class,'index']);
           Route::get('pdf',[RegulatorController::class,'pdf']);
+
+          // Route::get('',[RegulatorController::class,'index']);
+          Route::post('',[RegulatorController::class,'create']);
+          Route::put('',[RegulatorController::class,'update']);
+          Route::put('{id}/activate',[RegulatorController::class,'activate']);
+          Route::put('{id}/deactivate',[RegulatorController::class,'deactivate']);
+          Route::delete('',[RegulatorController::class,'destroy']);
+          Route::post('upload',[RegulatorController::class,'upload']);
+
+          Route::put('addreader',[RegulatorController::class,'addReaders']);
+          Route::put('removereader',[RegulatorController::class,'removeReaders']);
+          Route::put('{id}/accessibility',[RegulatorController::class,'accessibility']);
+
+          // Route::group([
+          //     'prefix' => 'types' ,
+          //     ], function() {
+          //       Route::get('', [TypeController::class,'index']);
+          // });
+          // Route::group([
+          //   'prefix' => 'organizations' ,
+          //   ], function() {
+          //     Route::get('', [OrganizationController::class,'index']);
+          // });
+          // Route::group([
+          //   'prefix' => 'signatures' ,
+          //   ], function() {
+          //     Route::get('', [SignatureController::class,'index']);
+          // });
+
     });
+
+
+    /** SEARCH SECTION */
+    Route::group([
+      'prefix' => 'search_regulators' ,
+      ], function() {
+        TrackPerformance::start('clientSearchRegulator');
+        Route::get('',[ SearchController::class , 'index']);
+        TrackPerformance::end('clientSearchRegulator');
+        TrackPerformance::save();
+        // Route::get('',function(){
+        //   return 'I am "regulators->SearchController"';
+        // });
+        Route::get('pdf',[ SearchController::class , 'pdf']);
+        Route::get('get/regulator/years',[ SearchController::class , 'getYears']);
+        Route::group([
+            'prefix' => 'types' ,
+            ], function() {
+                Route::get('compact', [ TypeController::class , 'index']);
+        });
+        Route::get('types/compact', [ TypeController::class , 'compactList']);
+        Route::get('{id}',[ RegulatorController::class , 'read']);
+
+    });
+
+    /** SEARCH SECTION */
+    Route::group([
+      'prefix' => 'regulators' ,
+      'namespace' => 'Api' ,
+      'middleware' => 'api'
+      ], function() {
+        Route::get('',[RegulatorController::class,'index']);
+        Route::get('pdf',[RegulatorController::class,'pdf']);
+        Route::group([
+            'prefix' => 'types' ,
+            ], function() {
+              Route::get('', [TypeController::class,'index']);
+        });
+        Route::group([
+          'prefix' => 'organizations' ,
+          ], function() {
+            Route::get('', [OrganizationController::class,'index']);
+        });
+        Route::group([
+          'prefix' => 'signatures' ,
+          ], function() {
+            Route::get('', [SignatureController::class,'index']);
+        });
+    });
+
+    /** FOLDER SECTION */
+    Route::group([
+      'prefix' => 'folders' ,
+      'middleware' => 'auth:api'
+      ], function() {
+
+          Route::get('',[ FolderController::class , 'index']);
+          Route::post('',[ FolderController::class , 'create']);
+          Route::get('{id}/read',[ FolderController::class , 'read']);
+          Route::put('',[ FolderController::class , 'update']);
+          Route::delete('',[ FolderController::class , 'delete']);
+          Route::get('regulators',[ FolderController::class , 'regulators']);
+          Route::put('regulators/add',[ FolderController::class , 'addRegulatorToFolder']);
+          Route::put('regulators/remove',[ FolderController::class , 'removeRegulatorFromFolder']);
+          Route::put('regulators/check',[ FolderController::class , 'checkRegulator']);
+          Route::get('user',[ FolderController::class , 'user']);
+          Route::get('list/regulator/validation',[ FolderController::class , 'listFolderWithRegulatorValidation']);
+
+          Route::put('{id}/accessibility',[FolderController::class,'accessibility']);
+          
+    });
+    /** FOLDER SECTION */
+    Route::group([
+      'prefix' => 'folders' ,
+      'middleware' => 'api'
+      ], function() {
+        Route::get('regulators',[ FolderController::class , 'regulators']);
+        Route::get('global',[ FolderController::class , 'globalFolder']);
+          
+    });
+
     /** TYPE SECTION */
     Route::group([
       'prefix' => 'types' ,
