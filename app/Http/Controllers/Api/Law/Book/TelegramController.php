@@ -32,22 +32,12 @@ class TelegramController extends Controller
 
     public function handleWebhook(Request $request)
     {
-        $data = $this->curlGet( $this->server.'/getUpdates' );
-        dd( $data );
-        if( strlen( $data) > 0 ) {
-            $data = json_decode( $data );
-            if( $data->ok == true ){
-                $messages = collect( $data->result );
-                $chatId = $messages->last()->message->chat->id ;
-                // return response()->json( $messages->last()->message ,200) ;
-                $result = $this->curlPost( $this->server.'/sendMessage',[
-                    'chat_id' => $chatId ,
-                    'text' => 'បានទទួលការហៅពី ខាង តេលេក្រាម។' ,
-                    'protect_content' => true
-                ],true);
-                return response()->json( json_decode( $result ) ,200) ;
-            }
-        }
+        $result = $this->curlPost( $this->server.'/sendMessage',[
+            'chat_id' => "38846216" ,
+            'text' => 'បានទទួលការហៅពី ខាង តេលេក្រាម។' ,
+            'protect_content' => true
+        ],true);
+        return response()->json( json_decode( $result ) ,200) ;
     }
 
     public function getUpdates(Request $request){        
