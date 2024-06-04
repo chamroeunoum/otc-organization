@@ -57,7 +57,7 @@ Route::group([
 
     Route::group([
       'prefix' => 'telegram' ,
-      'middleware' => 'auth:api'
+      'middleware' => 'api'
     ],function(){
       Route::get('webhook', 'TelegramController@handleWebhook');
       Route::get('getupdates',[TelegramController::class,'getUpdates']);
