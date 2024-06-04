@@ -59,7 +59,7 @@ Route::group([
       'prefix' => 'telegram' ,
       'middleware' => 'auth:api'
     ],function(){
-      Route::post('webhook', 'TelegramController@handleWebhook');
+      Route::get('webhook', 'TelegramController@handleWebhook');
       Route::get('getupdates',[TelegramController::class,'getUpdates']);
     });
 });
