@@ -30,17 +30,25 @@ class TelegramController extends Controller
         $this->selectedFields = ['id', 'title','description', 'color' , 'cover' , 'complete' , 'created_by', 'updated_by' , 'pdf' , 'created_at', 'updated_at' ] ;
     }
 
-    // public function handle(Request $request)
-    // {
-    //     $update = Telegram::commandsHandler(true);
-    //     $message = $update->getMessage();
-    //     $chat_id = $message->getChat()->getId();
-    //     echo $chat_id . PHP_EOL;
-    //     Telegram::sendMessage([
-    //         'chat_id' => $chat_id,
-    //         'text' => 'សួស្ដី!'
-    //     ]);
-    // }
+    public function handleWebhook(Request $request)
+    {
+        $data = $this->curlGet( $this->server.'/getUpdates' );
+
+        if( strlen( $data) > 0 ) {
+            $data = json_decode( $data );
+            if( $data->ok == true ){
+                $messages = collect( $data->result );
+                $chatId = $messages->last()->message->chat->id ;
+                // return response()->json( $messages->last()->message ,200) ;
+                $result = $this->curlPost( $this->server.'/sendMessage',[
+                    'chat_id' => $chatId ,
+                    'text' => 'បានទទួលការហៅពី ខាង តេលេក្រាម។' ,
+                    'protect_content' => true
+                ],true);
+                return response()->json( json_decode( $result ) ,200) ;
+            }
+        }
+    }
 
     public function getUpdates(Request $request){        
 
