@@ -33,7 +33,7 @@ class TelegramController extends Controller
     public function handleWebhook(Request $request)
     {
         $data = $this->curlGet( $this->server.'/getUpdates' );
-        echo $data['ok'];
+        dd( $data );
         if( strlen( $data) > 0 ) {
             $data = json_decode( $data );
             if( $data->ok == true ){
