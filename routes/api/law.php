@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Law\Book\PartController;
 use App\Http\Controllers\Api\Law\Book\SectionController;
 use App\Http\Controllers\Api\Law\Book\MatraController;
 use App\Http\Controllers\Api\Law\Book\TelegramController;
+use App\Http\Controllers\Api\Law\Book\FavoriteMatraController;
 
 
 Route::group([
@@ -53,11 +54,17 @@ Route::group([
     });
 
     Route::group([
-      'prefix' => 'users' ,
+      'prefix' => 'users/authenticated' ,
       'middleware' => 'auth:api'
     ], function() {
+        Route::get('',[ProfileController::class,'getAuthUser']);
+        Route::put('',[ProfileController::class,'updateAuthUser']);
         Route::post('upload',[UserController::class,'upload']);
         Route::post('picture/upload',[ProfileController::class,'upload']);
+        /** User favorited matras */
+        Route::get('matras', [ MatraController::class , 'ofUser' ]);
+        Route::put('matras/favorite', [ UserController::class , 'favoriteMatra' ]);
+        Route::get('favoriteids', [ FavoriteMatraController::class , 'getFavoriteIds' ] );
     });
 
     Route::group([

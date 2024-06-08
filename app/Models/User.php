@@ -209,6 +209,8 @@ class User extends Authenticatable
     public function appleAuthentication(){
         $this->thirdPartyAuthentications()->where('name',\App\ThirdPartyAuthentication::APPLE)->first();
     }
-
+    public function favoriteMatras(){
+      return $this->belongsToMany( \App\Models\Law\Book\Matra::class , 'favorite_matras' , 'user_id' , 'matra_id' );
+    }
 
 }

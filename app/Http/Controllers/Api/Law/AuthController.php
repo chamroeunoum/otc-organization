@@ -160,25 +160,25 @@ class AuthController extends Controller
                'message' => 'គណនីនេះត្រូវបានបិទជាបណ្ដោះអាសន្ន។'
            ], 403);
         }
-        // /**
-        //  * Check roles
-        //  */
-        // if( 
-        //     empty( 
-        //         array_intersect( 
-        //             $user->roles->pluck('id')->toArray() , 
-        //             \App\Models\Role::where('tag','client')->pluck('id')->toArray() 
-        //         ) 
-        //     ) 
-        // ){
-        //     /**
-        //      * User seem does not have any right to login into backend / core service
-        //      */
-        //     return response()->json([
-        //         'user' => $user ,
-        //         'message' => "គណនីនេះមិនមានសិទ្ធិគ្រប់គ្រាន់។"
-        //     ],403);
-        // }
+        /**
+         * Check roles
+         */
+        if( 
+            empty( 
+                array_intersect( 
+                    $user->roles->pluck('id')->toArray() , 
+                    \App\Models\Role::whereIn('name',['backend','client'])->pluck('id')->toArray() 
+                ) 
+            ) 
+        ){
+            /**
+             * User seem does not have any right to login into backend / core service
+             */
+            return response()->json([
+                'user' => $user ,
+                'message' => "គណនីនេះមិនមានសិទ្ធិគ្រប់គ្រាន់។"
+            ],403);
+        }
 
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;

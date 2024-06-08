@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Law\Book;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\CrudController;
 use Illuminate\Http\Request;
 use App\Models\Law\Book\Book AS RecordModel;
 use App\Models\Law\Book\Kunty;
@@ -12,8 +13,6 @@ use App\Models\Law\Book\Part;
 use App\Models\Law\Book\Section;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\CrudController;
-
 class BookController extends Controller
 {
     private $selectedFields ;

@@ -526,4 +526,22 @@ class UserController extends Controller
             ],403);
         }
     }
+    public function favoriteMatra(Request $request){
+        $user = \Auth::user();
+        if( $user == null ) return response()->json( [
+            'ok' => false ,
+            'message' => "សូមចូលប្រើប្រព័ន្ធជាមុនសិន។"
+        ] , 403);
+        $matra = intval( $request->id ) > 0 ? \App\Models\Law\Book\Matra::find( intval( $request->id ) ) : null ;
+        if( $matra == null ) return response()->json( [
+            'ok' => false ,
+            'message' => "សូមបញ្ជាក់អំពីមាត្រាដែលអ្នកចូលចិត្ត។"
+        ] , 422);
+        $result = $user->favoriteMatras()->toggle([$matra->id]);
+        return response()->json([
+            'ok' => true ,
+            'message' => 'រួចរាល់។' ,
+            'result' => $result
+        ],200);
+    }
 }

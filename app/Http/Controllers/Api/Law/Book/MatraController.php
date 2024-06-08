@@ -145,8 +145,7 @@ class MatraController extends Controller
             'title' => function($title){
                 return html_entity_decode( strip_tags( $title ) );
             }
-        ]
-    );
+        ]);
 
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true;
@@ -495,5 +494,140 @@ class MatraController extends Controller
                 'message' => __("crud.read.failed")
             ]
         );
+    }
+    /**
+     * User Favorited Matras
+     */
+    public function ofUser(Request $request){
+        $user = \Auth::user();
+        if( $user == null ) return response()->json( [
+            'ok' => false ,
+            'message' => "សូមចូលប្រើប្រព័ន្ធជាមុនសិន"
+        ] , 403);
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+        $book_id = isset( $request->book_id ) && intval( $request->book_id ) ? $request->book_id : false ;
+        $kunty_id = isset( $request->kunty_id ) && intval( $request->kunty_id ) ? $request->kunty_id : false ;
+        $matika_id = isset( $request->matika_id ) && intval( $request->matika_id ) ? $request->matika_id : false ;
+        $chapter_id = isset( $request->chapter_id ) && intval( $request->chapter_id ) ? $request->chapter_id : false ;
+        $part_id = isset( $request->part_id ) && intval( $request->part_id ) ? $request->part_id : false ;
+        $section_id = isset( $request->section_id ) && intval( $request->section_id ) ? $request->section_id : false ;
+
+        $queryString = [
+            "where" => [
+                'default' => [
+                    [
+                        'field' => 'book_id' ,
+                        'value' => $book_id === false ? "" : $book_id
+                    ],
+                    [
+                        'field' => 'kunty_id' ,
+                        'value' => $kunty_id === false ? "" : $kunty_id
+                    ],
+                    [
+                        'field' => 'matika_id' ,
+                        'value' => $matika_id === false ? "" : $matika_id
+                    ],
+                    [
+                        'field' => 'chapter_id' ,
+                        'value' => $chapter_id === false ? "" : $chapter_id
+                    ],
+                    [
+                        'field' => 'part_id' ,
+                        'value' => $part_id === false ? "" : $part_id
+                    ],
+                    [
+                        'field' => 'section_id' ,
+                        'value' => $section_id === false ? "" : $section_id
+                    ],
+                ],
+                // 'in' => [] ,
+                // 'not' => [] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'number' ,
+                //         'value' => $number === false ? "" : $number
+                //     ],
+                //     [
+                //         'field' => 'year' ,
+                //         'value' => $date === false ? "" : $date
+                //     ]
+                // ] ,
+            ] ,
+            // "pivots" => [
+            //     // $unit ?
+            //     // [
+            //     //     "relationship" => 'units',
+            //     //     "where" => [
+            //     //         "in" => [
+            //     //             "field" => "id",
+            //     //             "value" => [$request->unit]
+            //     //         ],
+            //     //     // "not"=> [
+            //     //     //     [
+            //     //     //         "field" => 'fieldName' ,
+            //     //     //         "value"=> 'value'
+            //     //     //     ]
+            //     //     // ],
+            //     //     // "like"=>  [
+            //     //     //     [
+            //     //     //        "field"=> 'fieldName' ,
+            //     //     //        "value"=> 'value'
+            //     //     //     ]
+            //     //     // ]
+            //     //     ]
+            //     // ]
+            //     // : []
+            // ],
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'number','title', 'meaning'
+                ]
+            ],
+            "order" => [
+                'field' => 'id' ,
+                'by' => 'asc'
+            ],
+        ];
+
+        $request->merge( $queryString );
+
+        $crud = new CrudController(new RecordModel(), $request, ['id', 'number','title', 'meaning' , 'book_id', 'kunty_id', 'matika_id', 'chapter_id' , 'part_id', 'section_id' , 'created_by' , 'updated_by' ]);
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            "book" => ['id','title','description'] ,
+            "kunty" => ['id', 'number', 'title'],
+            "matika" => ['id', 'number', 'title'],
+            "chapter" => ['id', 'number', 'title'],
+            "part" => ['id', 'number', 'title'],
+            "section" => ['id', 'number', 'title'],
+            'author' => ['id', 'firstname', 'lastname' ,'username'] ,
+            'editor' => ['id', 'firstname', 'lastname', 'username']
+        ]);
+        $builder = $crud->getListBuilder();
+
+        // Filter matra to get only the favorited matra of the authenticated user
+        $favoritedMatraIds = $user->favoriteMatras()->pluck('matra_id')->toArray();
+        $builder->whereIn('id', $favoritedMatraIds );
+
+        $responseData = $crud->pagination(true, $builder,[
+            'meaning' => function($meaning){
+                return html_entity_decode( strip_tags( $meaning ) );
+            } ,
+            'title' => function($title){
+                return html_entity_decode( strip_tags( $title ) );
+            }
+        ]);
+
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true;
+        return response()->json($responseData);
     }
 }

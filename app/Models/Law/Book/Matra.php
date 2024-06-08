@@ -77,6 +77,9 @@ class Matra extends Model
     {
         return $this->belongsTo(\App\Models\Law\Book\Section::class, 'section_id', 'id');
     }
+    public function favorites(){
+        return $this->belongsToMany( \App\Models\User::class , 'favorite_matras' , 'matra_id' , 'user_id' );
+    }
 
 
     public function folders(){
