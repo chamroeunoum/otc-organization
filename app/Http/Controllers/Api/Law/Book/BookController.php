@@ -34,26 +34,26 @@ class BookController extends Controller
 
 
         $queryString = [
-            // "where" => [
-            //     'default' => [
-            //         [
-            //             'field' => 'type_id' ,
-            //             'value' => $type === false ? "" : $type
-            //         ]
-            //     ],
-            //     'in' => [] ,
-            //     'not' => [] ,
-            //     'like' => [
-            //         [
-            //             'field' => 'number' ,
-            //             'value' => $number === false ? "" : $number
-            //         ],
-            //         [
-            //             'field' => 'year' ,
-            //             'value' => $date === false ? "" : $date
-            //         ]
-            //     ] ,
-            // ] ,
+            "where" => [
+                'default' => [
+                    [
+                        'field' => 'complete' ,
+                        'value' => 1
+                    ]
+                ],
+                // 'in' => [] ,
+                // 'not' => [] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'number' ,
+                //         'value' => $number === false ? "" : $number
+                //     ],
+                //     [
+                //         'field' => 'year' ,
+                //         'value' => $date === false ? "" : $date
+                //     ]
+                // ] ,
+            ] ,
             // "pivots" => [
             //     $unit ?
             //     [
@@ -97,7 +97,33 @@ class BookController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->selectedFields);
+        $crud = new CrudController(new RecordModel(), $request, 
+            // Selected fields
+            $this->selectedFields,
+            // Fields with callback
+            [
+                'meaning' => function($record){
+                    return html_entity_decode( strip_tags( $record->meaning ) );
+                } ,
+                'title' => function($record){
+                    return html_entity_decode( strip_tags( $record->title ) );
+                }
+            ],
+            // Rename fields
+            false,
+            // Extra fields
+            [
+                'total_kunties' => function($record){ return $record->kunties != null ? $record->kunties()->count() : 0 ; } ,
+                'total_matikas' => function($record){ return $record->matikas != null ? $record->matikas()->count() : 0 ; } ,
+                'total_chapters' => function($record){ return $record->chapters != null ? $record->chapters()->count() : 0 ; } ,
+                'total_parts' => function($record){ return $record->parts != null ? $record->parts()->count() : 0 ; } ,
+                'total_sections' => function($record){ return $record->sections != null ? $record->sections()->count() : 0 ; } ,
+                'total_matras' => function($record){ return $record->matras != null ? $record->matras()->count() : 0 ; }
+            ],
+            // Storage driver
+            'public'
+        );
+
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             'createdBy' => ['id', 'firstname', 'lastname' ,'username'] ,
@@ -671,6 +697,27 @@ class BookController extends Controller
                 return response()->json([
                     'regulator' => $regulator ,
                     'structure' => $regulator->getContent($request->id) ,
+                    'ok' => true ,
+                    'message' => __("crud.read.success")
+                ]);
+            }
+            return response()->json([
+                'ok' => false,
+                'message' => __("crud.read.failed")
+            ]);
+        }
+        return response()->json([
+            'record' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    public function content(Request $request){
+        if (($user = $request->user()) !== null) {
+            $book = RecordModel::select(['id','title','description'])->where('id',$request->id)->first();
+            if ( $book !== null ) {
+                return response()->json([
+                    'book' => $book ,
+                    'structure' => RecordModel::getContent($book->id) ,
                     'ok' => true ,
                     'message' => __("crud.read.success")
                 ]);

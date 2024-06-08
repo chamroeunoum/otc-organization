@@ -10,8 +10,7 @@ use App\Http\Controllers\Api\Admin\Law\Book\MatraController;
 
 /** Book SECTION */
 Route::group([
-  'prefix' => 'law' ,
-  'namespaces' => '\App\Http\Controllers\Api\Admin\Book' ,
+  'prefix' => 'book' ,
   'middleware' => 'auth:api'
   ], function() {
 
@@ -164,6 +163,28 @@ Route::group([
       Route::delete('{id}', [ SectionController::class , 'delete' ] ); 
   });
   /**
+   * Matra Section
+   */
+  Route::group([
+    'prefix' => 'matras' ,
+    ], function() {
+      Route::get('', [ MatraController::class , 'index' ] );
+      Route::post('', [ MatraController::class , 'store' ] );
+      Route::put('', [ MatraController::class , 'update' ] );
+      Route::get('{id}/read', [ MatraController::class , 'read' ] );
+      // Route::get('{id}/read', [ MatraController::class , function(Request $request){
+      //   return response()->json(["ok"=>true, 'id' => $request->id ],200);
+      // } ] );
+      Route::delete('{id}/delete', [ MatraController::class , 'delete' ] );
+      Route::put('exists', [ MatraController::class , 'exists' ] );
+
+      /** Activate / Deactivate the data for using */
+      Route::put('{id}/activate', [ MatraController::class , 'active' ]);
+      Route::put('{id}/deactivate', [ MatraController::class , 'unactive' ]);
+      /** Mini display */
+      Route::get('compact', [ MatraController::class , 'compactList' ] );
+  });
+  /**
    * types Section
    */
   Route::group([
@@ -185,27 +206,5 @@ Route::group([
 
       /** Mini display */
       Route::get('compact', "TypeController@compactList");
-  });
-  /**
-   * types Section
-   */
-  Route::group([
-    'prefix' => 'matras' ,
-    ], function() {
-      Route::get('', [ MatraController::class , 'index' ] );
-      Route::post('', [ MatraController::class , 'store' ] );
-      Route::put('', [ MatraController::class , 'update' ] );
-      Route::get('{id}/read', [ MatraController::class , 'read' ] );
-      // Route::get('{id}/read', [ MatraController::class , function(Request $request){
-      //   return response()->json(["ok"=>true, 'id' => $request->id ],200);
-      // } ] );
-      Route::delete('{id}/delete', [ MatraController::class , 'delete' ] );
-      Route::put('exists', [ MatraController::class , 'exists' ] );
-
-      /** Activate / Deactivate the data for using */
-      Route::put('{id}/activate', [ MatraController::class , 'active' ]);
-      Route::put('{id}/deactivate', [ MatraController::class , 'unactive' ]);
-      /** Mini display */
-      Route::get('compact', [ MatraController::class , 'compactList' ] );
   });
 });

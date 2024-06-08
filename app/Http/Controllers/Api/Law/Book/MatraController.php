@@ -16,12 +16,12 @@ class MatraController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-        $book_id = isset( $request->book_id ) && $request->book_id >0 ? $request->book_id : false ;
-        $kunty_id = isset( $request->kunty_id ) && $request->kunty_id >0 ? $request->kunty_id : false ;
-        $matika_id = isset( $request->matika_id ) && $request->matika_id >0 ? $request->matika_id : false ;
-        $chapter_id = isset( $request->chapter_id ) && $request->chapter_id >0 ? $request->chapter_id : false ;
-        $part_id = isset( $request->part_id ) && $request->part_id >0 ? $request->part_id : false ;
-        $section_id = isset( $request->section_id ) && $request->section_id >0 ? $request->section_id : false ;
+        $book_id = isset( $request->book_id ) && intval( $request->book_id ) ? $request->book_id : false ;
+        $kunty_id = isset( $request->kunty_id ) && intval( $request->kunty_id ) ? $request->kunty_id : false ;
+        $matika_id = isset( $request->matika_id ) && intval( $request->matika_id ) ? $request->matika_id : false ;
+        $chapter_id = isset( $request->chapter_id ) && intval( $request->chapter_id ) ? $request->chapter_id : false ;
+        $part_id = isset( $request->part_id ) && intval( $request->part_id ) ? $request->part_id : false ;
+        $section_id = isset( $request->section_id ) && intval( $request->section_id ) ? $request->section_id : false ;
 
         $queryString = [
             "where" => [
@@ -110,7 +110,7 @@ class MatraController extends Controller
         $crud = new CrudController(new RecordModel(), $request, ['id', 'number','title', 'meaning' , 'book_id', 'kunty_id', 'matika_id', 'chapter_id' , 'part_id', 'section_id' , 'created_by' , 'updated_by' ]);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
-            "regulator" => ['id','number','title','objective','year'] ,
+            "book" => ['id','title','description'] ,
             "kunty" => ['id', 'number', 'title'],
             "matika" => ['id', 'number', 'title'],
             "chapter" => ['id', 'number', 'title'],

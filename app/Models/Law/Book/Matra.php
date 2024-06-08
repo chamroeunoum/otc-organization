@@ -55,7 +55,7 @@ class Matra extends Model
     }
     public function book()
     {
-        return $this->belongsTo(\App\Models\Law\Book\Book::class, 'bid', 'id');
+        return $this->belongsTo(\App\Models\Law\Book\Book::class, 'book_id', 'id');
     }
     public function kunty()
     {

@@ -70,7 +70,7 @@ class AuthController extends Controller
         /**
          * Assign role to user
          */
-        $clientClientRole = \App\Models\Role::where('name','Client')->first();
+        $clientClientRole = \App\Models\Role::where('name','client')->first();
         if( $clientClientRole != null ){
             $user->assignRole( $clientClientRole );
         }
@@ -163,11 +163,19 @@ class AuthController extends Controller
         /**
          * Check roles
          */
-        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core_service')->pluck('id')->toArray() ) ) ){
+        if( 
+            empty( 
+                array_intersect( 
+                    $user->roles->pluck('id')->toArray() , 
+                    \App\Models\Role::where('tag','core_service')->pluck('id')->toArray() 
+                ) 
+            ) 
+        ){
             /**
              * User seem does not have any right to login into backend / core service
              */
             return response()->json([
+                'user' => $user ,
                 'message' => "គណនីនេះមិនមានសិទ្ធិគ្រប់គ្រាន់។"
             ],403);
         }
