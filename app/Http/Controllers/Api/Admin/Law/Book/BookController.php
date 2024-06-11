@@ -421,6 +421,59 @@ class BookController extends Controller
             'message' => __("crud.auth.failed")
         ], 401);
     }
+    /** Active the record */
+    public function complete(Request $request)
+    {
+        if (($user = $request->user()) !== null) {
+            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields  );
+            if ($crud->booleanField('complete', 1)) {
+                $record = $crud->formatRecord($record = $crud->read());
+                return response(
+                    [
+                        'record' => $record,
+                        'ok' => true ,
+                        'message' => 'Completed !'
+                    ]);
+            } else {
+                return response(
+                    [
+                        'ok' => false ,
+                        'message' => 'There is not record matched !'
+                    ]);
+            }
+        }
+        return response()->json([
+            'record' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
+    /** Unactive the record */
+    public function uncomplete(Request $request)
+    {
+        if (($user = $request->user()) !== null) {
+            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
+            if ( $crud->booleanField('complete', 0) ) {
+                $record = $crud->formatRecord($record = $crud->read());
+                // User does exists
+                return response(
+                    [
+                        'record' => $record,
+                        'ok' => true ,
+                        'message' => 'Uncompleted !'
+                    ]);
+            } else {
+                return response(
+                    [
+                        'ok' => false ,
+                        'message' => 'There is not record matched !'
+                    ]);
+            }
+        }
+        return response()->json([
+            'record' => null,
+            'message' => __("crud.auth.failed")
+        ], 401);
+    }
     /**
      * Remove file
      */

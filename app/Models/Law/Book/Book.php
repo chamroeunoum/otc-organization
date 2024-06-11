@@ -92,11 +92,11 @@ class Book extends Model
                 if( $k->matikas()->count() ){
                     $k->matikas = $k->matikas()->select(['id','number','title'])->get()->map(function($matika){
                         $matika->type = "matika" ;
-                        $matika->chapters = $matika->chapters()->select(['id','number','title'])->get()->map(function($c){
+                        $matika->chapters = $matika->chapters()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($c){
                             $c->type = "chapter" ;
-                            $c->parts = $c->parts()->select(['id','number','title'])->get()->map(function($p){
+                            $c->parts = $c->parts()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($p){
                                 $p->type = "part" ;
-                                $p->sections = $p->sections()->select(['id','number','title'])->get()->map(function($s){
+                                $p->sections = $p->sections()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($s){
                                     $s->type = "section" ;
                                     // $s->matras;
                                     return $s;
@@ -111,12 +111,12 @@ class Book extends Model
                         return $matika;
                     });
                 }
-                if( $k->chapters()->count() ){
-                    $k->chapters = $k->chapters()->select(['id','number','title'])->get()->map(function($c){
+                else if( $k->chapters()->count() ){
+                    $k->chapters = $k->chapters()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($c){
                         $c->type = "chapter" ;
-                        $c->parts = $c->parts()->select(['id','number','title'])->get()->map(function($p){
+                        $c->parts = $c->parts()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($p){
                             $p->type = "part" ;
-                            $p->sections = $p->sections()->select(['id','number','title'])->get()->map(function($s){
+                            $p->sections = $p->sections()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($s){
                                 $s->type = "section" ;
                                 // $s->matras;
                                 return $s;
@@ -132,7 +132,7 @@ class Book extends Model
                 return $k;
             });
         }
-        if( $book->matikas()
+        else if( $book->matikas()
             ->where(function($query){
                 $query->whereNull('kunty_id')->orWhere('kunty_id',0);
             })->count()
@@ -140,13 +140,13 @@ class Book extends Model
             $book->matikas = $book->matikas()
             ->where(function($query){
                 $query->whereNull('kunty_id')->orWhere('kunty_id',0);
-            })->select(['id','number','title'])->get()->map(function($matika){
+            })->select(['id','number','title'])->orderby('number','asc')->get()->map(function($matika){
                 $matika->type = "matika" ;
-                $matika->chapters = $matika->chapters()->select(['id','number','title'])->get()->map(function($c){
+                $matika->chapters = $matika->chapters()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($c){
                     $c->type = "chapter" ;
-                    $c->parts = $c->parts()->select(['id','number','title'])->get()->map(function($p){
+                    $c->parts = $c->parts()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($p){
                         $p->type="part";
-                        $p->sections = $p->sections()->select(['id','number','title'])->get()->map(function($s){
+                        $p->sections = $p->sections()->select(['id','number','title'])->orderby('number','asc')->get()->map(function($s){
                             $s->type="section";
                             // $s->matras;
                             return $s;
@@ -161,7 +161,7 @@ class Book extends Model
                 return $matika;
             });
         }
-        if( $book->chapters()
+        else if( $book->chapters()
             ->where(function($query){
                 $query->whereNull('kunty_id')->orWhere('kunty_id',0);
             })->where(function($query){
@@ -173,7 +173,7 @@ class Book extends Model
                 $query->whereNull('kunty_id')->orWhere('kunty_id',0);
             })->where(function($query){
                 $query->whereNull('matika_id')->orWhere('matika_id',0);
-            })->select(['id','number','title'])->get()->map(function($c){
+            })->select(['id','number','title'])->orderby('number','asc')->get()->map(function($c){
                 $c->type = "chapter" ;
                 $c->parts = $c->parts->map(function($p){
                     $p->type="part";

@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\Admin\Law\Book\MatraController;
 
 /** Book SECTION */
 Route::group([
-  'prefix' => 'book' ,
+  'prefix' => 'law' ,
   'middleware' => 'auth:api'
   ], function() {
 
@@ -38,6 +38,8 @@ Route::group([
       /** Activate / Deactivate the data for using */
       Route::put('{id}/activate', [BookController::class , 'active']);
       Route::put('{id}/deactivate', [BookController::class , 'unactive']);
+      Route::put('{id}/uncomplete', [BookController::class , 'uncomplete']);
+      Route::put('{id}/complete', [BookController::class , 'complete']);
       Route::get('{id}/content', [BookController::class , 'content']);
 
       Route::delete('{id}', [BookController::class , 'delete']);

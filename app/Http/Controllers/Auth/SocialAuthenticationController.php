@@ -418,18 +418,24 @@ class SocialAuthenticationController extends Controller
     {
         $CLIENT_ID_GOOGLE_IOS = env('GOOGLE_CLIENT_ID_IOS');
         $CLIENT_ID_GOOGLE_ANDROID = env('GOOGLE_CLIENT_ID_ANDROID');
+        $CLIENT_ID_GOOGLE_WEBAPP = env('GOOGLE_CLIENT_ID');
         $clientIOS = new Google_client(['client_id' => $CLIENT_ID_GOOGLE_IOS]);  // iOS client
         $clientAndroid = new Google_Client(['client_id' => $CLIENT_ID_GOOGLE_ANDROID]);  // Android client
+        $clientWebapp = new Google_Client(['client_id' => $CLIENT_ID_GOOGLE_WEBAPP]);  // Webapp
         $payload = null;
         $user_id = null;
         if (($payload = $clientIOS->verifyIdToken($request->stoken)) !== false) {
             $user_id = 'g' . $payload['sub'];
         } else if (($payload = $clientAndroid->verifyIdToken($request->stoken)) !== false) {
             $user_id = 'g' . $payload['sub'];
+        } else if (($payload = $clientWebapp->verifyIdToken($request->stoken)) !== false) {
+            $user_id = 'g' . $payload['sub'];
         } else {
             /** Error verify user_id */
         }
-        // dd( $payload );
+        return response()->json( [
+            'payload' => $payload
+        ],200 );
 
         /** Check user with his/her facebook_id or email or phone */
         $queryBuilder = \App\User::

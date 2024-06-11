@@ -28,7 +28,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'firstname', 'lastname', 'email', 'password','phone', 'active', 'activation_token', 'avatar' , 'avatar_url' , 'username' , 'login_count' , 'last_login' , 'last_logout' , 'ip' , 'mac_address' , 'authenip' , 'authy_id' , 'people_id'
+        'firstname', 'lastname', 'email', 'password','phone', 'active', 'activation_token', 'avatar' , 'avatar_url' , 'username' , 'login_count' , 'last_login' , 'last_logout' , 'ip' , 'mac_address' , 'authenip' , 'authy_id' , 'people_id' , 'google_user_id' , 'google_user_email' , 'google_user_phone', 'google_user_picture' , 'google_user_fullname' , 'google_user_lastname' , 'google_user_firstname' 
     ];
 
     /**

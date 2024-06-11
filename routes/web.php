@@ -19,3 +19,34 @@ Route::get('/', function () {
     return "";
     // return view('welcome');
 });
+
+Route::group(['middleware' => ['web']], function () {
+    // Facebook
+    Route::group(
+        [ 
+        'prefix' => 'google',
+        'middleware' => 'api'
+        ]
+        ,function(){
+            Route::post('redirect', function(Request $request){
+                return Socialite::driver('google')->redirect();
+            });
+            Route::post('callback', function(Request $request){
+                $googleUser = Socialite::driver('google')->user();
+                $user = User::updateOrCreate([
+                'github_id' => $googleUser->id,
+                ], [
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken,
+                ]);
+            
+                Auth::login($user);
+            
+                return redirect('/dashboard');
+            });
+        }
+    );
+});
+

@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +15,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+use App\Http\Controllers\Api\Law\GoogleController;
 use App\Http\Controllers\Api\Law\AuthController;
 use App\Http\Controllers\Api\Law\UserController;
 use App\Http\Controllers\Api\Law\ProfileController;
@@ -26,10 +30,12 @@ use App\Http\Controllers\Api\Law\Book\TelegramController;
 use App\Http\Controllers\Api\Law\Book\FavoriteMatraController;
 
 
+
 Route::group([
     'prefix' => 'law' ,
     'api'
   ],function(){
+
 
     /** RESET PASSWORD */
     Route::put('password/forgot',[UserController::class,'forgotPassword']);
@@ -54,6 +60,17 @@ Route::group([
     });
 
     Route::group([
+      'prefix' => 'auth'
+    ], function () {
+      Route::group([
+        'prefix' => 'google' ,
+        'middleware' => 'api'
+      ], function() {
+          Route::post('signin', [GoogleController::class,'updateOrCreate']);
+      });
+    });
+
+    Route::group([
       'prefix' => 'users/authenticated' ,
       'middleware' => 'auth:api'
     ], function() {
@@ -69,7 +86,7 @@ Route::group([
 
     Route::group([
       'prefix' => 'books' ,
-      'middleware' => 'auth:api'
+      'middleware' => 'api'
     ],function(){
       Route::get('',[BookController::class,'index']);
       Route::get('{id}/read',[BookController::class,'read']);

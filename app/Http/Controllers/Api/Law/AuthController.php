@@ -26,21 +26,60 @@ class AuthController extends Controller
      */
     public function signup(Request $request)
     {
-        $request->validate([
-            'firstname' => 'required|string',
-            'lastname' => 'required|string',
-            'phone' => 'required|string|unique:users',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed'
-        ]);
+        // $result = $request->validate([
+        //     'firstname' => 'required|string',
+        //     'lastname' => 'required|string',
+        //     'phone' => 'required|string|unique:users',
+        //     'email' => 'required|string|email|unique:users',
+        //     'password' => 'required|string|confirmed'
+        // ]);
+
+        if( strlen( trim( $request->firstname ) ) <= 0 || strlen( trim( $request->lastname ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "សូមបំពេញ គោត្តនាម និង នាម។"
+            ],422);            
+        }
+
+        if( strlen( trim( $request->password ) ) <= 0 || strlen( trim( $request->password_confirmation ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "សូមបំពេញ ពាក្យសម្ងាត់ និង បញ្ចាក់ពាក្យសម្ងាត់។"
+            ],422);            
+        }
+        if( strlen( trim( $request->password ) ) > 0 && strlen( trim( $request->password_confirmation ) ) > 0 && $request->password != $request->password_confirmation ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "ពាក្យសម្រាត់ និងការបញ្ជាក់ពាក្យសម្ងាត់ មិនផ្ទៀងផ្ទាត់គ្នា។"
+            ],422);            
+        }
+
+        if( strlen( trim( $request->email ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => "សូមបំពេញ អ៊ីមែលរបស់អ្នក។"
+            ],422);            
+        }
+
+        /**
+         * Check email
+         */
+        $user = \App\Models\User::where('email',$request->email )->first();
+        if( $user != null ){
+            // This email is already in exits
+            return response()->json([
+                'ok' => false ,
+                'message' => 'អ៊ីមែលនេះមានរួចហើយ។'
+            ],403);
+        }
 
         $user = new User([
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'name' => $request->lastname . ' ' . $request->firstname ,
-            'phone' => $request->phone ,
-            'username' => $request->email,
-            'email' => $request->email,
+            'phone' => $request->phone??"" ,
+            'username' => $request->email??"",
+            'email' => $request->email??"",
             'active' => 1 , // Unactive user
             'password' => bcrypt($request->password),
             'activation_token' => strtoupper( Str::random(6) )

@@ -121,6 +121,10 @@ class MatraController extends Controller
         ]);
         $builder = $crud->getListBuilder();
         
+        $builder->whereHas('book',function($bookQuery){
+            $bookQuery->where('complete',1)->where('active',1);
+        });
+
         // /** Filter by regulator id */
         // if( $request->book_id > 0 ){
         //     $builder = $builder->where('book_id',$request->book_id);
