@@ -46,7 +46,7 @@ class TelegramController extends Controller
          * Check whether the admin and super admin come to visit
          * This does not allow the admin and super admin to visit
          */
-        if( !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
+        if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
             $user = null ;
             return response()->json([
                 'ok' => false ,
