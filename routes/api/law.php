@@ -27,7 +27,7 @@ use App\Http\Controllers\Api\Law\Book\ChapterController;
 use App\Http\Controllers\Api\Law\Book\PartController;
 use App\Http\Controllers\Api\Law\Book\SectionController;
 use App\Http\Controllers\Api\Law\Book\MatraController;
-use App\Http\Controllers\Api\Law\Book\TelegramController;
+use App\Http\Controllers\Api\Law\Book\TelegramBotController;
 use App\Http\Controllers\Api\Law\Book\FavoriteMatraController;
 
 
@@ -253,7 +253,7 @@ Route::group([
       'prefix' => 'telegram' ,
       'middleware' => 'api'
     ],function(){
-      Route::post('webhook', [TelegramController::class,'handleWebhook']);
-      Route::get('getupdates',[TelegramController::class,'getUpdates']);
+      Route::post('webhook', [TelegramBotController::class,'handleWebhook']);
+      Route::get('getupdates',[TelegramBotController::class,'getUpdates']);
     });
 });

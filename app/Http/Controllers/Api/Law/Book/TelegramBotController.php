@@ -19,7 +19,7 @@ use Telegram\Bot\Laravel\Facades\Telegram;
 use NotificationChannels\Telegram\TelegramMessage;
 use NotificationChannels\Telegram\TelegramUpdates;
 
-class TelegramController extends Controller
+class TelegramBotController extends Controller
 {
 
     private $selectedFields ;
