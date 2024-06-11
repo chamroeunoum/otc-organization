@@ -102,14 +102,14 @@ class TelegramController extends Controller
         }else{
             /** If does not exist then create account for user */
             $user = \App\Models\User::create([
-                'firstname' => $request->lastname,
-                'lastname' => $request->firstname,
-                'name' => $request->lastname . ' ' . $request->firstname,
+                'firstname' => $request->last_name,
+                'lastname' => $request->first_name,
+                'name' => $request->last_name . ' ' . $request->first_name,
                 'password' => bcrypt('1234567890!@#$%^&*()'),
                 'active' => 1,
                 'telegram_user_id' => $request->id ,
-                'telegram_user_lastname' => $request->lastname ,
-                'telegram_user_firstname' => $request->firstname ,
+                'telegram_user_lastname' => $request->last_name ,
+                'telegram_user_firstname' => $request->first_name ,
                 'telegram_user_username' => $request->username ,
                 'telegram_user_picture' => $request->photo_url ,
                 'telegram_user_hash' => $request->hash ,
@@ -128,13 +128,13 @@ class TelegramController extends Controller
             if( $user->people_id > 0 && ( $person = \App\Models\People\People::find( $user->people_id )->onlyTrashed()->first() ) != null ){
                 $person->restore();
                 $person->update([
-                    'firstname' => $request->firstname ,
-                    'lastname' => $request->lastname
+                    'firstname' => $request->first_name ,
+                    'lastname' => $request->last_name
                 ]);
             }else{
                 $person = \App\Models\People\People::create([
-                    'firstname' => $request->firstname ,
-                    'lastname' => $request->lastname
+                    'firstname' => $request->first_name ,
+                    'lastname' => $request->last_name
                 ]);
             }
             $user->people_id = $person->id;
