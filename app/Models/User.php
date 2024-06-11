@@ -178,7 +178,7 @@ class User extends Authenticatable
     {
         parent::boot();
         static::deleting(function($obj) {
-            \Storage::disk('public')->delete($obj->image);
+          if( $obj->image != null && strlen(trim( $obj->image ))) \Storage::disk('public')->delete($obj->image);
         });
     }
     /**
