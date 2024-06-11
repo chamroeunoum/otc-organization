@@ -16,6 +16,7 @@ use Laravel\Socialite\Facades\Socialite;
 |
 */
 use App\Http\Controllers\Api\Law\GoogleController;
+use App\Http\Controllers\Api\Law\TelegramController;
 use App\Http\Controllers\Api\Law\AuthController;
 use App\Http\Controllers\Api\Law\UserController;
 use App\Http\Controllers\Api\Law\ProfileController;
@@ -67,6 +68,12 @@ Route::group([
         'middleware' => 'api'
       ], function() {
           Route::post('signin', [GoogleController::class,'updateOrCreate']);
+      });
+      Route::group([
+        'prefix' => 'telegram' ,
+        'middleware' => 'api'
+      ], function() {
+          Route::post('signin', [TelegramController::class,'updateOrCreate']);
       });
     });
 
