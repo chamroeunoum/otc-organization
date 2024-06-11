@@ -27,12 +27,26 @@ class TelegramController extends Controller
         last_name: "OUM" -> telegram_user_lastname
         photo_url: "https://t.me/i/userpic/320/17SfzmPHs2An_FggmTXO5jGxH-MlK1RrKPQ4sT3OG0E.jpg" -> telegram_user_picture
         */
+        $email = '' ;
+        if( isset( $request->email ) && strlen(trim($request->email))>0 ){
+            $email = $request->email;
+        }else{
+            $email = $request->first_name . $request->last_name . $request->id . "@telegram.otc";
+        }
         // Check whether has been already registerd
         $user = \App\Models\User::
             where('telegram_user_id', $request->id)
             ->whereNotNull('telegram_user_id')
             ->first();
         
+        // Check whether the user is already our member with the email
+        if( $user == null ){
+            $user = \App\Models\User::
+            where('email', $email)
+            ->whereNotNull('email')
+            ->first();
+        }
+
         // Check whether the user is already our member with the email
         if( $user == null && $request->hash != "" ){
             $user = \App\Models\User::
@@ -63,6 +77,10 @@ class TelegramController extends Controller
                 $query->where('telegram_user_hash', $request->hash)
                 ->whereNotNull('telegram_user_hash');
             })
+            ->orWhere(function($query) use($request){
+                $query->where('email', $email)
+                ->whereNotNull('email');
+            })
             ->onlyTrashed()
             ->first() ) !== null) {
             /**
@@ -70,7 +88,7 @@ class TelegramController extends Controller
              * Check whether the admin and super admin come to visit
              * This does not allow the admin and super admin to visit
              */
-            if( !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
+            if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
                 // if the deleted account is the admin or super admin type then this operation does not allow
                 $user == null ;
                 return response()->json([
@@ -94,7 +112,7 @@ class TelegramController extends Controller
                 'telegram_user_auth_date' => $request->auth_date ,
             ]);
             if( strlen(trim($user->email)) <= 0 || $user->email == null ){
-                $user->update(['email' => $request->username.$request->id.'@telegram.otc']);
+                $user->update(['email' => $email ]);
             }
             if( strlen(trim($user->username)) <= 0 || $user->username == null ){
                 $user->update(['username' => $request->username ]);
@@ -114,7 +132,7 @@ class TelegramController extends Controller
                 'telegram_user_picture' => $request->photo_url ,
                 'telegram_user_hash' => $request->hash ,
                 'telegram_user_auth_date' => $request->auth_date ,
-                'email' => $request->username.$request->id.'@telegram.otc' ,
+                'email' => $email ,
                 'username' => $request->username
             ]);
             $clientClientRole = \App\Models\Role::where('name','client')->orWhere('name','Client')->first();
@@ -129,12 +147,14 @@ class TelegramController extends Controller
                 $person->restore();
                 $person->update([
                     'firstname' => $request->first_name ,
-                    'lastname' => $request->last_name
+                    'lastname' => $request->last_name ,
+                    'email' => $email
                 ]);
             }else{
                 $person = \App\Models\People\People::create([
                     'firstname' => $request->first_name ,
-                    'lastname' => $request->last_name
+                    'lastname' => $request->last_name ,
+                    'email' => $email
                 ]);
             }
             $user->people_id = $person->id;

@@ -27,15 +27,21 @@ class GoogleController extends Controller
         picture: "https://lh3.googleusercontent.com/a/ACg8ocJ3BXrm7vWWO_A-9VVRIKnX-6Brji0vMuICqShCBJsqq95YawBW=s96-c"
         sub: "115273140778490497838"
         */
+        $email = '' ;
+        if( isset( $request->email ) && strlen(trim($request->email))>0 ){
+            $email = $request->email;
+        }else{
+            $email = $request->given_name . $request->family_name . $request->sub . "@google.otc" ;
+        }
         // Check whether has been already registerd
         $user = \App\Models\User::
             where('google_user_id', $request->sub)
             ->whereNotNull('google_user_id')
             ->first();
         // Check whether the user is already our member with the email
-        if( $user == null && $request->email != "" ){
+        if( $user == null ){
                 $user = \App\Models\User::
-                where('email', $request->email)
+                where('email', $email )
                 ->whereNotNull('email')
                 ->first();
         }
@@ -52,7 +58,7 @@ class GoogleController extends Controller
          * Check whether the admin and super admin come to visit
          * This does not allow the admin and super admin to visit
          */
-        if( !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
+        if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
             $user = null ;
             return response()->json([
                 'ok' => false ,
@@ -70,7 +76,7 @@ class GoogleController extends Controller
                 ->whereNotNull('phone');
             })
             ->orWhere(function($query) use($request){
-                $query->where('email', $request->email)
+                $query->where('email', $email)
                 ->whereNotNull('email');
             })->onlyTrashed()
             ->first() ) !== null) {
@@ -79,7 +85,7 @@ class GoogleController extends Controller
              * Check whether the admin and super admin come to visit
              * This does not allow the admin and super admin to visit
              */
-            if( !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
+            if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
                 // if the deleted account is the admin or super admin type then this operation does not allow
                 $user == null ;
                 return response()->json([
@@ -99,7 +105,7 @@ class GoogleController extends Controller
                 'google_user_firstname' => $request->given_name ,
                 'google_user_fullname' => $request->name ,
                 'google_user_picture' => $request->picture ,
-                'google_user_email' => $request->email 
+                'google_user_email' => $email 
             ]);
         }else{
             /** If does not exist then create account for user */
@@ -107,12 +113,12 @@ class GoogleController extends Controller
                 'firstname' => $request->family_name,
                 'lastname' => $request->given_name,
                 'name' => $request->family_name . ' ' . $request->given_name,
-                'email' => $request->email,
+                'email' => $email,
                 'phone' => $request->phone != "" ? $request->phone : "",
                 'password' => bcrypt('1234567890!@#$%^&*()'),
                 'active' => 1,
                 'google_user_id' => $request->sub,
-                'google_user_email' => $request->email,
+                'google_user_email' => $email,
                 'google_user_picture' => $request->picture ,
                 'google_user_phone' => $request->phone != "" ? $request->phone : "",
                 'google_user_lastname' => $request->family_name,
