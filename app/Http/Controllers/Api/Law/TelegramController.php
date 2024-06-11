@@ -99,8 +99,8 @@ class TelegramController extends Controller
         }else{
             /** If does not exist then create account for user */
             $user = \App\Models\User::create([
-                'firstname' => $request->family_name,
-                'lastname' => $request->given_name,
+                'firstname' => $request->lastname,
+                'lastname' => $request->firstname,
                 'name' => $request->lastname . ' ' . $request->firstname,
                 'password' => bcrypt('1234567890!@#$%^&*()'),
                 'active' => 1,
