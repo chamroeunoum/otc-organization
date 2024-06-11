@@ -124,13 +124,13 @@ class TelegramController extends Controller
             if( $user->people_id > 0 && ( $person = \App\Models\People\People::find( $user->people_id )->onlyTrashed()->first() ) != null ){
                 $person->restore();
                 $person->update([
-                    'firstname' => $user->firstname??$user->telegram_user_firstname ,
-                    'lastname' => $user->lastname??$user->telegram_user_lastname
+                    'firstname' => $request->firstname ,
+                    'lastname' => $request->lastname
                 ]);
             }else{
                 $person = \App\Models\People\People::create([
-                    'firstname' => $user->firstname??$user->telegram_user_firstname ,
-                    'lastname' => $user->lastname??$user->telegram_user_lastname
+                    'firstname' => $request->firstname ,
+                    'lastname' => $request->lastname
                 ]);
             }
             $user->people_id = $person->id;
