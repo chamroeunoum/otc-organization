@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\People\People;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\File;
 use Laravolt\Avatar\Avatar;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -166,9 +167,13 @@ class GoogleController extends Controller
                 $avatar = new Avatar();
                 $profile_picture = $avatar->create($user->name)->getImageObject()->encode('png');
             }
+            $path = 'avatars/' . $user->id ;
+            if(!File::isDirectory($path)){
+                File::makeDirectory($path, 0777, true, true);
+            }
             $uniqeName = md5( $user->name );
-            Storage::disk(env("FILESYSTEM_DRIVER","public"))->put('avatars/' . $user->id . '/'.$uniqeName.'.png', (string) $profile_picture, "public");
-            $user->avatar_url = 'avatars/' . $user->id . '/'.$uniqeName.'.png';
+            Storage::disk(env("FILESYSTEM_DRIVER","public"))->put( $path . '/'.$uniqeName.'.png', (string) $profile_picture, "public");
+            $user->avatar_url = $path . '/'.$uniqeName.'.png';
             $user->save();
         }
 
