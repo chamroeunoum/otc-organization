@@ -69,7 +69,7 @@ class TelegramController extends Controller
         }
 
         /** Just in case admin has deleted user from system with SoftDeletes */
-        if (( $user = \App\Models\User::where(function($query) use($request){
+        if (( $user = \App\Models\User::where(function($query) use($request, $email ){
                 $query->where('telegram_user_id', $request->id)
                 ->whereNotNull('telegram_user_id');
             })

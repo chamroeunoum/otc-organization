@@ -67,7 +67,7 @@ class GoogleController extends Controller
         }
 
         /** Just in case admin has deleted user from system with SoftDeletes */
-        if (( $user = \App\Models\User::where(function($query) use($request){
+        if (( $user = \App\Models\User::where(function($query) use($request, $email){
                 $query->where('google_user_id', $request->sub)
                 ->whereNotNull('google_user_id');
             })
