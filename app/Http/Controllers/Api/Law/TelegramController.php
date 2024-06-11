@@ -61,7 +61,7 @@ class TelegramController extends Controller
             })
             ->orWhere(function($query) use($request){
                 $query->where('telegram_user_hash', $request->hash)
-                ->whereNotNull('hasg');
+                ->whereNotNull('hash');
             })
             ->onlyTrashed()
             ->first() ) !== null) {
