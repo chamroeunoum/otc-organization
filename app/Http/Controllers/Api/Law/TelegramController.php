@@ -90,7 +90,7 @@ class TelegramController extends Controller
                 'telegram_user_firstname' => $request->firstname ,
                 'telegram_user_username' => $request->username ,
                 'telegram_user_picture' => $request->photo_url ,
-                'telegram_user_hash' => $request->hash ,
+                'telegram_user_hash' => $request->hash , 
                 'telegram_user_auth_date' => $request->auth_date
             ]);
         }else{
