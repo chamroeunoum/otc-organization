@@ -168,11 +168,14 @@ class GoogleController extends Controller
                 $profile_picture = $avatar->create($user->name)->getImageObject()->encode('png');
             }
             $path = 'avatars/' . $user->id ;
-            File::ensureDirectoryExists( $path );
-            $uniqeName = md5( $user->name );
-            Storage::disk(env("FILESYSTEM_DRIVER","public"))->put( $path . '/'.$uniqeName.'.png', (string) $profile_picture, "public");
-            $user->avatar_url = $path . '/'.$uniqeName.'.png';
-            $user->save();
+            if( !Storage::disk('public')->exists( $path ) ){
+                if( Storage::makeDirectory( $path ) ){
+                    $uniqeName = md5( $user->name );
+                    Storage::disk(env("FILESYSTEM_DRIVER","public"))->put( $path . '/'.$uniqeName.'.png', (string) $profile_picture, "public");
+                    $user->avatar_url = $path . '/'.$uniqeName.'.png';
+                    $user->save();
+                }
+            }
         }
 
         if( $user ){
