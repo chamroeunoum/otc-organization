@@ -71,11 +71,11 @@ class GoogleController extends Controller
                 $query->where('google_user_id', $request->sub)
                 ->whereNotNull('google_user_id');
             })
-            ->orWhere(function($query) use($request){
+            ->orWhere(function($query) use($request, $email){
                 $query->where('phone', $request->phone)
                 ->whereNotNull('phone');
             })
-            ->orWhere(function($query) use($request){
+            ->orWhere(function($query) use($request, $email){
                 $query->where('email', $email)
                 ->whereNotNull('email');
             })->onlyTrashed()

@@ -73,11 +73,11 @@ class TelegramController extends Controller
                 $query->where('telegram_user_id', $request->id)
                 ->whereNotNull('telegram_user_id');
             })
-            ->orWhere(function($query) use($request){
+            ->orWhere(function($query) use($request, $email){
                 $query->where('telegram_user_hash', $request->hash)
                 ->whereNotNull('telegram_user_hash');
             })
-            ->orWhere(function($query) use($request){
+            ->orWhere(function($query) use($request, $email){
                 $query->where('email', $email)
                 ->whereNotNull('email');
             })
