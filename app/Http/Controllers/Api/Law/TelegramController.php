@@ -96,6 +96,9 @@ class TelegramController extends Controller
             if( strlen(trim($user->email)) <= 0 || $user->email == null ){
                 $user->update(['email' => $request->username.$request->id.'@telegram.otc']);
             }
+            if( strlen(trim($user->username)) <= 0 || $user->username == null ){
+                $user->update(['username' => $request->username ]);
+            }
         }else{
             /** If does not exist then create account for user */
             $user = \App\Models\User::create([
@@ -111,7 +114,8 @@ class TelegramController extends Controller
                 'telegram_user_picture' => $request->photo_url ,
                 'telegram_user_hash' => $request->hash ,
                 'telegram_user_auth_date' => $request->auth_date ,
-                'email' => $request->username.$request->id.'@telegram.otc'
+                'email' => $request->username.$request->id.'@telegram.otc' ,
+                'username' => $request->username
             ]);
             $clientClientRole = \App\Models\Role::where('name','client')->orWhere('name','Client')->first();
             if( $clientClientRole != null ){
