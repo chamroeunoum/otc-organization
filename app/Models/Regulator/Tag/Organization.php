@@ -45,6 +45,21 @@ class Organization extends Tag
     public function totalChildNodesOfAllLevels(){
         return $this->where('tpid',"LIKE", $this->tpid . ":" . $this->id . "%" )->count();
     }
+    public function totalStaffsOfAllLevels(){
+        $staffs = $this->where('tpid',"LIKE", $this->tpid . ":" . $this->id . "%" )->pluck('id')->map(function($organizationId){
+            if( ( $organization = Organization::find( $organizationId ) ) != null ){
+                return [
+                    'totalOfficers' => 
+                    // ( $organization->leader != null ? $organization->leader->count() : 0 ) + 
+                    ( $organization->staffs != null ? $organization->staffs->count() : 0 )
+                ];
+            }
+            return [
+                'totalOfficers' => 0
+            ] ;
+        });
+        return $staffs->sum('totalOfficers');
+    }
     /**
      * Relationship
      */

@@ -36,18 +36,52 @@ class PeopleController extends Controller
     public function index(Request $request){
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
-        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
-        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+        $perPage = isset( $request->perPage ) && intval( $request->perPage ) > 0 ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && intval( $request->page ) > 0 ? $request->page : 1 ;
+        
+        $positions = isset( $request->positions ) ? explode(',',$request->positions) : false ;
+        if( is_array( $positions ) && !empty( $positions ) ){
+            $positions = array_filter( $positions, function($position){
+                return intval( $position ) > 0 ;
+            } );
+        }
+
+        $organizations = isset( $request->organizations ) ? explode(',',$request->organizations) : false ;
+        if( is_array( $organizations ) && !empty( $organizations ) ){
+            $organizations = array_filter( $organizations , function($organization){
+                return intval( $organization ) > 0 ;
+            } );
+        }
+
+        $peopleIds = isset( $request->ids ) ? explode(',',$request->ids) : false ;
+        if( is_array( $peopleIds ) && !empty( $peopleIds ) ){
+            $peopleIds = array_filter( $peopleIds , function($peopleId){
+                return intval( $peopleId ) > 0 ;
+            } );
+        }
+
+        // return response()->json([
+        //     'positions' => $positions ,
+        //     'organizations' => $organizations ,
+        //     'peopleIds' => $peopleIds ,
+        // ],200);
         
         $queryString = [
-            // "where" => [
+            "where" => [
             //     'default' => [
             //         [
             //             'field' => 'type_id' ,
             //             'value' => $type === false ? "" : $type
             //         ]
             //     ],
-            //     'in' => [] ,
+                'in' => [
+                    is_array( $peopleIds ) && !empty( $peopleIds )
+                        ?   [
+                            'field' => 'id' ,
+                            'value' => $peopleIds
+                        ]
+                        : []
+                ] ,
             //     'not' => [] ,
             //     'like' => [
             //         [
@@ -59,32 +93,31 @@ class PeopleController extends Controller
             //             'value' => $date === false ? "" : $date
             //         ]
             //     ] ,
-            // ] ,
-            // "pivots" => [
-            //     $unit ?
-            //     [
-            //         "relationship" => 'units',
-            //         "where" => [
-            //             "in" => [
-            //                 "field" => "id",
-            //                 "value" => [$request->unit]
-            //             ],
-            //         // "not"=> [
-            //         //     [
-            //         //         "field" => 'fieldName' ,
-            //         //         "value"=> 'value'
-            //         //     ]
-            //         // ],
-            //         // "like"=>  [
-            //         //     [
-            //         //        "field"=> 'fieldName' ,
-            //         //        "value"=> 'value'
-            //         //     ]
-            //         // ]
-            //         ]
-            //     ]
-            //     : []
-            // ],
+            ] ,
+            "pivots" => [
+                is_array( $organizations ) && !empty( $organizations ) ?
+                [
+                    "relationship" => 'organizations',
+                    "where" => [
+                        "in" => [
+                            "field" => "organization_id",
+                            "value" => $organizations
+                        ]
+                    ]
+                ]
+                : [] ,
+                is_array( $positions ) && !empty( $positions ) ?
+                [
+                    "relationship" => 'positions',
+                    "where" => [
+                        "in" => [
+                            "field" => "position_id",
+                            "value" => $positions
+                        ]
+                    ]
+                ]
+                : []
+            ],
             "pagination" => [
                 'perPage' => $perPage,
                 'page' => $page
@@ -461,15 +494,19 @@ class PeopleController extends Controller
             ],403);
         }
 
-        if( $record->image != null && $record->image != "" && Storage::disk('public')->exists( $record->image )  ){
-            $record->image = Storage::disk("public")->url( $record->image  );
-        }else{
-            $record->image = null ;
-        }
-
+        $record->user;
         $record->countesies;
         $record->positions;
         $record->organizations;
+        $record = $record->toArray();
+
+        $record['image'] = $record['image'] != null && trim($record['image'] ) != "" && \Storage::disk('public')->exists( $record['image'] )
+            ? \Storage::disk('public')->url( $record['image'] )
+            : (
+                $record['user'] != null && $record['user']['avatar_url'] != null && trim($record['user']['avatar_url']) != "" && \Storage::disk('public')->exists( $record['user']['avatar_url'] )
+                ? \Storage::disk('public')->url( $record['user']['avatar_url'] )
+                : false
+            );
 
         return response()->json([
             'record' => $record ,

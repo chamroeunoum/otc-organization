@@ -11,7 +11,7 @@ use App\Models\Regulator\Tag\Position as RecordModel;
 class PositionController extends Controller
 {
     private $model = null ;
-    private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'record_index'  ] ;
+    private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'record_index' , 'active' ] ;
     private $renameFields = [
         'pid' => 'parentId'
     ];
@@ -24,13 +24,21 @@ class PositionController extends Controller
     public function index(Request $request){
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
-        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
-        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-        $id = intval( $request->id ) > 0 ? intval( $request->id ) : 489 ; // 489 តំណែងក្នុងអង្គភាព
-        $root = $id > 0 
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? intval( $request->perPage ) : 50 ;
+        $page = isset( $request->page ) && $request->page !== "" ? intval( $request->page ) : 1 ;
+        $id = isset( $request->id ) && intval( $request->id ) > 0? intval( $request->id ) : false ; // 163 គឺ រាជរដ្ឋាភិបាល
+
+        $root = $id 
             ? RecordModel::where('id',$id)->first()
             : RecordModel::where('model', get_class( $this->model ) )->first();
-
+        if( $root == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ក្រសួងស្ថាប័ននេះមិនមានឡើយ។'
+            ],422);
+        }
+        $root->parentNode;
+        $root->totalChilds = $root->totalChildNodesOfAllLevels();
         $queryString = [
             "where" => [
                 // 'default' => [
@@ -39,23 +47,25 @@ class PositionController extends Controller
                 //         'value' => $pid
                 //     ] : [] ,
                 // ],
+                
                 // 'in' => [] ,
+
                 // 'not' => [
                 //     [
                 //         'field' => 'id' ,
                 //         'value' => 4
                 //     ]
                 // ] ,
-                // 'like' => [
-                //     [
-                //         'field' => 'number' ,
-                //         'value' => $number === false ? "" : $number
-                //     ],
-                //     [
-                //         'field' => 'year' ,
-                //         'value' => $date === false ? "" : $date
-                //     ]
-                // ] ,
+                'like' => [
+                    [
+                        'field' => 'tpid' ,
+                        'value' => ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%"
+                    ],
+                    // [
+                    //     'field' => 'year' ,
+                    //     'value' => $date === false ? "" : $date
+                    // ]
+                ] ,
             ] ,
             "pagination" => [
                 'perPage' => $perPage,
@@ -74,19 +84,210 @@ class PositionController extends Controller
         ];
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->fields , false , $this->renameFields );
+        $crud = new CrudController(new RecordModel(), $request, $this->fields , false , $this->renameFields , [
+            'totalChilds' => function($record){
+                return $record->totalChildNodesOfAllLevels();
+            },
+            // 'totalStaffsOfAllLevels' => function($record){
+            //     return $record->totalStaffsOfAllLevels();
+            // },
+            // 'totalLeaders' => function($record){
+            //     return $record->leader == null ? 0 : $record->leader->count();
+            // },
+            // 'totalStaffs' => function($record){
+            //     return $record->staffs == null ? 0 : $record->staffs->count();
+            // },
+            'pid' => function($record){
+                return $record->pid;
+            }
+        ] );
+
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            // 'leader' => [ 
+            //     'id' , 'firstname' , 'lastname' , 'image' 
+            //     , 'organizations' => [ 'id' , 'name', 'desp' ]
+            //     , 'positions' => [ 'id' , 'name', 'desp' ]
+            //     , 'countesies' => [ 'id' , 'name', 'desp' ]
+            // ] ,
+            // 'staffs' => [ 
+            //     'id' , 'firstname' , 'lastname' , 'image' 
+            //     // , 'organizations' => [ 'id' , 'name', 'desp' ]
+            //     // , 'positions' => [ 'id' , 'name', 'desp' ]
+            //     // , 'countesies' => [ 'id' , 'name', 'desp' ]
+            // ],
+            'parentNode' => [
+                'id' , 'name'
+            ],
+            'childNodes' => [
+                'id' , 'name'
+            ]
+        ]);
+
         $builder = $crud->getListBuilder();
         
-        $builder = $builder->where('tpid', "LIKE" , ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%");
+        // $builder->where('tpid', "LIKE" , ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%" );
         $root->parentId = null ;
 
+        $root->leader = $root->leader != null
+            ? $root->leader->map(function($leader){
+                $leader->organizations;
+                $leader->positions;
+                $leader->countesies;
+                return $leader ;
+            }) : [] ;
+
+        // $root->staffs = $root->staffs != null
+        // ? $root->staffs->map(function($staff){
+        //     $staff->organizations;
+        //     $staff->positions;
+        //     $staff->countesies;
+        //     return $staff ;
+        // }) : [] ;
+
         $responseData = $crud->pagination(true , $builder );
-        $responseData['records'] = $responseData['records']; // ->prepend( $root );
-        $responseData['records'] = $responseData['records']->map(function($organization){
-            $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
-            $organization['staffs'] = $org != null ? $org->organizationStaffs : [] ;
-            return $organization;
-        });
+        $responseData['root'] = $root ;
+        // $responseData['records'] = $responseData['records']->prepend( $root );
+        // $responseData['records'] = $responseData['records']->map(function($organization){
+        //     $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
+        //     $organization['staffs'] = $org != null ? $org->staffs->map(function($staff){
+        //         $staff->organizations;
+        //         $staff->positions;
+        //         $staff->countesies;
+        //         return $staff ;
+        //     }) : [] ;
+        //     $organization['leader'] = $org != null ? $org->leader->map(function($leader){
+        //         $leader->organizations;
+        //         $leader->positions;
+        //         $leader->countesies;
+        //         return $leader ;
+        //     }) : [] ;
+        //     return $organization;
+        // });
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        return response()->json($responseData);
+    }
+    /**
+     * Listing function
+     */
+    public function listByParent(Request $request){
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? intval( $request->perPage ) : 50 ;
+        $page = isset( $request->page ) && $request->page !== "" ? intval( $request->page ) : 1 ;
+        $id = intval( $request->id ) > 0 ? intval( $request->id ) : false ;
+        $root = $id
+            ? RecordModel::where('id',$id)->first()
+            : RecordModel::where('model', get_class( $this->model ) )->first();
+        $root->totalChilds = $root->totalChildNodesOfAllLevels();
+
+        $queryString = [
+            "where" => [
+                // 'default' => [
+                //     $pid > 0 ? [
+                //         'field' => 'pid' ,
+                //         'value' => $pid
+                //     ] : [] ,
+                // ],
+                
+                // 'in' => [] ,
+
+                // 'not' => [
+                //     [
+                //         'field' => 'id' ,
+                //         'value' => 4
+                //     ]
+                // ] ,
+                'like' => [
+                    [
+                        'field' => 'tpid' ,
+                        'value' => ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%"
+                    ],
+                    // [
+                    //     'field' => 'year' ,
+                    //     'value' => $date === false ? "" : $date
+                    // ]
+                ] ,
+            ] ,
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'name' , 'desp'
+                ]
+            ],
+            "order" => [
+                'field' => 'record_index' ,
+                'by' => 'asc'
+            ],
+        ];
+        $request->merge( $queryString );
+
+        $crud = new CrudController(new RecordModel(), $request, $this->fields , false , $this->renameFields , [
+            'totalChilds' => function($record){
+                return $record->totalChildNodesOfAllLevels();
+            }
+        ] );
+
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            'leader' => [ 
+                'id' , 'firstname' , 'lastname' , 'image' 
+                , 'organizations' => [ 'id' , 'name', 'desp' ]
+                , 'positions' => [ 'id' , 'name', 'desp' ]
+                , 'countesies' => [ 'id' , 'name', 'desp' ]
+            ] ,
+            'staffs' => [ 
+                'id' , 'firstname' , 'lastname' , 'image' 
+                // , 'organizations' => [ 'id' , 'name', 'desp' ]
+                // , 'positions' => [ 'id' , 'name', 'desp' ]
+                // , 'countesies' => [ 'id' , 'name', 'desp' ]
+            ]
+        ]);
+
+        $builder = $crud->getListBuilder();
+        
+        // $builder->where('tpid', "LIKE" , ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%" );
+        $root->parentId = null ;
+
+        $root->leader = $root->leader != null
+            ? $root->leader->map(function($leader){
+                $leader->organizations;
+                $leader->positions;
+                $leader->countesies;
+                return $leader ;
+            }) : [] ;
+
+        // $root->staffs = $root->staffs != null
+        // ? $root->staffs->map(function($staff){
+        //     $staff->organizations;
+        //     $staff->positions;
+        //     $staff->countesies;
+        //     return $staff ;
+        // }) : [] ;
+
+        $responseData = $crud->pagination(true , $builder );
+        $responseData['records'] = $responseData['records']->prepend( $root );
+        // $responseData['records'] = $responseData['records']->map(function($organization){
+        //     $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
+        //     $organization['staffs'] = $org != null ? $org->staffs->map(function($staff){
+        //         $staff->organizations;
+        //         $staff->positions;
+        //         $staff->countesies;
+        //         return $staff ;
+        //     }) : [] ;
+        //     $organization['leader'] = $org != null ? $org->leader->map(function($leader){
+        //         $leader->organizations;
+        //         $leader->positions;
+        //         $leader->countesies;
+        //         return $leader ;
+        //     }) : [] ;
+        //     return $organization;
+        // });
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
@@ -98,31 +299,46 @@ class PositionController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 1000 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+        
+        $id = isset( $request->id ) && intval( $request->id ) > 0? intval( $request->id ) : false ; // 163 គឺ រាជរដ្ឋាភិបាល
+
+        $root = $id > 0 
+            ? RecordModel::where('id',$id)->first()
+            : RecordModel::where('model', get_class( $this->model ) )->first();
+        if( $root == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ក្រសួងស្ថាប័ននេះមិនមានឡើយ។'
+            ],422);
+        }
+
         $queryString = [
             "where" => [
                 // 'default' => [
-                //     [
-                //         'field' => 'model' ,
-                //         'value' => ''
-                //     ],
+                //     $pid > 0 ? [
+                //         'field' => 'pid' ,
+                //         'value' => $pid
+                //     ] : [] ,
                 // ],
+                
                 // 'in' => [] ,
+
                 // 'not' => [
                 //     [
                 //         'field' => 'id' ,
                 //         'value' => 4
                 //     ]
                 // ] ,
-                // 'like' => [
-                //     [
-                //         'field' => 'number' ,
-                //         'value' => $number === false ? "" : $number
-                //     ],
-                //     [
-                //         'field' => 'year' ,
-                //         'value' => $date === false ? "" : $date
-                //     ]
-                // ] ,
+                'like' => [
+                    [
+                        'field' => 'tpid' ,
+                        'value' => ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%"
+                    ],
+                    // [
+                    //     'field' => 'year' ,
+                    //     'value' => $date === false ? "" : $date
+                    // ]
+                ] ,
             ] ,
             "pagination" => [
                 'perPage' => $perPage,
@@ -140,23 +356,57 @@ class PositionController extends Controller
             ],
         ];
         $request->merge( $queryString );
+
         $crud = new CrudController(new RecordModel(), $request, $this->fields );
-        $responseData = $crud->pagination(true, $this->model->childNodes()->orderby('record_index','asc') );
+
+        $builder = $crud->getListBuilder();
+        $responseData = $crud->pagination(true , $builder );
+
+        $responseData['records'] = $responseData['records'];
+        // ->prepend( $root );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);
+    }
+    public function read(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់។'
+            ],201);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'មិនមានព័ត៌មាននេះឡើយ។'
+            ],201);
+        }
+        return response()->json([
+            'record' => $record ,
+            'ok' => true ,
+            'message' => 'រួចរាល់'
+        ],200);
     }
     /**
      * Create an account
      */
     public function store(Request $request){
+        // Get parent
+        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 163 ) ;
+        if( $parentNode == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ស្ថាប័នមេ នេះមិនមានឡើយ។'
+            ],403);
+        }
         // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
         $record = RecordModel::create([
             'name' => $request->name,
             'desp' => $request->desp ,
-            'image' => $request->image ,
-            'pid' => null ,
-            'tpid' => null
+            'pid' => $parentNode->id ,
+            'tpid' => $parentNode->tpid .':'. $parentNode->id ,
+            'image' => null
         ]);
 
         if( $record ){
@@ -181,102 +431,78 @@ class PositionController extends Controller
         $parent = intval( $request->pid ) > 0 
             ? RecordModel::find($request->pid) 
             : null ;
-        if( $parent == null ){
+        $child = intval( $request->cid ) > 0 
+            ? RecordModel::find($request->cid) 
+            : null ;
+        if( $parent == null || $child == null ){
             return response()->json([
                 'ok' => false ,
-                'message' => "សូមជ្រើសរើសមេជាមុនសិន។"
+                'message' => "សូមជ្រើសរើស អង្គភាពមេ និង អង្គភាពចំណុះ។"
             ],350);
         }
-        /**
-         * In case the child that is going to be added is the child of the govenment
-         */
-        $root = null ;
-        if( $parent->tpid == null || $parent->tpid <=0 ){
-            $root = RecordModel::where('model', get_class( new RecordModel ) )->first();
-        }
-        // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
-        $record = new RecordModel();
-        $record->name = $request->name ;
-        $record->desp = $request->desp;
-        $record->image = '' ;
-        $record->pid = $parent->id ;
-        $record->save();
-        // $record = RecordModel::create([
-        //     'name' => $request->name,
-        //     'desp' => $request->desp ,
-        //     'image' => $request->image ,
-        //     'pid' => $parent->id ,
-        //     'tpid' => ''
-        // ]);
-        $record->tpid = ( $parent->tpid != "" ? $parent->tpid : $parent->pid ).":".$parent->id;
-        $record->save();
-
-        if( $record ){
-            return response()->json([
-                'record' => $record ,
-                'ok' => true ,
-                'message' => 'បង្កើតបានរួចរាល់'
-            ], 200);
-
-        }else {
-            return response()->json([
-                'user' => null ,
-                'ok' => false ,
-                'message' => 'មានបញ្ហា។'
-            ], 201);
-        }
+        $child->pid = $parent->id ;
+        $child->save();
+        return response()->json([
+            'child' => $child ,
+            'parent' => $parent ,
+            'ok' => true ,
+            'message' => 'បានភ្ជាប់អង្គភាបចំណុះរួចរាល់។'
+        ], 200);
     }
     /**
-     * Create an account
+     * Update an account
      */
     public function update(Request $request){
-        $record = isset( $request->id ) && $request->id > 0 ? RecordModel::find($request->id) : false ;
-        if( $record ) {
-            $updateData = [
-                'name' => $request->name ,
-                'desp' => $request->desp ,
-                'image' => $request->image
-            ];
-            intval( $request->pid ) > 0
-                ? $updateData['pid'] = $request->pid
-                : false ;
-            $record->update( $updateData );
+        // Get parent
+        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 163 ) ;
+        if( $parentNode == null ){
             return response()->json([
-                'record' => $record ,
-                'message' => 'កែប្រែព័ត៌មានរួចរាល់ !' ,
-                'ok' => true
-            ], 200);
-        }else{
-            // អ្នកប្រើប្រាស់មិនមាន
-            return response([
-                'record' => null ,
-                'message' => 'គណនីដែលអ្នកចង់កែប្រែព័ត៌មាន មិនមានឡើយ។' ,
-                'ok' => false
-            ], 403);
+                'ok' => false ,
+                'message' => 'ស្ថាប័នមេនេះមិនមានឡើយ។'
+            ],403);
         }
+        $record = isset( $request->id ) && intval( $request->id ) > 0 ? RecordModel::find($request->id) : null ;
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ស្ថាប័នមនេះមិនមានឡើយ។'
+            ],403);
+        }
+        $updateData = [
+            'name' => $request->name ,
+            'desp' => $request->desp ,
+            'pid' => $parentNode->id ,
+            'tpid' => $parentNode->tpid != null && $parentNode->tpid != "" ? $parentNode->tpid .':'. $parentNode->id : $parentNode->id ,
+        ];
+        $record->update( $updateData );
+        return response()->json([
+            'record' => $record ,
+            'message' => 'កែប្រែព័ត៌មានរួចរាល់ !' ,
+            'ok' => true
+        ], 200);
     }
     /**
      * Active function of the account
      */
     public function active(Request $request){
-        $user = RecordModel::find($request->id) ;
-        if( $user ){
-            $user->active = $request->active ;
-            $user->save();
-            // User does exists
+        $record = RecordModel::find($request->id) ;
+        if( $record ){
+            $record->active = $request->active ;
+            $record->save();
+            // record does exists
             return response([
-                'user' => $user ,
+                'record' => $record ,
                 'ok' => true ,
-                'message' => 'គណនី '.$user->name.' បានបើកដោយជោគជ័យ !' 
+                'message' => 'ជោគជ័យ !' 
                 ],
                 200
             );
         }else{
-            // User does not exists
+            // record does not exists
             return response([
-                'user' => null ,
+                'record' => null ,
                 'ok' => false ,
-                'message' => 'សូមទោស គណនីនេះមិនមានទេ !' 
+                'message' => 'សូមទោស មិនមានទេ !' 
                 ],
                 201
             );
@@ -286,24 +512,24 @@ class PositionController extends Controller
      * Unactive function of the account
      */
     public function unactive(Request $request){
-        $user = RecordModel::find($request->id) ;
-        if( $user ){
-            $user->active = 0 ;
-            $user->save();
-            // User does exists
+        $record = RecordModel::find($request->id) ;
+        if( $record ){
+            $record->active = 0 ;
+            $record->save();
+            // Urecordser does exists
             return response([
                 'ok' => true ,
-                'user' => $user ,
-                'message' => 'គណនី '.$user->name.' បានបិទដោយជោគជ័យ !' 
+                'record' => $record ,
+                'message' => 'ជោគជ័យ !' 
                 ],
                 200
             );
         }else{
             // User does not exists
             return response([
-                'user' => null ,
+                'record' => null ,
                 'ok' => false ,
-                'message' => 'សូមទោស គណនីនេះមិនមានទេ !' ],
+                'message' => 'សូមទោសមិនមានទេ !' ],
                 201
             );
         }
@@ -516,5 +742,99 @@ class PositionController extends Controller
         // $responseData['sql'] = $builder->toSql();
         return response()->json($responseData, 200);
     }
-
+    /**
+     * Set leader
+     */
+    public function setLeader(Request $request){
+        $record = isset( $request->organization_id ) && $request->organization_id > 0 ? RecordModel::find($request->organization_id) : false ;
+        if( $record ) {
+            if( intval( $request->people_id ) > 0 ){
+                $record->leader()->sync([$request->people_id]);
+            }else{
+                $record->leader()->sync([]);
+            }
+            $record->leader = $record->leader->map(function( $leader ){
+                $leader->positions;
+                $leader->countesies;
+                return $leader ;
+            });
+            $record->staffs = $record->staffs->map(function( $staff ){
+                $staff->positions;
+                $staff->countesies;
+                return $staff ;
+            });
+            return response()->json([
+                'record' => $record ,
+                'message' => 'ជោគជ័យ!' ,
+                'ok' => true
+            ], 200);
+        }else{
+            // អ្នកប្រើប្រាស់មិនមាន
+            return response([
+                'record' => null ,
+                'message' => 'មានបញ្ហាពេលកំណត់ថ្នាក់ដឹកនាំសម្រាប់ក្រសួង ស្ថាប័ន។' ,
+                'ok' => false
+            ], 500);
+        }
+    }
+    /**
+     * Get people within the orgainzation
+     */
+    public function people(Request $request ){
+        $record = isset( $request->id ) && $request->id > 0 ? RecordModel::find($request->id) : false ;
+        if( $record ) {
+            $record->leader = $record->leader->map(function( $leader ){
+                $leader->positions;
+                $leader->countesies;
+                return $leader ;
+            });
+            $record->staffs = $record->staffs->map(function( $staff ){
+                $staff->positions;
+                $staff->countesies;
+                return $staff ;
+            });
+            return response()->json([
+                'record' => $record ,
+                'message' => 'ជោគជ័យ!' ,
+                'ok' => true
+            ], 200);
+        }else{
+            // អ្នកប្រើប្រាស់មិនមាន
+            return response([
+                'record' => null ,
+                'message' => 'មានបញ្ហាក្នុងពេលអានព័ត៌មាន សមាសភាព ក្នុងក្រសួងស្ថាប័ន។' ,
+                'ok' => false
+            ], 500);
+        }
+    }
+    public function addPeopleToOrganization(Request $request ){
+        $record = isset( $request->organization_id ) && $request->organization_id > 0 ? RecordModel::find($request->organization_id) : false ;
+        if( $record ) {
+            if( intval( $request->people_id ) > 0 ){
+                $record->staffs()->toggle([$request->people_id]);
+            }
+            $record->leader = $record->leader->map(function( $leader ){
+                $leader->positions;
+                $leader->countesies;
+                return $leader ;
+            });
+            $record->staffs = $record->staffs->map(function( $staff ){
+                $staff->positions;
+                $staff->countesies;
+                return $staff ;
+            });
+            return response()->json([
+                'record' => $record ,
+                'message' => 'ជោគជ័យ!' ,
+                'ok' => true
+            ], 200);
+        }else{
+            // អ្នកប្រើប្រាស់មិនមាន
+            return response([
+                'record' => null ,
+                'message' => 'មានបញ្ហាពេលកំណត់ថ្នាក់ដឹកនាំសម្រាប់ក្រសួង ស្ថាប័ន។' ,
+                'ok' => false
+            ], 500);
+        }
+    }
 }

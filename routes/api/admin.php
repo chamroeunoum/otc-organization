@@ -127,12 +127,15 @@ Route::group([
         'middleware' => 'auth:api'
         ], function() {
             Route::get('',[OrganizationController::class,'index']);
+            Route::get('compact',[OrganizationController::class,'compact']);
+            Route::get('listbyparent',[OrganizationController::class,'listByParent']);
             Route::post('create',[OrganizationController::class,'store']);
             Route::post('addchild',[OrganizationController::class,'addChild']);
             Route::put('update',[OrganizationController::class,'update']);
             Route::get('{id}/read',[OrganizationController::class,'read']);
             Route::delete('{id}/delete',[OrganizationController::class,'destroy']);
             Route::put('activate',[OrganizationController::class,'active']);
+            Route::put('deactivate',[OrganizationController::class,'unactive']);
             /**
              * Check the unique user information
              */
@@ -142,6 +145,33 @@ Route::group([
             Route::get('{id}/people',[ OrganizationController::class , 'people']);
             Route::put('setleader',[ OrganizationController::class , 'setLeader']);
             Route::put('addstaff',[ OrganizationController::class , 'addPeopleToOrganization']);
+    });
+
+    /** POSITION SECTION */
+    Route::group([
+        'prefix' => 'positions' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[PositionController::class,'index']);
+            Route::get('compact',[PositionController::class,'compact']);
+            Route::get('listbyparent',[PositionController::class,'listByParent']);
+            Route::post('create',[PositionController::class,'store']);
+            Route::post('addchild',[PositionController::class,'addChild']);
+            Route::put('update',[PositionController::class,'update']);
+            Route::get('{id}/read',[PositionController::class,'read']);
+            Route::delete('{id}/delete',[PositionController::class,'destroy']);
+            Route::put('activate',[PositionController::class,'active']);
+            Route::put('deactivate',[PositionController::class,'unactive']);
+            /**
+             * Check the unique user information
+             */
+            Route::get('children',[PositionController::class,'getChildren']);
+            Route::get('regulators',[PositionController::class,'getRegulators']);
+            Route::get('staffs',[ PositionController::class , 'staffs']);
+            Route::get('{id}/people',[ PositionController::class , 'people']);
+            Route::put('setleader',[ PositionController::class , 'setLeader']);
+            Route::put('addstaff',[ PositionController::class , 'addPeopleToPosition']);
     });
 
     /** COUNTESY SECTION */
@@ -250,39 +280,39 @@ Route::group([
             Route::delete('',[RegulatorParentController::class,'destroy']);
     });
 
-    Route::group([
-        'prefix' => 'organizations' ,
-        ], function() {
-            Route::get('',[OrganizationController::class,'index']);
-            Route::get('compact', [OrganizationController::class,'compact']);
-            Route::get('read',[OrganizationController::class,'read']);
-            Route::post('',[OrganizationController::class,'create']);
-            Route::put('',[OrganizationController::class,'update']);
-            Route::put('{id}/activate',[OrganizationController::class,'activate']);
-            Route::put('{id}/deactivate',[OrganizationController::class,'deactivate']);
-            Route::delete('',[OrganizationController::class,'destroy']);
+    // Route::group([
+    //     'prefix' => 'organizations' ,
+    //     ], function() {
+    //         Route::get('',[OrganizationController::class,'index']);
+    //         Route::get('compact', [OrganizationController::class,'compact']);
+    //         Route::get('read',[OrganizationController::class,'read']);
+    //         Route::post('',[OrganizationController::class,'create']);
+    //         Route::put('',[OrganizationController::class,'update']);
+    //         Route::put('{id}/activate',[OrganizationController::class,'activate']);
+    //         Route::put('{id}/deactivate',[OrganizationController::class,'deactivate']);
+    //         Route::delete('',[OrganizationController::class,'destroy']);
 
-            Route::get('child',[OrganizationController::class,'child']);
-            Route::post('upload',[OrganizationController::class,'upload']);
+    //         Route::get('child',[OrganizationController::class,'child']);
+    //         Route::post('upload',[OrganizationController::class,'upload']);
             
-    });
+    // });
 
-    Route::group([
-        'prefix' => 'positions' ,
-        ], function() {
-            Route::get('',[PositionController::class,'index']);
-            Route::get('compact', [PositionController::class,'compact']);
-            Route::get('read',[PositionController::class,'read']);
-            Route::post('',[PositionController::class,'create']);
-            Route::put('',[PositionController::class,'update']);
-            Route::put('{id}/activate',[PositionController::class,'activate']);
-            Route::put('{id}/deactivate',[PositionController::class,'deactivate']);
-            Route::delete('',[PositionController::class,'destroy']);
+    // Route::group([
+    //     'prefix' => 'positions' ,
+    //     ], function() {
+    //         Route::get('',[PositionController::class,'index']);
+    //         Route::get('compact', [PositionController::class,'compact']);
+    //         Route::get('read',[PositionController::class,'read']);
+    //         Route::post('',[PositionController::class,'create']);
+    //         Route::put('',[PositionController::class,'update']);
+    //         Route::put('{id}/activate',[PositionController::class,'activate']);
+    //         Route::put('{id}/deactivate',[PositionController::class,'deactivate']);
+    //         Route::delete('',[PositionController::class,'destroy']);
 
-            Route::get('child',[PositionController::class,'child']);
-            Route::post('upload',[PositionController::class,'upload']);
+    //         Route::get('child',[PositionController::class,'child']);
+    //         Route::post('upload',[PositionController::class,'upload']);
             
-    });
+    // });
 
     /** FOLDER SECTION */
     // Route::group([
