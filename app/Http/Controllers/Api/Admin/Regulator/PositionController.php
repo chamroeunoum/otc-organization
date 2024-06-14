@@ -393,7 +393,7 @@ class PositionController extends Controller
      */
     public function store(Request $request){
         // Get parent
-        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 163 ) ;
+        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 489 ) ;
         if( $parentNode == null ){
             return response()->json([
                 'ok' => false ,
@@ -405,7 +405,7 @@ class PositionController extends Controller
             'name' => $request->name,
             'desp' => $request->desp ,
             'pid' => $parentNode->id ,
-            'tpid' => $parentNode->tpid .':'. $parentNode->id ,
+            'tpid' => $parentNode->tpid != null && $parentNode->tpid != "" ? $parentNode->tpid .':'. $parentNode->id : $parentNode->id ,
             'image' => null
         ]);
 
@@ -454,7 +454,7 @@ class PositionController extends Controller
      */
     public function update(Request $request){
         // Get parent
-        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 163 ) ;
+        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 489 ) ;
         if( $parentNode == null ){
             return response()->json([
                 'ok' => false ,
