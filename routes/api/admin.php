@@ -91,6 +91,15 @@ Route::group([
             Route::delete('{id}/delete',[PeopleController::class,'destroy']);
     });
 
+    /** PEOPLE / USER INFORMATION SECTION */
+    Route::group([
+        'prefix' => 'people' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'api'
+        ], function() {
+            Route::get('{id}/read',[PeopleController::class,'read']);
+    });
+
     /** FOLDER SECTION */
     Route::group([
         'prefix' => 'folders' ,
