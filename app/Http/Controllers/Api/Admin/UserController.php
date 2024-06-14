@@ -115,7 +115,10 @@ class UserController extends Controller
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "person" => [ 'id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' , 'mobile_phone' , 'office_phone' , 'nid' , 'email' , 'marry_status' ] ,
-            "roles" => ['id','name', 'tag']
+            "roles" => ['id','name', 'tag'] ,
+            "countesies" => [ 'id' , 'name' ] ,
+            "positions" => [ 'id' , 'name' ] ,
+            "organizations" => [ 'id' , 'name' ] ,
         ]);
 
         $builder = $crud->getListBuilder()->whereNull('deleted_at');
