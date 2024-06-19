@@ -73,6 +73,9 @@ class Regulator extends Model
     public function signatures(){
       return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','regulator_signatures','regulator_id','signature_id');
     }
+    public function books(){
+      return $this->belongsToMany(\App\Models\Law\Book\Book::class,'book_references','regulator_id','book_id');
+  }
 
     // public function setPdfAttribute($value)
     // {

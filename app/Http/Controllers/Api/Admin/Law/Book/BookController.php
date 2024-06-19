@@ -123,7 +123,8 @@ class BookController extends Controller
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             'createdBy' => [ 'id' , 'firstname', 'lastname' ,'username'] ,
-            'updatedBy' => [ 'id' , 'firstname', 'lastname', 'username'] ,
+            'updatedBy' => [ 'id' , 'firstname', 'lastname', 'username'] , 
+            'references' => [ 'id', 'fid' , 'title' , 'objective', 'year' , 'pdf' , 'publish' , 'active' , 'created_by' , 'updated_by' , 'accessibility' ]
         ]);
 
         $builder = $crud->getListBuilder();
@@ -323,30 +324,39 @@ class BookController extends Controller
         ], 401);
     }
     /** Upload file */
-    public function upload(Request $request){
-        if (($user = $request->user()) !== null) {
-            $crud = new CrudController(new RecordModel(), $request, $this->selectedFields  );
-            $record = $crud->read();
-            list($year,$month,$day) = explode('-', \Carbon\Carbon::parse( $record->year )->format('Y-m-d') );
-            $path = 'documents/'.$record->type_id."/".$year;
-            if (($record = $crud->upload('pdfs',$path, new File($_FILES['files']['tmp_name']), $record->id . '-' . $record->type_id.'-'.$year.$month.$day."-".$record->number.'.pdf' , false )) !== false) {
-                // $record = $crud->formatRecord($record);
-                return response()->json([
-                    'record' => $record,
-                    'ok' => true ,
-                    'message' => __("crud.delete.success")
-                ]);
+    public function uploadCover(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $book = \App\Models\Law\Book\Book::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('public')->putFile( 'book/covers' , new File( $_FILES['files']['tmp_name'] ) );
+                $book->cover = $uniqeName ;
+                $book->save();
+                if( Storage::disk('public')->exists( $book->cover ) ){
+                    $book->cover = Storage::disk("public")->url( $book->cover  );
+                    return response([
+                        'record' => $book ,
+                        'message' => 'ជោគជ័យក្នុងការបញ្ចូលឯកសារយោង។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $book ,
+                        'message' => 'មិនមានឯកសារយោងដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់ឯកសារយោង។'
+                ],403);
             }
-            return response()->json([
-                'ok' => false ,
-                'message' => __("crud.delete.failed")
-            ]);
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
         }
-        return response()->json([
-            'record' => null,
-            'message' => __("crud.auth.failed")
-        ], 401);
     }
+    
     /** Check duplicate Regulator */
     public function exists(Request $request){
         if (($user = $request->user()) !== null) {
@@ -597,5 +607,188 @@ class BookController extends Controller
             $status = 200;
         }
         return response()->json($responseData, $status);
+    }
+    public function references(Request $request){
+        $book = isset( $request->book_id ) && intval( $request->book_id ) ? RecordModel::find( $request->book_id ) : null ;
+        if( $book == null ) {
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់សៀវភៅដែលត្រូវភ្ជាប់ឯកសារយោង។'
+            ],403);
+        }
+        $reference = isset( $request->regulator_id ) && intval( $request->regulator_id ) ? \App\Models\Regulator\Regulator::find( $request->regulator_id ) : null ;
+        if( $reference == null ) {
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមភ្ជាប់ឯកសារយោង។'
+            ],403);
+        }
+        $book->references()->toggle([$reference->id]);
+        $book->references;
+        return response()->json([
+            'ok' => true ,
+            'record' => $book ,
+            'message' => 'ឯកសារយោងបានភ្ជាប់រួចរាល់។'
+        ],200);
+    }
+
+    public function regulators(Request $request){
+
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+
+        $organizations = isset( $request->organizations ) ? array_filter( explode(',',$request->organizations) , function($organization){ return intval( $organization );} ) : false ;
+        $signatures = isset( $request->signatures ) ? array_filter( explode(',',$request->signatures) , function($signature){ return intval( $signature ) ;}) : false ;
+        $types = isset( $request->types ) ? array_filter( explode(',',$request->types) , function($type){ return intval( $type ) ;}) : false ;
+
+        $queryString = [
+            // "where" => [
+            //     // 'default' => [
+            //     //     [
+            //     //         'field' => 'created_by' ,
+            //     //         'value' => $user->id
+            //     //     ]
+            //     // ],
+            //     // 'in' => [
+            //     //     [
+            //     //         'field' => 'type' ,
+            //     //         'value' => isset( $request->type ) && $request->type !== null ? [$request->type] : false
+            //     //     ]
+            //     // ] ,
+            //     // 'not' => [
+            //     //     [
+            //     //         'field' => 'type' ,
+            //     //         'value' => [4]
+            //     //     ]
+            //     // ] ,
+            //     // 'like' => [
+            //     //     [
+            //     //         'field' => 'number' ,
+            //     //         'value' => $number === false ? "" : $number
+            //     //     ],
+            //     //     [
+            //     //         'field' => 'year' ,
+            //     //         'value' => $date === false ? "" : $date
+            //     //     ]
+            //     // ] ,
+            // ] ,
+            "pivots" => [
+                $types ?
+                [
+                    "relationship" => 'types',
+                    "where" => [
+                        // "in" => [
+                        //     "field" => "type_id",
+                        //     "value" => $types
+                        // ],
+                        "like" => 
+                            $search === false ? []
+                            : [
+                                "field" => "name" ,
+                                "value" => $search    
+                            ]
+                    ]
+                ]
+                : [] ,
+                $signatures ?
+                [
+                    "relationship" => 'signatures',
+                    "where" => [
+                        // "in" => [
+                        //     "field" => "signature_id",
+                        //     "value" => $signatures
+                        // ],
+                        "like" => 
+                            $search === false ? []
+                            : [
+                                "field" => "name" ,
+                                "value" => $search    
+                            ]
+                    ]
+                ]
+                : [] ,
+                $organizations ?
+                [
+                    "relationship" => 'organizations',
+                    "where" => [
+                        // "in" => [
+                        //     "field" => "organization_id",
+                        //     "value" => $organizations
+                        // ],
+                        "like" => 
+                            $search === false ? []
+                            : [
+                                "field" => "name" ,
+                                "value" => $search    
+                            ]
+                    ]
+                ]
+                : []
+            ],
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'objective', 'fid', 'year'
+                ]
+            ],
+            "order" => [
+                'field' => 'id' ,
+                'by' => 'desc'
+            ],
+        ];
+
+        $request->merge( $queryString );
+
+        $selectFields = [
+            'id',
+            'fid' ,
+            'title' ,
+            'objective',
+            'year' ,
+            'pdf' ,
+            'publish' ,
+            'active' ,
+            'created_by' ,
+            'updated_by' ,
+            'accessibility'
+        ];
+
+        $crud = new CrudController(new \App\Models\Regulator\Regulator(), $request, $selectFields,[
+            /**
+             * custom the value of the field
+             */
+            'pdf' => function($record){
+                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( str_replace( 'regulators/' , '' , $record->pdf ) ) )
+                ? true
+                // \Storage::disk('regulator')->url( $pdf ) 
+                : false ;
+                return $record->pdf ;
+            },
+           'objective' => function($record){
+                    return html_entity_decode( strip_tags( $record->objective ) );
+                }
+            ]
+        );
+
+        $crud->setRelationshipFunctions([
+            /** relationship name => [ array of fields name to be selected ] */
+            'organizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'signatures' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'types' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'books' => [ 'id', 'name' ]
+        ]);
+
+        $builder = $crud->getListBuilder();
+
+        $responseData = $crud->pagination(true, $builder);
+        $responseData['message'] = __("crud.read.success");
+        $responseData['ok'] = true ;
+        return response()->json($responseData, 200);
     }
 }

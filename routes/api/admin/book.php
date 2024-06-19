@@ -21,7 +21,7 @@ Route::group([
     'prefix' => 'books' ,
     ], function() {
       Route::get('', [BookController::class , 'index']);
-      Route::get('{id}', [BookController::class , 'read']);
+      Route::get('{id}/read', [BookController::class , 'read']);
       Route::get('{id}/kunties', [BookController::class , 'kunties']);
       Route::get('{id}/matikas', [BookController::class , 'matikas']);
       Route::get('{id}/matras', [BookController::class , 'ofBook']);
@@ -34,15 +34,18 @@ Route::group([
       Route::post('removefile', [BookController::class , 'removeFile']);
 
       Route::put('', [BookController::class , 'update']);
-      Route::post('upload', [BookController::class , 'upload']);
+      Route::post('uploadcover', [BookController::class , 'uploadCover']);
       /** Activate / Deactivate the data for using */
       Route::put('{id}/activate', [BookController::class , 'active']);
       Route::put('{id}/deactivate', [BookController::class , 'unactive']);
       Route::put('{id}/uncomplete', [BookController::class , 'uncomplete']);
       Route::put('{id}/complete', [BookController::class , 'complete']);
       Route::get('{id}/content', [BookController::class , 'content']);
-
       Route::delete('{id}', [BookController::class , 'delete']);
+
+      /** User to fetch regulators and assign it as the reference document of the book. */
+      Route::get('regulators',[BookController::class,'regulators']);
+      Route::put('references', [BookController::class , 'references']);
   });
   /**
    * Kunty Section

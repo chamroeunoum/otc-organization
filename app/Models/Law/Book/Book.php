@@ -239,6 +239,9 @@ class Book extends Model
     public function matras(){
         return $this->hasMany(Matra::class,'book_id','id');
     }
+    public function references(){
+        return $this->belongsToMany(\App\Models\Regulator\Regulator::class,'book_references','book_id','regulator_id');
+    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES
@@ -298,6 +301,8 @@ class Book extends Model
                 foreach ($obj->pdf as $file_path) {
                     \Storage::disk(env('FILESYSTEM_DRIVER','public'))->delete($file_path);
                 }
+            }else if( strlen( trim( $obj->pdf ) ) > 0 && \Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists( $obj->pdf ) ){
+                \Storage::disk(env('FILESYSTEM_DRIVER','public'))->delete($obj->pdf);
             }
         });
     }

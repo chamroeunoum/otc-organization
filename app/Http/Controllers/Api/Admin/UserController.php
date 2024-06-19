@@ -540,6 +540,81 @@ class UserController extends Controller
             'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
         ],200);
     }
+
+    public function checkIdentification(Request $request){
+        if( !isset( $request->term ) || strlen( trim ( $request->term ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីព័ត៌មានដែលត្រូវពិនិត្យផ្ទៀងផ្ទាត់។'
+            ],422);
+        }
+        if( !isset( $request->type ) || in_array( $request->type , [ 'id' , 'phone' , 'email' ]) == false ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបំពេញព័ត៌មានឲ្យបានគ្រប់គ្រាន់។'
+            ],422);
+        }
+
+        $result = null ;
+        switch( $request->type ){
+            case "phone" :
+                $result = RecordModel::where( 'phone' , $request->term );
+                break;
+            case "email" :
+                $result = RecordModel::where( 'email' , $request->term );
+                break;
+            case "id" :
+                $result = RecordModel::where( 'id' , intval( $request->term ) );
+                break;
+        }
+        /**
+         * Check whether the matched case are many records
+         */
+        if( $result->count() > 1 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ករណីផ្ទៀងផ្ទាត់ហាក់មានចំនួនច្រើន។'
+            ],403);
+        }
+        $record = $result->first();
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'មិនមានព័ត៌មានផ្ទៀងផ្ទាត់ឡើយ។'
+            ],403);
+        }
+
+        if( $record->people_id <= 0 || $record->people_id == null ){
+            /**
+             * Create owner of the account, in case the account does not has the owner.
+             */
+            $person = \App\Models\People\People::create([
+                'firstname' => $record->firstname , 
+                'lastname' => $record->lastname , 
+                'gender' => $record->gender , 
+                'dob' => $record->dob , 
+                'mobile_phone' => $record->phone , 
+                'email' => $record->email , 
+                'image' => $record->avatar_url 
+            ]);
+            $record->people_id = $person->id ;
+            $record->save();
+        }
+
+        if( $record->avatar_url != null && $record->avatar_url != "" && Storage::disk('public')->exists( $record->avatar_url )  ){
+            $record->avatar_url = Storage::disk("public")->url( $record->avatar_url  );
+        }else{
+            $record->avatar_url = null ;
+        }
+
+        $record->person ;
+
+        return response()->json([
+            'record' => $record ,
+            'ok' => true ,
+            'message' => 'ជោគជ័យ។'
+        ],200);
+    }
     /**
      * Check the username
      */

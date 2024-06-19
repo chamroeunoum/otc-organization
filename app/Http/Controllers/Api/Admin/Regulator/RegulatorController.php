@@ -37,62 +37,77 @@ class RegulatorController extends Controller
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
 
+        $organizations = isset( $request->organizations ) ? array_filter( explode(',',$request->organizations) , function($organization){ return intval( $organization );} ) : false ;
+        $signatures = isset( $request->signatures ) ? array_filter( explode(',',$request->signatures) , function($signature){ return intval( $signature ) ;}) : false ;
+        $types = isset( $request->types ) ? array_filter( explode(',',$request->types) , function($type){ return intval( $type ) ;}) : false ;
+
+
         $queryString = [
-            "where" => [
-                // 'default' => [
-                //     [
-                //         'field' => 'created_by' ,
-                //         'value' => $user->id
-                //     ]
-                // ],
-                // 'in' => [
-                //     [
-                //         'field' => 'type' ,
-                //         'value' => isset( $request->type ) && $request->type !== null ? [$request->type] : false
-                //     ]
-                // ] ,
-                // 'not' => [
-                //     [
-                //         'field' => 'type' ,
-                //         'value' => [4]
-                //     ]
-                // ] ,
-                // 'like' => [
-                //     [
-                //         'field' => 'number' ,
-                //         'value' => $number === false ? "" : $number
-                //     ],
-                //     [
-                //         'field' => 'year' ,
-                //         'value' => $date === false ? "" : $date
-                //     ]
-                // ] ,
-            ] ,
-            // "pivots" => [
-            //     $unit ?
-            //     [
-            //         "relationship" => 'units',
-            //         "where" => [
-            //             "in" => [
-            //                 "field" => "id",
-            //                 "value" => [$request->unit]
-            //             ],
-            //         // "not"=> [
-            //         //     [
-            //         //         "field" => 'fieldName' ,
-            //         //         "value"=> 'value'
-            //         //     ]
-            //         // ],
-            //         // "like"=>  [
-            //         //     [
-            //         //        "field"=> 'fieldName' ,
-            //         //        "value"=> 'value'
-            //         //     ]
-            //         // ]
-            //         ]
-            //     ]
-            //     : []
-            // ],
+            // "where" => [
+            //     // 'default' => [
+            //     //     [
+            //     //         'field' => 'created_by' ,
+            //     //         'value' => $user->id
+            //     //     ]
+            //     // ],
+            //     // 'in' => [
+            //     //     [
+            //     //         'field' => 'type' ,
+            //     //         'value' => isset( $request->type ) && $request->type !== null ? [$request->type] : false
+            //     //     ]
+            //     // ] ,
+            //     // 'not' => [
+            //     //     [
+            //     //         'field' => 'type' ,
+            //     //         'value' => [4]
+            //     //     ]
+            //     // ] ,
+            //     // 'like' => [
+            //     //     [
+            //     //         'field' => 'number' ,
+            //     //         'value' => $number === false ? "" : $number
+            //     //     ],
+            //     //     [
+            //     //         'field' => 'year' ,
+            //     //         'value' => $date === false ? "" : $date
+            //     //     ]
+            //     // ] ,
+            // ] ,
+            "pivots" => [
+                $types ?
+                [
+                    "relationship" => 'types',
+                    "where" => [
+                        "in" => [
+                            "field" => "type_id",
+                            "value" => $types
+                        ],
+                    ]
+                ]
+                : [] ,
+                $signatures ?
+                [
+                    "relationship" => 'signatures',
+                    "where" => [
+                        "in" => [
+                            "field" => "signature_id",
+                            "value" => $signatures
+                        ],
+                    ]
+                ]
+                : [] ,
+                $organizations ?
+                [
+                    "relationship" => 'organizations',
+                    "where" => [
+                        "in" => [
+                            "field" => "organization_id",
+                            "value" => $organizations
+                        ],
+                    ]
+                ]
+                : []
+            ],
             "pagination" => [
                 'perPage' => $perPage,
                 'page' => $page
@@ -144,7 +159,8 @@ class RegulatorController extends Controller
             'ownOrganizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
             'relatedOrganizations' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
             'signatures' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
-            'types' => [ 'id' , 'name' , 'desp' , 'pid' ] 
+            'types' => [ 'id' , 'name' , 'desp' , 'pid' ] ,
+            'books' => [ 'id' , 'name' ]
         ]);
 
         $builder = $crud->getListBuilder();
@@ -344,7 +360,8 @@ class RegulatorController extends Controller
         $document = RecordModel::findOrFail($request->id);
         if($document) {
             // $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( $record->pdf ) )
-            $path = storage_path('data') . '/regulators/' . $document->pdf;
+            // $path = storage_path('data') . '/regulators/' . $document->pdf;
+            $path = storage_path('data') . ( strpos( $document->pdf , 'regulators' ) !== false ? '/' . $document->pdf : '/regulators/' . $document->pdf ) ;
             $ext = pathinfo($path);
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
             
@@ -614,8 +631,8 @@ class RegulatorController extends Controller
         }
         $record->with('ministries')->with('signatures')->with('ministries')->with('type');
         return response()->json([
-            'record' => $record ,
             'ok' => $record->update(['active'=>1]) ,
+            'record' => $record ,
             'message' => 'បានបើកឯកសាររួចរាល់។'
         ],200);
     }
@@ -635,8 +652,50 @@ class RegulatorController extends Controller
         }
         $record->with('ministries')->with('signatures')->with('ministries')->with('type');
         return response()->json([
-            'record' => $record ,
             'ok' => $record->update(['active'=>0]) ,
+            'record' => $record ,
+            'message' => 'បានបើកឯកសាររួចរាល់។'
+        ],200);
+    }
+    public function publish(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $record->with('ministries')->with('signatures')->with('ministries')->with('type');
+        return response()->json([
+            'ok' => $record->update(['publish'=>1]) ,
+            'record' => $record ,
+            'message' => 'បានបើកឯកសាររួចរាល់។'
+        ],200);
+    }
+    public function unpublish(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
+            ],423);
+        }
+        $record->with('ministries')->with('signatures')->with('ministries')->with('type');
+        return response()->json([
+            'ok' => $record->update(['publish'=>0]) ,
+            'record' => $record ,
             'message' => 'បានបើកឯកសាររួចរាល់។'
         ],200);
     }

@@ -723,4 +723,150 @@ class AttendantController extends Controller
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
     }
+
+    /**
+     * Check in and out with attendant without specified the timeslot.
+     * Required information : Email or Phone of the User Account , check status (IN , OUT)
+     */
+    public function checkAttendantByEmailOrPhoneByOrganization(Request $request){
+        $organization = null ;
+        if( isset( $request->organization_id ) && strlen( trim ( $request->organization_id ) ) > 0 && intval( $request->organization_id ) > 0 ){
+            $organization = \App\Models\Regulator\Tag\Organization::where('id', intval( $request->organization_id ) )->first();
+        }
+        // return response()->json([
+        //     'result' => $organization
+        // ],200);
+        $result = false ;
+        if( isset( $request->email ) && strlen( trim ( $request->email ) ) > 0 ){
+            $result = \App\Models\User::where('email',$request->email);
+        }
+        else if( isset( $request->phone ) && strlen( trim ( $request->phone ) ) > 0 ){
+            $result = \App\Models\User::where('phone',$request->phone);
+        }
+        if( $result == false ){
+            return response()->json([
+                'ok'=> false ,
+                'message' => 'សូមពិនិត្យព័ត៌មានដែលអ្នកបានផ្ដល់ម្ដងទៀត។'
+            ],403);
+        }
+        if( $result != false && $result->count() > 1 ){
+            return response()->json([
+                'ok'=> false ,
+                'message' => 'ព័ត៌មានដែលផ្ទៀងផ្ទាត់មានចំនួនច្រើន។' ,
+                'result' => $result->get()
+            ],403);
+        }
+        $user = $result->first();
+        $now = \Carbon\Carbon::now();
+        /**
+         * Check whether the attendant has been registered once already
+         */
+        $attendant = $user->attendants()->where('date',$now->format('Y-m-d'))->orderBy('id','desc')->first() ;
+        if( $attendant == null ){
+            /**
+             * The attendant of the date have not registered, yet
+             */
+            $attendant = RecordModel::create([
+                'user_id' => $user->id ,
+                'date' => $now->format('Y-m-d') ,
+                'late_or_early' => 0.0 ,
+                'worked_time' => 0.0 ,
+                'duration' => 0.0 ,
+                'created_at' => $now ,
+                'updated_at' => $now ,
+            ]);
+        }
+        /**
+         * Create checktime of the attendant
+         */
+        $parentChecktime = $attendant->checktimes->count() > 0 
+            ? $attendant->checkTimes()->orderby('id','desc')->first()
+            : null ;
+        $checktime = $attendant->checktimes()->create([
+            'attendant_id' => $attendant->id ,
+            'timeslot_id' => 0 ,
+            'organization_id' => $organization == null ? 0 : $organization->id ,
+            'checktime' => $now->format('H:i') ,
+            'check_status' => $parentChecktime == null ? "IN" : "OUT" ,
+            'checktype' => 'System' ,
+            'parent_checktime_id' => $parentChecktime == null ? 0 : $parentChecktime->id ,
+            'meta' => $request->meta ,
+            'created_at' => $now ,
+            'updated_at' => $now
+        ]);
+
+        return response()->json([
+            'ok' => true ,
+            'message' => 'ជោគជ័យ។' ,
+            'attendant' => $attendant ,
+            'checktime' => $checktime 
+        ],200);
+    }
+
+    /**
+     * Check in and out with attendant without specified the timeslot.
+     * Required information : Email or Phone of the User Account , check status (IN , OUT)
+     */
+    public function getAttendantByEmailOrPhone(Request $request){
+        if( !isset( $request->term ) || strlen( trim ( $request->term ) ) <= 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីព័ត៌មានដែលត្រូវពិនិត្យផ្ទៀងផ្ទាត់។'
+            ],422);
+        }
+        if( !isset( $request->type ) || in_array( $request->type , [ 'id' , 'phone' , 'email' ]) == false ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបំពេញព័ត៌មានឲ្យបានគ្រប់គ្រាន់។'
+            ],422);
+        }
+
+        $result = null ;
+        switch( $request->type ){
+            case "phone" :
+                $result = \App\Models\User::where( 'phone' , $request->term );
+                break;
+            case "email" :
+                $result = \App\Models\User::where( 'email' , $request->term );
+                break;
+            case "id" :
+                $result = \App\Models\User::where( 'id' , intval( $request->term ) );
+                break;
+        }
+        /**
+         * Check whether the matched case are many records
+         */
+        if( $result->count() > 1 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ករណីផ្ទៀងផ្ទាត់ហាក់មានចំនួនច្រើន។'
+            ],403);
+        }
+        $user = $result->first();
+        $now = \Carbon\Carbon::now();
+        if( $user == null ){
+            return response()->json([
+                'ok'=> false ,
+                'message' => 'សូមពិនិត្យព័ត៌មានដែលអ្នកបានផ្ដល់ម្ដងទៀត។'
+            ],403);
+        }
+        /**
+         * Check whether the attendant has been registered once already
+         */
+        $attendant = $user->attendants()->where('date',$now->format('Y-m-d'))->orderBy('id','desc')->first() ;
+        if( $attendant == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'មិនទាន់បានចុះវត្តមានឡើយ។'
+            ],403);
+        }
+        $attendant->checktimes != null ? $attendant->checktimes->each(function($checktime){
+            $checktime->organization;
+        }) : false ;
+        return response()->json([
+            'ok' => true ,
+            'message' => 'បានចុះវត្តមានរួចហើយ។' ,
+            'attendant' => $attendant
+        ],200);
+    }
 }

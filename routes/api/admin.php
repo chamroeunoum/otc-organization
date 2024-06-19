@@ -69,6 +69,10 @@ Route::group([
             Route::delete('{id}/delete',[UserController::class,'destroy']);
             Route::put('activate',[UserController::class,'active']);
             Route::put('password/change',[UserController::class,'passwordChange']);
+
+            // Use to check the account does exist or not base on the phone or email or officer_identification_number
+            Route::get('checkidentification/{term}/{type}',[UserController::class,'checkIdentification']);
+            
             /**
              * Check the unique user information
              */
@@ -76,6 +80,13 @@ Route::group([
             Route::get('phone/exist',[UserController::class,'checkPhone']);
             Route::get('email/exist',[UserController::class,'checkEmail']);
             Route::post('upload',[UserController::class,'upload']);
+    });
+    Route::group([
+        'prefix' => 'users' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'api'
+        ], function() {
+        Route::get('checkidentification/{term}/{type}',[UserController::class,'checkIdentification']);
     });
 
     /** PEOPLE / USER INFORMATION SECTION */
@@ -155,6 +166,13 @@ Route::group([
             Route::put('setleader',[ OrganizationController::class , 'setLeader']);
             Route::put('addstaff',[ OrganizationController::class , 'addPeopleToOrganization']);
     });
+    Route::group([
+        'prefix' => 'organizations' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'api'
+        ], function() {
+        Route::get('{id}/read',[OrganizationController::class,'read']);
+    });
 
     /** POSITION SECTION */
     Route::group([
@@ -225,6 +243,8 @@ Route::group([
             Route::put('',[RegulatorController::class,'update']);
             Route::put('{id}/activate',[RegulatorController::class,'activate']);
             Route::put('{id}/deactivate',[RegulatorController::class,'deactivate']);
+            Route::put('{id}/publish',[RegulatorController::class,'publish']);
+            Route::put('{id}/unpublish',[RegulatorController::class,'unpublish']);
             Route::delete('',[RegulatorController::class,'destroy']);
             Route::post('upload',[RegulatorController::class,'upload']);
             

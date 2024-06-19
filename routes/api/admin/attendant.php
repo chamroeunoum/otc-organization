@@ -38,3 +38,12 @@ Route::group([
      */
     Route::get('{date}/month/{userId}/user',[AttendantController::class,'userAttendants']);
   });
+
+  Route::group([
+    'prefix' => 'attendants' ,
+    'namespaces' => '\App\Http\Controllers\Api\Admin\Attendant' ,
+    'middleware' => 'api'
+    ], function() {
+    Route::post('checkattendantbyemailorphone',[AttendantController::class,'checkAttendantByEmailOrPhoneByOrganization']);
+    Route::get('getattendantbyemailorphone/{term}/{type}',[AttendantController::class,'getAttendantByEmailOrPhone']);
+  });
