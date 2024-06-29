@@ -773,7 +773,7 @@ class AttendantController extends Controller
                 'worked_time' => 0.0 ,
                 'duration' => 0.0 ,
                 'created_at' => $now ,
-                'updated_at' => $now ,
+                'updated_at' => $now
             ]);
         }
         /**
@@ -782,6 +782,38 @@ class AttendantController extends Controller
         $parentChecktime = $attendant->checktimes->count() > 0 
             ? $attendant->checkTimes()->orderby('id','desc')->first()
             : null ;
+
+        // if the photo is provided
+        $uniqeName = "" ;
+        if( isset( $request->photo ) && strlen( trim ( $request->photo ) ) > 0 ){
+
+            /**
+             * Create backup folder
+             */
+            $folderName = \Carbon\Carbon::now()->format('Y-m-d');
+            if( !\Storage::disk('attendant')->exists( $folderName ) ){
+                if( ( $result = \Storage::disk('attendant')->makeDirectory( $folderName ) ) != true ){
+                    return response()->json([
+                        'ok' => false ,
+                        'result' => $result ,
+                        'message' => 'មានបញ្ហាក្នុងការបង្កើតថតដាក់រូបថត។'
+                    ],403);
+                }
+            }
+
+            list($base64,$data) = explode( 'base64,' , $request->photo );
+            $data = base64_decode($data);
+            $filename = md5( \Carbon\Carbon::now()->format('Y-m-d H:i:s')).'.jpg';
+            if( Storage::disk('attendant')->put( $folderName.'/'.$filename , $data , 'public' ) == false ){
+                return response()->json([
+                    'ok' => false ,
+                    'result' => $folderName.'/'.$filename ,
+                    'message' => 'មានបញ្ហាដាក់រូបភាព។'
+                ],403);
+            }
+            $uniqeName = $folderName.'/'.$filename ;
+        }
+
         $checktime = $attendant->checktimes()->create([
             'attendant_id' => $attendant->id ,
             'timeslot_id' => 0 ,
@@ -792,7 +824,10 @@ class AttendantController extends Controller
             'parent_checktime_id' => $parentChecktime == null ? 0 : $parentChecktime->id ,
             'meta' => $request->meta ,
             'created_at' => $now ,
-            'updated_at' => $now
+            'updated_at' => $now ,
+            'lat' => $request->lat ,
+            'lng' => $request->lng ,
+            'photo' => $uniqeName 
         ]);
 
         return response()->json([

@@ -601,16 +601,26 @@ class UserController extends Controller
             $record->save();
         }
 
-        if( $record->avatar_url != null && $record->avatar_url != "" && Storage::disk('public')->exists( $record->avatar_url )  ){
-            $record->avatar_url = Storage::disk("public")->url( $record->avatar_url  );
-        }else{
-            $record->avatar_url = null ;
-        }
-
-        $record->person ;
-
         return response()->json([
-            'record' => $record ,
+            'record' => [
+                'person' => $record->person ,
+                'id' => $record->id ,
+                'phone' => $record->phone ,
+                'email' => $record->email ,
+                'firstname' => $record->firstname ,
+                'lastname' => $record->lastname ,
+                'countesies' => $record->person != null && $record->person->countesies != null ? $record->person->countesies :  [] ,
+                'positions' => $record->person != null && $record->person->positions != null ? $record->person->positions :  [] ,
+                'organizations' => $record->person != null && $record->person->organizations != null ? $record->person->organizations :  [] ,
+                'avatar_url' => 
+                    $record->avatar_url != null && strlen( $record->avatar_url ) > 0 && \Storage::disk('public')->exists( $record->avatar_url ) 
+                        ? \Storage::disk('public')->url( $record->avatar_url ) 
+                        : (
+                            $record->person != null && $record->person->image != null && \Storage::disk('public')->exists( $record->person->image )
+                                ? \Storage::disk('public')->url( $record->person->image )
+                                : null
+                        )
+            ],
             'ok' => true ,
             'message' => 'ជោគជ័យ។'
         ],200);

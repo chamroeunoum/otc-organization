@@ -75,6 +75,13 @@ return [
             'url' => env('APP_URL').'/storage/comments',
             'throw' => true ,
         ],
+        
+        'attendant' => [
+            'driver' => 'local',
+            'root' => storage_path('data/attendants') ,
+            'url' => env('APP_URL').'/storage/attendants',
+            'throw' => true ,
+        ],
 
         's3' => [
             'driver' => 's3',
