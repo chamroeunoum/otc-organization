@@ -21,7 +21,7 @@ class SignatureController extends Controller
     public function index(Request $request){
         // $perpage = 
         return response([
-            'records' => $this->model->children()->get(),
+            'records' => $this->model->childNodes()->get(),
             'message' => 'អានព័ត៌មាននៃគណនីបានរួចរាល់ !' 
         ],200 );
     }
@@ -75,7 +75,7 @@ class SignatureController extends Controller
         ];
         $request->merge( $queryString );
         $crud = new CrudController(new RecordModel(), $request, $this->fields );
-        $responseData = $crud->pagination(true, $this->model->children()->orderby('record_index','asc') );
+        $responseData = $crud->pagination(true, $this->model->childNodes()->orderby('record_index','asc') );
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
         return response()->json($responseData);

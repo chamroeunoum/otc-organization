@@ -64,8 +64,8 @@ class RegulatorController extends Controller
             //     // ] ,
             //     // 'like' => [
             //     //     [
-            //     //         'field' => 'number' ,
-            //     //         'value' => $number === false ? "" : $number
+            //     //         'field' => 'fid' ,
+            //     //         'value' => $fid === false ? "" : $fid
             //     //     ],
             //     //     [
             //     //         'field' => 'year' ,
@@ -206,8 +206,8 @@ class RegulatorController extends Controller
                 ] // ,
                 // 'like' => [
                 //     [
-                //         'field' => 'number' ,
-                //         'value' => $number === false ? "" : $number
+                //         'field' => 'fid' ,
+                //         'value' => $fid === false ? "" : $fid
                 //     ],
                 //     [
                 //         'field' => 'year' ,
@@ -390,11 +390,27 @@ class RegulatorController extends Controller
     public function upload(Request $request){
         $user = \Auth::user();
         if( $user ){
-            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['file'] ) && $_FILES['file']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['file']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['file']['tmp_name'] ) / 1024 , 4 );
             $mbFilesize = round( $kbFilesize / 1024 , 4 );
             if( ( $document = \App\Models\Regulator\Regulator::find($request->id) ) !== null ){
                 list($year,$month,$day) = explode('-',$document->year);
-                $uniqeName = Storage::disk('regulator')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
+                $uniqeName = Storage::disk('regulator')->putFile( '' , new File( $_FILES['file']['tmp_name'] ) );
                 $document->pdf = $uniqeName ;
                 $document->save();
                 if( Storage::disk('regulator')->exists( $document->pdf ) ){
@@ -437,7 +453,7 @@ class RegulatorController extends Controller
          */
         
         $record = RecordModel::create([
-            'fid' => $request->number?? ''  ,
+            'fid' => $request->fid?? ''  ,
             'title' => $request->title?? '' ,
             'objective' => $request->objective ,
             'year' => $request->year?? \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
@@ -496,7 +512,7 @@ class RegulatorController extends Controller
              * Save information of the regulator and its related information
              */
             if( $record->update([
-                'fid' => $request->number ,
+                'fid' => $request->fid ,
                 'title' => $request->title ,
                 'objective' => $request->objective ,
                 'year' => $request->year ,
