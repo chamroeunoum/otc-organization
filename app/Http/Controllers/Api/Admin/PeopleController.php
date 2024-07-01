@@ -148,7 +148,11 @@ class PeopleController extends Controller
         //     "person" => ['id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' ] ,
         //     "roles" => ['id','name', 'tag'] ,
             "countesies" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
-            "organizations" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
+            "organizations" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' , 'code' ] ,
+            "organizationPeople" => [ 
+                'id', 'people_id' , 'organization_id' , 'code' ,
+                'organization' => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' , 'code' ]
+            ] ,
             "positions" => [ 'id', 'name' , 'desp' , 'pid' , 'record_index' ] ,
             'user' => [ 'id' , 'username' , 'phone' , 'email' , 'avatar_url' , 'firstname' , 'lastname' ]
         ]);
@@ -498,6 +502,10 @@ class PeopleController extends Controller
         $record->countesies;
         $record->positions;
         $record->organizations;
+        $record->organizationPeople->map(function($organizationPivot){
+            $organizationPivot->organization;
+            return $organizationPivot;
+        });
         $record = $record->toArray();
 
         $record['image'] = $record['image'] != null && trim($record['image'] ) != "" && \Storage::disk('public')->exists( $record['image'] )
@@ -552,4 +560,39 @@ class PeopleController extends Controller
     //         ],403);
     //     }
     // }
+    /**
+     * Active function of the account
+     */
+    public function updateOrganizationCode(Request $request){
+        $organization = intval( $request->organization_id ) > 0 ? \App\Models\Regulator\Tag\Organization::find($request->organization_id) : null ;
+        if( $organization == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អង្គភាព។'
+            ],403);
+        }
+        $people = intval( $request->people_id ) > 0 ? \App\Models\People\People::find($request->people_id) : null ;
+        if( $people == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់មន្ត្រីក្នុងអង្គភាព។'
+            ],403);
+        }
+        $organizationPeople = \App\Models\People\OrganizationPeople::where('organization_id',$organization->id)
+        ->where('people_id',$people->id)->first();
+        if( $organizationPeople == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'មន្ត្រីនេះមិនស្ថិតក្នុងអង្គភាពនេះឡើយ។'
+            ],403);
+        }
+        $organizationPeople->code = $request->code ;
+        $organizationPeople->save();
+        // User does exists
+        return response([
+            'record' => $organizationPeople ,
+            'ok' => true ,
+            'message' => 'ជោគជ័យ !' 
+        ], 200);
+    }
 }

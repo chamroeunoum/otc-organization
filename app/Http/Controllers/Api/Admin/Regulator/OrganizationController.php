@@ -11,7 +11,7 @@ use App\Models\Regulator\Tag\Organization as RecordModel;
 class OrganizationController extends Controller
 {
     private $model = null ;
-    private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'record_index' , 'active' ] ;
+    private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'code' , 'record_index' , 'active' ] ;
     private $renameFields = [
         'pid' => 'parentId'
     ];
@@ -403,6 +403,7 @@ class OrganizationController extends Controller
         $record = RecordModel::create([
             'name' => $request->name,
             'desp' => $request->desp ,
+            'code' => $request->code ,
             'pid' => $parentNode->id ,
             'tpid' => $parentNode->tpid .':'. $parentNode->id ,
             'image' => null
@@ -469,6 +470,7 @@ class OrganizationController extends Controller
         }
         $updateData = [
             'name' => $request->name ,
+            'code' => $request->code ,
             'desp' => $request->desp ,
             'pid' => $parentNode->id ,
             'tpid' => $parentNode->tpid != null && $parentNode->tpid != "" ? $parentNode->tpid .':'. $parentNode->id : $parentNode->id ,

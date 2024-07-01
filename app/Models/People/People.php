@@ -49,6 +49,10 @@ class People extends Model
   {
       return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_people','people_id','organization_id');
   }
+  public function organizationPeople()
+  {
+      return $this->hasMany('App\Models\People\OrganizationPeople','people_id','id');
+  }
   public function organizationLeader()
   {
       return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_leader','people_id','organization_id');

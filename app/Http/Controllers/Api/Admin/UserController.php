@@ -160,6 +160,8 @@ class UserController extends Controller
                 $user['person']['organizations'] = $people->organizations;
                 $user['person']['positions'] = $people->positions;
                 $user['person']['countesies'] = $people->countesies;
+                $people->organizationPeople->map(function($organizationPivot){ $organizationPivot->organization; return $organizationPivot; });
+                $user['person']['organization_people'] = $people->organizationPeople;
             }
             return $user;
         });

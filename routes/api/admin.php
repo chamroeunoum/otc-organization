@@ -100,6 +100,8 @@ Route::group([
             Route::put('update',[PeopleController::class,'update']);
             Route::get('{id}/read',[PeopleController::class,'read']);
             Route::delete('{id}/delete',[PeopleController::class,'destroy']);
+            Route::put('update_organization_code',[PeopleController::class,'updateOrganizationCode']);
+            
     });
 
     /** PEOPLE / USER INFORMATION SECTION */
