@@ -165,7 +165,7 @@ class AuthController extends Controller
          * Allow backend and client member to be logged in
          */
         if( 
-            empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::client()->pluck('id')->toArray() ) ) ||
+            empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::client()->pluck('id')->toArray() ) ) &&
             empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::backend()->pluck('id')->toArray() ) )
         ){
             /**
