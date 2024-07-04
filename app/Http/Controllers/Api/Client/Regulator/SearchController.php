@@ -29,8 +29,8 @@ class SearchController extends Controller
 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
-        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
-        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+        $perPage = isset( $request->perPage ) && intval( $request->perPage ) > 0 ? $request->perPage : 10 ;
+        $page = isset( $request->page ) && intval( $request->page ) > 0 ? $request->page : 1 ;
         
         $fid = isset( $request->fid ) && $request->fid != "" && $request->fid != null && $request->fid != 'null' ? $request->fid : false ;
         $year = isset( $request->year ) && $request->year != "" && $request->year != null && $request->year != 'null'  ? \Carbon\Carbon::parse( $request->year ) : false ;

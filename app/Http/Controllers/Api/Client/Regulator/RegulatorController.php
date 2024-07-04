@@ -132,11 +132,10 @@ class RegulatorController extends Controller
                 : false ;
                 return $record->pdf ;
             },
-           'objective' => function($record){
-                    return html_entity_decode( strip_tags( $record->objective ) );
-                }
-            ]
-        );
+            'objective' => function($record){
+                return html_entity_decode( strip_tags( $record->objective ) );
+            }
+        ]);
 
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
@@ -346,11 +345,13 @@ class RegulatorController extends Controller
             //   $user_id= Auth::user()->id;
             //   $current_date = date('Y-m-d H:i:s');
             //   DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
-            \App\Models\Log\Log::regulator([
-                'user_id' => Auth::user()->id ,
-                'regulator_id' => $document->id
-            ]);
-
+            $user = \Auth::user();
+            if( $user != null ){
+                \App\Models\Log\Log::regulator([
+                    'user_id' => $user()->id ,
+                    'regulator_id' => $document->id
+                ]);
+            }
             if(is_file($path)) {
                 $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
@@ -363,7 +364,7 @@ class RegulatorController extends Controller
             {
                 return response([
                     'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
-                    'path' => $path
+                    // 'path' => $path
                 ],404 );
             }
         }

@@ -635,6 +635,20 @@ class FolderController extends Controller
             'year' ,
             'pdf' ,
             'publish'
+        ],[
+            /**
+             * custom the value of the field
+             */
+            'pdf' => function($record){
+                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('document')->exists( $record->pdf ) )
+                ? true
+                // \Storage::disk('regulator')->url( $pdf ) 
+                : false ;
+                return $record->pdf ;
+            },
+            'objective' => function($record){
+                return html_entity_decode( strip_tags( $record->objective ) );
+            }
         ]);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
@@ -647,16 +661,7 @@ class FolderController extends Controller
 
         $builder = $crud->getListBuilder();
 
-        $responseData = $crud->pagination(true, $builder,
-            [
-                'field' => 'pdf' ,
-                'callback'=> function($pdf){
-                    $pdf = ( $pdf !== "" && \Storage::disk('public')->exists( $pdf ) )
-                    ? \Storage::disk('public')->url( $pdf ) : null ;
-                    return $pdf ;
-                }
-            ]
-        );
+        $responseData = $crud->pagination(true, $builder);
         
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;

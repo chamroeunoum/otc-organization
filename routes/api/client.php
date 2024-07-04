@@ -155,17 +155,17 @@ Route::group([
       Route::group([
           'prefix' => 'types' ,
           ], function() {
-            Route::get('', [TypeController::class,'index']);
+            Route::get('', [TypeController::class,'compact']);
       });
       Route::group([
         'prefix' => 'organizations' ,
         ], function() {
-          Route::get('', [OrganizationController::class,'index']);
+          Route::get('', [OrganizationController::class,'compact']);
       });
       Route::group([
         'prefix' => 'signatures' ,
         ], function() {
-          Route::get('', [SignatureController::class,'index']);
+          Route::get('', [SignatureController::class,'compact']);
       });
   });
 
