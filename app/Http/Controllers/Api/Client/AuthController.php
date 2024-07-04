@@ -166,7 +166,8 @@ class AuthController extends Controller
          */
         if( 
             empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::client()->pluck('id')->toArray() ) ) &&
-            empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::backend()->pluck('id')->toArray() ) )
+            empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::backend()->pluck('id')->toArray() ) ) &&
+            empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::admin()->pluck('id')->toArray() ) )
         ){
             /**
              * User seem does not have any right to login into backend / core service
