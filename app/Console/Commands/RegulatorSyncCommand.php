@@ -145,8 +145,8 @@ class RegulatorSyncCommand extends Command
                                 'pid' => 163 ,
                                 'tpid' => 163 ,
                             ]);
-                            $regulator->organizations()->sync([$organization->id]);
                         }
+                        $regulator->organizations()->sync([$organization->id]);
                     }, $document->ministries );
                     
                     echo "=> LINK REGULATOR TO OWN ORGANIZATIOS." . PHP_EOL;
@@ -167,8 +167,8 @@ class RegulatorSyncCommand extends Command
                                 'pid' => 163 ,
                                 'tpid' => 163 ,
                             ]);
-                            $regulator->ownOrganizations()->sync([$own_organization->id]);
                         }
+                        $regulator->ownOrganizations()->sync([$own_organization->id]);
                     }, $document->own_ministries );
                     
                     echo "=> LINK REGULATOR TO RELATED ORGANIZATIOS." . PHP_EOL;
@@ -189,8 +189,8 @@ class RegulatorSyncCommand extends Command
                                 'pid' => 163 ,
                                 'tpid' => 163 ,
                             ]);
-                            $regulator->relatedOrganizations()->sync([$related_organization->id]);
                         }
+                        $regulator->relatedOrganizations()->sync([$related_organization->id]);
                     },$document->related_ministries);
                     
                     echo "=> LINK REGULATOR TO SIGNATURES." . PHP_EOL;
@@ -211,8 +211,8 @@ class RegulatorSyncCommand extends Command
                                 'pid' => 37 ,
                                 'tpid' => 37 ,
                             ]);
-                            $regulator->signatures()->sync([$signature->id]);
                         }
+                        $regulator->signatures()->sync([$signature->id]);
                     }, $document->signatures );
                     $regulator->save();
                 }
