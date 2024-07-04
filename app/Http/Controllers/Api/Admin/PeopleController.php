@@ -165,7 +165,7 @@ class PeopleController extends Controller
         if( true ){
             $builder->whereHas('user',function( $query ) {
                 $query->whereHas('roles',function($q){
-                    $q->whereIn('role_id',[3,4]);
+                    $q->whereIn('role_id',[2,3,4]);
                 });
             });
         }
