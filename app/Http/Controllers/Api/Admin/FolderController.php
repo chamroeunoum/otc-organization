@@ -559,6 +559,14 @@ class FolderController extends Controller
             'year' ,
             'pdf' ,
             'publish'
+        ],[
+            'pdf' => function($record) {
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) );
+                return $record->pdf ;
+            },
+            'objective' => function($record){
+                return html_entity_decode( strip_tags( $record->objective ) );
+            }
         ]);
         $crud->setRelationshipFunctions([
             'types' => [ 'id', 'name' ] ,
@@ -568,16 +576,7 @@ class FolderController extends Controller
 
         $builder = $crud->getListBuilder();
 
-        $responseData = $crud->pagination(true, $builder,
-            [
-                'field' => 'pdf' ,
-                'callback'=> function($pdf){
-                    $pdf = ( $pdf !== "" && \Storage::disk('public')->exists( $pdf ) )
-                    ? \Storage::disk('public')->url( $pdf ) : null ;
-                    return $pdf ;
-                }
-            ]
-        );
+        $responseData = $crud->pagination(true, $builder);
         
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;

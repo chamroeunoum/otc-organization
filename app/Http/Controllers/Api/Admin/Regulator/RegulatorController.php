@@ -141,17 +141,16 @@ class RegulatorController extends Controller
              * custom the value of the field
              */
             'pdf' => function($record){
-                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( $record->pdf ) )
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) )
                 ? true
                 // \Storage::disk('regulator')->url( $pdf ) 
                 : false ;
                 return $record->pdf ;
             },
-           'objective' => function($record){
-                    return html_entity_decode( strip_tags( $record->objective ) );
-                }
-            ]
-        );
+            'objective' => function($record){
+                return html_entity_decode( strip_tags( $record->objective ) );
+            } 
+        ]);
 
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */

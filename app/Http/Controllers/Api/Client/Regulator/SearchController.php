@@ -132,19 +132,7 @@ class SearchController extends Controller
              * custom the value of the field
              */
             'pdf' => function($record){
-                $record->pdf = is_array( $record->pdf ) && !empty( $record->pdf ) ?
-                    (
-                        array_map(function($file){ return (
-                            \Storage::disk('document')->exists( $file ) ? str_replace(['/','.pdf','documents'],$file ) : false 
-                        ); } , $record->pdf )
-                    ) : 
-                    (
-                        $record->pdf != "" && $record->pdf != null 
-                        ? ( 
-                            \Storage::disk('document')->exists( $record->pdf ) ? str_replace(['/','.pdf','documents'],"",$record->pdf) : false 
-                        )
-                        : false
-                    ) ;
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) );
                 return $record->pdf ;
             },
            'objective' => function($record){

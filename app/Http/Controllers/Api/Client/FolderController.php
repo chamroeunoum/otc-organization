@@ -640,7 +640,7 @@ class FolderController extends Controller
              * custom the value of the field
              */
             'pdf' => function($record){
-                $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('document')->exists( $record->pdf ) )
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) )
                 ? true
                 // \Storage::disk('regulator')->url( $pdf ) 
                 : false ;
