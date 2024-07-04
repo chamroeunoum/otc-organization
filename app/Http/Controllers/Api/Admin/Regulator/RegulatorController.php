@@ -360,7 +360,7 @@ class RegulatorController extends Controller
         if($document) {
             // $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( $record->pdf ) )
             // $path = storage_path('data') . '/regulators/' . $document->pdf;
-            $path = storage_path('data') . ( strpos( $document->pdf , 'regulators' ) !== false ? '/' . $document->pdf : '/regulators/' . $document->pdf ) ;
+            $path = storage_path('data') . str_replace([ 'regulators/' ,'documents/' ],'regulators/', $document->pdf ) ;
             $ext = pathinfo($path);
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
             
