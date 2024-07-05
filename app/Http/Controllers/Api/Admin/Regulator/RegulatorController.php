@@ -9,6 +9,12 @@ use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 
+use FilippoToso\PdfWatermarker\Facades\ImageWatermarker;
+use FilippoToso\PdfWatermarker\Support\Pdf;
+use FilippoToso\PdfWatermarker\Watermarks\ImageWatermark;
+use FilippoToso\PdfWatermarker\PdfWatermarker;
+use FilippoToso\PdfWatermarker\Support\Position;
+
 
 class RegulatorController extends Controller
 {
@@ -360,19 +366,57 @@ class RegulatorController extends Controller
         if($document) {
             // $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( $record->pdf ) )
             // $path = storage_path('data') . '/regulators/' . $document->pdf;
-            $path = storage_path('data') . '/' . str_replace([ 'regulators/' ,'documents/' ],'regulators/', $document->pdf ) ;
-            $ext = pathinfo($path);
+            $pathPdf = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ;
+            $ext = pathinfo($pathPdf);
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
-            
+        
             /**   Log the access of the user */
             //   $user_id= Auth::user()->id;
             //   $current_date = date('Y-m-d H:i:s');
             //   DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
 
-            if(is_file($path)) {
-                $pdfBase64 = base64_encode( file_get_contents($path) );
+            if(is_file($pathPdf)) {
+                // Check whether the pdf has once applied the watermark
+                if( !file_exists (storage_path('data') . '/watermarkfiles/' . $document->pdf ) ){
+                    // Specify path to the existing pdf
+                    $pdf = new Pdf( $pathPdf );
+
+                    // Specify path to image. The image must have a 96 DPI resolution.
+                    $watermark = new ImageWatermark( 
+                        storage_path('data') . 
+                        '/watermark5.png' 
+                    );
+
+                    // Create a new watermarker
+                    $watermarker = new PDFWatermarker($pdf, $watermark); 
+
+                    // Set the position of the watermark including optional X/Y offsets
+                    // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
+
+                    // All possible positions can be found in Position::options
+                    // $watermarker->setPosition($position);
+
+                    // Place watermark behind original PDF content. Default behavior places it over the content.
+                    // $watermarker->setAsBackground();
+
+
+                    // Only Watermark specific range of pages
+                    // This would only watermark page 3 and 4
+                    // $watermarker->setPageRange(3, 4);
+                    
+                    // Save the new PDF to its specified location
+                    $watermarker->save( storage_path('data') . '/watermarkfiles/' . $document->pdf );
+                }   
+
+                $pdfBase64 = base64_encode( 
+                    file_get_contents( 
+                        // $pathPdf 
+                        storage_path('data') . '/watermarkfiles/' . $document->pdf
+                    ) 
+                );
+                
                 return response([
-                    'serial' => str_replace(['regulators','/','.pdf'],'',$document->pdf ) ,
+                    'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                     "filename" => $filename,
                     "ok" => true 
@@ -381,7 +425,7 @@ class RegulatorController extends Controller
             {
                 return response([
                     'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
-                    'path' => $path
+                    'path' => $pathPdf
                 ],500 );
             }
         }

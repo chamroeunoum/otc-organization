@@ -7,10 +7,9 @@ use Carbon\Carbon;
 
 class Log extends Model
 {
-
     protected static $columns = [ 'user_id' , 'regulator_id' , 'datetime' ] ;
     public static function regulator($data=[]){
-        $logDirectory = storage_path() . '/logs' ;
+        $logDirectory = storage_path() . '/logs/regulators' ;
         $todayLog = 'regulator-'.\Carbon\Carbon::now()->format('Ymd').'.csv';
         $fields = [
             $data['user_id'] ,

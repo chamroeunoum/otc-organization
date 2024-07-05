@@ -337,7 +337,7 @@ class RegulatorController extends Controller
     {
         $document = RecordModel::findOrFail($request->id);
         if($document) {
-            $path = storage_path('data') . '/' . $document->pdf;
+            $path = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ;
             $ext = pathinfo($path);
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
             
@@ -353,9 +353,49 @@ class RegulatorController extends Controller
                 ]);
             }
             if(is_file($path)) {
-                $pdfBase64 = base64_encode( file_get_contents($path) );
+
+                // Check whether the pdf has once applied the watermark
+                if( !file_exists (storage_path('data') . '/watermarkfiles/' . $document->pdf ) ){
+                    // Specify path to the existing pdf
+                    $pdf = new Pdf( $pathPdf );
+
+                    // Specify path to image. The image must have a 96 DPI resolution.
+                    $watermark = new ImageWatermark( 
+                        storage_path('data') . 
+                        '/watermark5.png' 
+                    );
+
+                    // Create a new watermarker
+                    $watermarker = new PDFWatermarker($pdf, $watermark); 
+
+                    // Set the position of the watermark including optional X/Y offsets
+                    // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
+
+                    // All possible positions can be found in Position::options
+                    // $watermarker->setPosition($position);
+
+                    // Place watermark behind original PDF content. Default behavior places it over the content.
+                    // $watermarker->setAsBackground();
+
+
+                    // Only Watermark specific range of pages
+                    // This would only watermark page 3 and 4
+                    // $watermarker->setPageRange(3, 4);
+                    
+                    // Save the new PDF to its specified location
+                    $watermarker->save( storage_path('data') . '/watermarkfiles/' . $document->pdf );
+                }   
+
+                $pdfBase64 = base64_encode( 
+                    file_get_contents( 
+                        // $pathPdf 
+                        storage_path('data') . '/watermarkfiles/' . $document->pdf
+                    ) 
+                );
+
+                // $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
-                    'serial' => str_replace(['documents','/','.pdf'],'',$document->pdf ) ,
+                    'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                     "filename" => $filename,
                     "ok" => true 

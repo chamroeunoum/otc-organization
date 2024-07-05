@@ -132,7 +132,9 @@ class SearchController extends Controller
              * custom the value of the field
              */
             'pdf' => function($record){
-                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) );
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) )
+                ? true
+                : false ;
                 return $record->pdf ;
             },
            'objective' => function($record){
@@ -217,7 +219,7 @@ class SearchController extends Controller
     public function pdf(Request $request)
     {
         $regulatorId = isset( $request->id ) && intval( $request->id ) > 0 ? $request->id : false ;
-        $regulatorSerial = isset( $request->serial ) && is_string( $request->serial ) ? $request->serial : false ;
+        $regulatorSerial = isset( $request->serial ) && is_string( $request->serial ) && strlen( $request->serial ) > 0 ? $request->serial : false ;
         $regulator = $regulatorId 
             ? RecordModel::findOrFail($request->id) 
             : (
@@ -239,13 +241,25 @@ class SearchController extends Controller
              * Check whether the pdf is array or string of regulator path
              */
             $path = '' ;
+
             if( $regulatorId !== false ){
-                $path = storage_path('data') . '/' 
-                . ( is_array( $regulator->pdf ) && !empty( $regulator->pdf ) ? $regulator->pdf[0] : '' ) 
-                . ( is_string( $regulator->pdf ) ? $regulator->pdf : '' ) ;    
+                if( 
+                    is_array( $regulator->pdf ) &&
+                    !empty( $regulator->pdf )
+                ){
+                    foreach( $regulator->pdf AS $index => $pdfPath ){
+                        if( strlen( $pdfPath ) > 0 && \Storage::disk('regulator')->exists( $pdfPath ) ){
+                            $path = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $pdfPath ) ;
+                            break ;
+                        }
+                    }
+                }
+                else if( is_string( $regulator->pdf ) && strlen( $regulator->pdf ) > 0 && \Storage::disk('regulator')->exists( $regulator->pdf ) ){
+                    $path = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $regulator->pdf ) ;
+                }
             }
-            if( $regulatorSerial !== false ){
-                $path = storage_path('data') . '/documents/' . $regulatorSerial . '.pdf' ;    
+            else if( $regulatorSerial !== false ){
+                $path = storage_path('data') . '/regulators/' . $regulatorSerial . '.pdf' ;    
             }
 
             $ext = pathinfo($path);
@@ -262,7 +276,47 @@ class SearchController extends Controller
             }
 
             if(is_file($path)) {
-                $pdfBase64 = base64_encode( file_get_contents($path) );
+
+                // Check whether the pdf has once applied the watermark
+                if( !file_exists (storage_path('data') . '/watermarkfiles/' . $regulator->pdf ) ){
+                    // Specify path to the existing pdf
+                    $pdf = new Pdf( $pathPdf );
+
+                    // Specify path to image. The image must have a 96 DPI resolution.
+                    $watermark = new ImageWatermark( 
+                        storage_path('data') . 
+                        '/watermark5.png' 
+                    );
+
+                    // Create a new watermarker
+                    $watermarker = new PDFWatermarker($pdf, $watermark); 
+
+                    // Set the position of the watermark including optional X/Y offsets
+                    // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
+
+                    // All possible positions can be found in Position::options
+                    // $watermarker->setPosition($position);
+
+                    // Place watermark behind original PDF content. Default behavior places it over the content.
+                    // $watermarker->setAsBackground();
+
+
+                    // Only Watermark specific range of pages
+                    // This would only watermark page 3 and 4
+                    // $watermarker->setPageRange(3, 4);
+                    
+                    // Save the new PDF to its specified location
+                    $watermarker->save( storage_path('data') . '/watermarkfiles/' . $regulator->pdf );
+                }   
+
+                $pdfBase64 = base64_encode( 
+                    file_get_contents( 
+                        // $pathPdf 
+                        storage_path('data') . '/watermarkfiles/' . $regulator->pdf
+                    ) 
+                );
+
+                // $pdfBase64 = base64_encode( file_get_contents($path) );
                 return response([
                     'serial' => $regulatorSerial ,
                     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
