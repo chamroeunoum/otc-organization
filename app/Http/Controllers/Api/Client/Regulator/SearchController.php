@@ -263,7 +263,7 @@ class SearchController extends Controller
             }
 
             $ext = pathinfo($path);
-            $filename = str_replace('/' , '-', $regulator->fid) . "." . isset( $ext['extension'] ) && strlen( $ext['extension'] ) > 0 ? $ext['extension'] : 'pdf' ;
+            $filename = str_replace('/' , '-', $regulator->fid) . "." . 'pdf' ;
             
             /**   Log the access of the user */
             if( \Auth::user() !== null ){
