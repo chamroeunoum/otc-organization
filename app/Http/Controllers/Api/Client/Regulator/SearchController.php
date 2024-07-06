@@ -255,11 +255,11 @@ class SearchController extends Controller
                         }
                     }
                 }
-                else if( is_string( $regulator->pdf ) && strlen( $regulator->pdf ) > 0 && \Storage::disk('regulator')->exists( $regulator->pdf ) ){
+                if( is_string( $regulator->pdf ) && strlen( $regulator->pdf ) > 0 && \Storage::disk('regulator')->exists( $regulator->pdf ) ){
                     $path = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $regulator->pdf ) ;
                 }
             }
-            else if( $regulatorSerial !== false ){
+            if( $regulatorSerial !== false ){
                 $path = storage_path('data') . '/regulators/' . $regulatorSerial . '.pdf' ;    
             }
 
