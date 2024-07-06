@@ -344,15 +344,15 @@ class PeopleController extends Controller
             $user->people_id = $person->id ;
             $user->save();
 
-            if( isset( $request->organizations ) && !empty( $request->organizations ) ){
-                $user->person->organizations()->sync( $request->organizations );
+            if( isset( $request->organizations ) && !empty( $request->organizations && $person->organizations != null ) ){
+                $person->organizations()->sync( $request->organizations );
             }
-            if( isset( $request->positions ) && !empty( $request->positions ) ){
-                $user->person->positions()->sync( $request->positions );
+            if( isset( $request->positions ) && !empty( $request->positions ) && $person->positions != null  ){
+                $person->positions()->sync( $request->positions );
             }
 
-            if( isset( $request->countesies ) && !empty( $request->countesies ) ){
-                $user->person->countesies()->sync( $request->countesies );
+            if( isset( $request->countesies ) && !empty( $request->countesies ) && $person->countesies != null  ){
+                $person->countesies()->sync( $request->countesies );
             }
 
             /**
@@ -409,7 +409,7 @@ class PeopleController extends Controller
             if( isset( $request->positions ) && is_array( $request->positions ) && $person->positions != null ){
                 $person->positions()->sync( $request->positions );
             }
-            if( isset( $request->countesies ) && is_array( $request->countesies && $person->countesies != null  ) ){
+            if( isset( $request->countesies ) && is_array( $request->countesies ) && $person->countesies != null ){
                 $person->countesies()->sync( $request->countesies );
             }
             return response()->json([

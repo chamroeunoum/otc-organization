@@ -192,6 +192,12 @@ class AuthController extends Controller
             }
         }
 
+        if( $user->person != null ){
+            $user->person->organizations;
+            $user->person->positions;
+            $user->person->countesies;
+        }
+
         return response()->json([
             'ok' => true ,
             'upload_max_filesize' => ini_get("upload_max_filesize") ,

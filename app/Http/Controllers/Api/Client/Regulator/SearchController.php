@@ -128,14 +128,11 @@ class SearchController extends Controller
         $request->merge( $queryString );
 
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields,[
-            /**
-             * custom the value of the field
-             */
             'pdf' => function($record){
-                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) )
+                return ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) )
                 ? true
+                // \Storage::disk('regulator')->url( $pdf ) 
                 : false ;
-                return $record->pdf ;
             },
            'objective' => function($record){
                 return html_entity_decode( strip_tags( $record->objective ) );
