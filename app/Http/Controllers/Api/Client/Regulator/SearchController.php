@@ -219,7 +219,7 @@ class SearchController extends Controller
      */
     public function pdf(Request $request)
     {
-        $regulatorId = isset( $request->id ) && intval( $request->id ) > 0 ? $request->id : false ;
+        $regulatorId = isset( $request->id ) && intval( $request->id ) > 0 ? intval($request->id) : false ;
         $regulatorSerial = isset( $request->serial ) && is_string( $request->serial ) && strlen( $request->serial ) > 0 ? $request->serial : false ;
         $regulator = $regulatorId 
             ? RecordModel::findOrFail($request->id) 
@@ -242,25 +242,26 @@ class SearchController extends Controller
              * Check whether the pdf is array or string of regulator path
              */
             $path = '' ;
-
-            if( $regulatorId !== false ){
-                if( 
-                    is_array( $regulator->pdf ) &&
-                    !empty( $regulator->pdf )
-                ){
-                    foreach( $regulator->pdf AS $index => $pdfPath ){
-                        if( strlen( $pdfPath ) > 0 && \Storage::disk('regulator')->exists( $pdfPath ) ){
-                            $path = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $pdfPath ) ;
-                            break ;
-                        }
+            if( 
+                is_array( $regulator->pdf ) &&
+                !empty( $regulator->pdf )
+            ){
+                foreach( $regulator->pdf AS $index => $pdfPath ){
+                    if( 
+                        ( strlen( $pdfPath ) > 0 && 
+                        \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $pdfPath ) ) )
+                    ){
+                        $path = storage_path('data') . '/regulators/' . str_replace( [ 'regulators/' , 'documents/' ] , '' , $pdfPath ) ;
+                        break ;
                     }
                 }
-                if( is_string( $regulator->pdf ) && strlen( $regulator->pdf ) > 0 && \Storage::disk('regulator')->exists( $regulator->pdf ) ){
-                    $path = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $regulator->pdf ) ;
-                }
             }
-            if( $regulatorSerial !== false ){
-                $path = storage_path('data') . '/regulators/' . $regulatorSerial . '.pdf' ;    
+            if( 
+                is_string( $regulator->pdf ) && 
+                strlen( $regulator->pdf ) > 0 && 
+                \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $regulator->pdf ) ) 
+            ){
+                $path = storage_path('data') . '/regulators/' . str_replace( [ 'regulators/' , 'documents/' ] , '' , $regulator->pdf ) ;
             }
 
             $ext = pathinfo($path);
