@@ -329,7 +329,8 @@ class SearchController extends Controller
             {
                 return response([
                     'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
-                    'path' => $path
+                    'path' => $path ,
+                    'regulator' => $regulator
                 ],404 );
             }
         }else{
