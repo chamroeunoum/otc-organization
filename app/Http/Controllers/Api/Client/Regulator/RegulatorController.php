@@ -9,6 +9,12 @@ use App\Http\Controllers\CrudController;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 
+use FilippoToso\PdfWatermarker\Facades\ImageWatermarker;
+use FilippoToso\PdfWatermarker\Support\Pdf;
+use FilippoToso\PdfWatermarker\Watermarks\ImageWatermark;
+use FilippoToso\PdfWatermarker\PdfWatermarker;
+use FilippoToso\PdfWatermarker\Support\Position;
+
 
 class RegulatorController extends Controller
 {

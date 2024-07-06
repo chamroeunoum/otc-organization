@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\Regulator\Regulator as RecordModel;
 use App\Http\Controllers\CrudController;
 
+use FilippoToso\PdfWatermarker\Facades\ImageWatermarker;
+use FilippoToso\PdfWatermarker\Support\Pdf;
+use FilippoToso\PdfWatermarker\Watermarks\ImageWatermark;
+use FilippoToso\PdfWatermarker\PdfWatermarker;
+use FilippoToso\PdfWatermarker\Support\Position;
 
 class SearchController extends Controller
 {
@@ -283,7 +288,7 @@ class SearchController extends Controller
                 // Check whether the pdf has once applied the watermark
                 if( !file_exists (storage_path('data') . '/watermarkfiles/' . $regulator->pdf ) ){
                     // Specify path to the existing pdf
-                    $pdf = new Pdf( $pathPdf );
+                    $pdf = new Pdf( $path );
 
                     // Specify path to image. The image must have a 96 DPI resolution.
                     $watermark = new ImageWatermark( 
