@@ -46,6 +46,10 @@ class SearchController extends Controller
                         'value' => 1
                     ] ,
                     [
+                        'field' => 'publish' ,
+                        'value' => 1
+                    ] ,
+                    [
                         'field' => 'accessibility' ,
                         'value' => [ 4 ]
                     ]
@@ -272,7 +276,8 @@ class SearchController extends Controller
                 // DB::insert('insert into regulator_view_logs (user_id, regulator_id, date) values (?,?,?)', [\Auth::user()->id, $regulator->id, $current_date]);
             }
 
-            if(is_file($path)) {
+            // if(is_file($path)) {
+            if(file_exists($path)) {
 
                 // Check whether the pdf has once applied the watermark
                 if( !file_exists (storage_path('data') . '/watermarkfiles/' . $regulator->pdf ) ){
