@@ -381,7 +381,7 @@ class SearchController extends Controller
                     $pdfBase64 = base64_encode( file_get_contents( $pdfWatermark ) );
                     
                     return response([
-                        'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
+                        'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $regulator->pdf ) ,
                         "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                         "filename" => $filename,
                         "ok" => true 
