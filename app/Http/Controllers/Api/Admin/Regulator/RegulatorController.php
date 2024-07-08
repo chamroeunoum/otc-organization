@@ -376,40 +376,8 @@ class RegulatorController extends Controller
             //   DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
 
             if(file_exists( $pathPdf ) && is_file($pathPdf)) {
-                $watermarkPath = storage_path('data') . '/watermarkfiles/watermark5.png'  ;
-                if( file_exists( $watermarkPath ) && is_file($watermarkPath) ){
-                    // Check whether the pdf has once applied the watermark
-                    if( !file_exists (storage_path('data') . '/watermarkfiles/' . $document->pdf ) ){
-                        // Specify path to the existing pdf
-                        $pdf = new Pdf( $pathPdf );
 
-                        // Specify path to image. The image must have a 96 DPI resolution.
-                        $watermark = new ImageWatermark( $watermarkPath );
-                        
-                        // Create a new watermarker
-                        $watermarker = new PDFWatermarker(
-                            $pdf, 
-                            $watermark
-                        ); 
-
-                        // Set the position of the watermark including optional X/Y offsets
-                        // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
-
-                        // All possible positions can be found in Position::options
-                        // $watermarker->setPosition($position);
-
-                        // Place watermark behind original PDF content. Default behavior places it over the content.
-                        // $watermarker->setAsBackground();
-
-
-                        // Only Watermark specific range of pages
-                        // This would only watermark page 3 and 4
-                        // $watermarker->setPageRange(3, 4);
-                        
-                        // Save the new PDF to its specified location
-                        $watermarker->save( storage_path('data') . '/watermarkfiles/' . $document->pdf );
-                    }   
-
+                if( cp( $pathPdf , storage_path('data') . '/watermarkfiles/' . $document->pdf ) ){
                     $pdfBase64 = base64_encode( 
                         file_get_contents( 
                             // $pathPdf 
@@ -425,10 +393,63 @@ class RegulatorController extends Controller
                     ],200);
                 }else{
                     return response()->json([
-                        'message' => 'មិនមានរូបផាព Watermark។' ,
-                        'watermark' => $watermarkPath
-                    ],200);
+                        'message' => 'មិនបញ្ហាអានអានឯកសារយោង'
+                    ],403);
                 }
+
+                // $watermarkPath = storage_path('data') . '/watermarkfiles/watermark5.png'  ;
+                // if( file_exists( $watermarkPath ) && is_file($watermarkPath) ){
+                //     // Check whether the pdf has once applied the watermark
+                //     if( !file_exists (storage_path('data') . '/watermarkfiles/' . $document->pdf ) ){
+                //         // Specify path to the existing pdf
+                //         $pdf = new Pdf( $pathPdf );
+
+                //         // Specify path to image. The image must have a 96 DPI resolution.
+                //         $watermark = new ImageWatermark( $watermarkPath );
+                        
+                //         // Create a new watermarker
+                //         $watermarker = new PDFWatermarker(
+                //             $pdf, 
+                //             $watermark
+                //         ); 
+
+                //         // Set the position of the watermark including optional X/Y offsets
+                //         // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
+
+                //         // All possible positions can be found in Position::options
+                //         // $watermarker->setPosition($position);
+
+                //         // Place watermark behind original PDF content. Default behavior places it over the content.
+                //         // $watermarker->setAsBackground();
+
+
+                //         // Only Watermark specific range of pages
+                //         // This would only watermark page 3 and 4
+                //         // $watermarker->setPageRange(3, 4);
+                        
+                //         // Save the new PDF to its specified location
+                //         $watermarker->save( storage_path('data') . '/watermarkfiles/' . $document->pdf );
+                //     }   
+
+                //     $pdfBase64 = base64_encode( 
+                //         file_get_contents( 
+                //             // $pathPdf 
+                //             storage_path('data') . '/watermarkfiles/' . $document->pdf
+                //         ) 
+                //     );
+                    
+                //     return response([
+                //         'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
+                //         "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                //         "filename" => $filename,
+                //         "ok" => true 
+                //     ],200);
+                // }else{
+                //     return response()->json([
+                //         'message' => 'មិនមានរូបផាព Watermark។' ,
+                //         'watermark' => $watermarkPath
+                //     ],200);
+                // }
             }else
             {
                 return response([
