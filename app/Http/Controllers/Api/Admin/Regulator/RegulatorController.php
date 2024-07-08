@@ -386,12 +386,18 @@ class RegulatorController extends Controller
                         storage_path('data') . 
                         '/watermarkfiles/watermark5.png' 
                     );
-
-                    // Create a new watermarker
-                    $watermarker = new PDFWatermarker(
-                        $pdf, 
-                        $watermark
-                    ); 
+                    try{
+                        // Create a new watermarker
+                        $watermarker = new PDFWatermarker(
+                            $pdf, 
+                            $watermark
+                        ); 
+                    }catch(\Exception $e ){
+                        return response()->json([
+                            'pdf' => $pdf ,
+                            'water' => $watermark
+                        ],200);
+                    }
 
                     // Set the position of the watermark including optional X/Y offsets
                     // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
