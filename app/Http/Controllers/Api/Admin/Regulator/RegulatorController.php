@@ -384,7 +384,7 @@ class RegulatorController extends Controller
                     // Specify path to image. The image must have a 96 DPI resolution.
                     $watermark = new ImageWatermark( 
                         storage_path('data') . 
-                        '/watermark5.png' 
+                        '/watermarkfiles/watermark5.png' 
                     );
 
                     // Create a new watermarker
