@@ -385,19 +385,12 @@ class RegulatorController extends Controller
 
                         // Specify path to image. The image must have a 96 DPI resolution.
                         $watermark = new ImageWatermark( $watermarkPath );
-                        try{
-                            // Create a new watermarker
-                            $watermarker = new PDFWatermarker(
-                                $pdf, 
-                                $watermark
-                            ); 
-                        }catch(\Exception $e ){
-                            return response()->json([
-                                'pdf' => $pathPdf ,
-                                'water' => $watermarkPath,
-                                'error' => $e
-                            ],200);
-                        }
+                        
+                        // Create a new watermarker
+                        $watermarker = new PDFWatermarker(
+                            $pdf, 
+                            $watermark
+                        ); 
 
                         // Set the position of the watermark including optional X/Y offsets
                         // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
