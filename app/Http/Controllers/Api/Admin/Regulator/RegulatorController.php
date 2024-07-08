@@ -388,7 +388,10 @@ class RegulatorController extends Controller
                     );
 
                     // Create a new watermarker
-                    $watermarker = new PDFWatermarker($pdf, $watermark); 
+                    $watermarker = new PDFWatermarker(
+                        $pdf, 
+                        $watermark
+                    ); 
 
                     // Set the position of the watermark including optional X/Y offsets
                     // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
