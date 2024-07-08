@@ -380,8 +380,7 @@ class RegulatorController extends Controller
                 if( copy( $pathPdf , storage_path('data') . '/watermarkfiles/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ) ){
                     $pdfBase64 = base64_encode( 
                         file_get_contents( 
-                            // $pathPdf 
-                            storage_path('data') . '/watermarkfiles/' . $document->pdf
+                            storage_path('data') . '/watermarkfiles/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf )
                         ) 
                     );
                     
