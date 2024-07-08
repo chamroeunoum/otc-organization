@@ -377,7 +377,7 @@ class RegulatorController extends Controller
 
             if(file_exists( $pathPdf ) && is_file($pathPdf)) {
 
-                if( copy( $pathPdf , storage_path('data') . '/watermarkfiles/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ){
+                if( copy( $pathPdf , storage_path('data') . '/watermarkfiles/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ) ){
                     $pdfBase64 = base64_encode( 
                         file_get_contents( 
                             // $pathPdf 
