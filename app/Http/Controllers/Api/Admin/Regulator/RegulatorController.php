@@ -395,7 +395,7 @@ class RegulatorController extends Controller
                             return response()->json([
                                 'pdf' => $pathPdf ,
                                 'water' => $watermarkPath,
-                                'error' => $e->toString()
+                                'error' => $e
                             ],200);
                         }
 
