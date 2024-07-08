@@ -393,7 +393,7 @@ class RegulatorController extends Controller
                             ); 
                         }catch(\Exception $e ){
                             return response()->json([
-                                'pdf' => $pdfPath ,
+                                'pdf' => $pathPdf ,
                                 'water' => $watermarkPath,
                                 'error' => $e->toString()
                             ],200);
