@@ -286,51 +286,126 @@ class SearchController extends Controller
             if(file_exists($path)) {
 
                 // Check whether the pdf has once applied the watermark
-                if( !file_exists (storage_path('data') . '/watermarkfiles/' . $regulator->pdf ) ){
-                    // Specify path to the existing pdf
-                    $pdf = new Pdf( $path );
+                // if( !file_exists (storage_path('data') . '/watermarkfiles/' . $regulator->pdf ) ){
+                //     // Specify path to the existing pdf
+                //     $pdf = new Pdf( $path );
 
-                    // Specify path to image. The image must have a 96 DPI resolution.
-                    $watermark = new ImageWatermark( 
-                        storage_path('data') . 
-                        '/watermark5.png' 
-                    );
+                //     // Specify path to image. The image must have a 96 DPI resolution.
+                //     $watermark = new ImageWatermark( 
+                //         storage_path('data') . 
+                //         '/watermark5.png' 
+                //     );
 
-                    // Create a new watermarker
-                    $watermarker = new PDFWatermarker($pdf, $watermark); 
+                //     // Create a new watermarker
+                //     $watermarker = new PDFWatermarker($pdf, $watermark); 
 
-                    // Set the position of the watermark including optional X/Y offsets
-                    // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
+                //     // Set the position of the watermark including optional X/Y offsets
+                //     // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
 
-                    // All possible positions can be found in Position::options
-                    // $watermarker->setPosition($position);
+                //     // All possible positions can be found in Position::options
+                //     // $watermarker->setPosition($position);
 
-                    // Place watermark behind original PDF content. Default behavior places it over the content.
-                    // $watermarker->setAsBackground();
+                //     // Place watermark behind original PDF content. Default behavior places it over the content.
+                //     // $watermarker->setAsBackground();
 
 
-                    // Only Watermark specific range of pages
-                    // This would only watermark page 3 and 4
-                    // $watermarker->setPageRange(3, 4);
+                //     // Only Watermark specific range of pages
+                //     // This would only watermark page 3 and 4
+                //     // $watermarker->setPageRange(3, 4);
                     
-                    // Save the new PDF to its specified location
-                    $watermarker->save( storage_path('data') . '/watermarkfiles/' . $regulator->pdf );
-                }   
+                //     // Save the new PDF to its specified location
+                //     $watermarker->save( storage_path('data') . '/watermarkfiles/' . $regulator->pdf );
+                // }   
+                $pdfWatermark = storage_path('data') . '/watermarkfiles/' . str_replace([ 'regulators/' ,'documents/' ],'', $regulator->pdf );
+                if( 
+                    copy( 
+                        $path , 
+                        $pdfWatermark
+                    )
+                ){
 
-                $pdfBase64 = base64_encode( 
-                    file_get_contents( 
-                        // $pathPdf 
-                        storage_path('data') . '/watermarkfiles/' . $regulator->pdf
-                    ) 
-                );
+                    // $watermarkPath = storage_path('data') . '/watermarkfiles/watermark5.png'  ;
+                    // if( file_exists( $watermarkPath ) && is_file($watermarkPath) ){
+                    //     // Check whether the pdf has once applied the watermark
+                    //     if( !file_exists ( storage_path('data') . '/watermarkfiles/' . $document->pdf ) ){
+                    //         // Specify path to the existing pdf
+                    //         $pdf = new Pdf( $pathPdf );
 
-                // $pdfBase64 = base64_encode( file_get_contents($path) );
-                return response([
-                    'serial' => $regulatorSerial ,
-                    "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
-                    "filename" => $filename ,
-                    "ok" => true
-                ],200);
+                    //         // Specify path to image. The image must have a 96 DPI resolution.
+                    //         $watermark = new ImageWatermark( $watermarkPath );
+                            
+                    //         // Create a new watermarker
+                    //         $watermarker = new PDFWatermarker(
+                    //             $pdf, 
+                    //             $watermark
+                    //         ); 
+
+                    //         // Set the position of the watermark including optional X/Y offsets
+                    //         // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
+
+                    //         // All possible positions can be found in Position::options
+                    //         // $watermarker->setPosition($position);
+
+                    //         // Place watermark behind original PDF content. Default behavior places it over the content.
+                    //         // $watermarker->setAsBackground();
+
+
+                    //         // Only Watermark specific range of pages
+                    //         // This would only watermark page 3 and 4
+                    //         // $watermarker->setPageRange(3, 4);
+                            
+                    //         // Save the new PDF to its specified location
+                    //         $watermarker->save( storage_path('data') . '/watermarkfiles/' . $document->pdf );
+                    //     }   
+
+                    //     $pdfBase64 = base64_encode( 
+                    //         file_get_contents( 
+                    //             // $pathPdf 
+                    //             storage_path('data') . '/watermarkfiles/' . $document->pdf
+                    //         ) 
+                    //     );
+                        
+                    //     return response([
+                    //         'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
+                    //         "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                    //         "filename" => $filename,
+                    //         "ok" => true 
+                    //     ],200);
+                    // }else{
+                    //     return response()->json([
+                    //         'message' => 'មិនមានរូបផាព Watermark។' ,
+                    //         'watermark' => $watermarkPath
+                    //     ],200);
+                    // }
+
+                    $pdfBase64 = base64_encode( file_get_contents( $pdfWatermark ) );
+                    
+                    return response([
+                        'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
+                        "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                        "filename" => $filename,
+                        "ok" => true 
+                    ],200);
+                }else{
+                    return response()->json([
+                        'message' => 'មិនបញ្ហាអានអានឯកសារយោង'
+                    ],403);
+                }
+
+                // $pdfBase64 = base64_encode( 
+                //     file_get_contents( 
+                //         // $pathPdf 
+                //         storage_path('data') . '/watermarkfiles/' . $regulator->pdf
+                //     ) 
+                // );
+
+                // // $pdfBase64 = base64_encode( file_get_contents($path) );
+                // return response([
+                //     'serial' => $regulatorSerial ,
+                //     "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                //     "filename" => $filename ,
+                //     "ok" => true
+                // ],200);
             }else
             {
                 return response([
