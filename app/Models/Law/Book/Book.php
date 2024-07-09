@@ -315,4 +315,18 @@ class Book extends Model
 
     //     // $this->uploadMultipleFilesToDisk($value, $attribute_name, $disk, $destination_path);
     // }
+    public static function bookContenInformation(){
+        return Book::all()->map(function($b){ 
+            return [ 
+                'b' => $b->id , 
+                't' => $b->title ,  
+                'k' => $b->kunties()->count() , 
+                'm' => $b->matikas()->count(), 
+                'c' => $b->chapters()->count(), 
+                'p' => $b->parts()->count(), 
+                's' => $b->sections()->count(), 
+                'matras' => $b->matras->count()
+            ]; 
+        });
+    }
 }

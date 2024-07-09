@@ -1,5 +1,7 @@
 <?php
+
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 
 class ChaptersTableSeeder extends Seeder
@@ -71,19 +73,6 @@ class ChaptersTableSeeder extends Seeder
             ),
             4 => 
             array (
-                'id' => 5,
-                'number' => 'ជំពូកទី ២',
-                'title' => 'កម្មសិទ្ធិ',
-                'book_id' => 1,
-                'kunty_id' => 3,
-                'matika_id' => 1,
-                'created_by' => 3,
-                'updated_by' => 3,
-                'created_at' => '2015-06-16 00:00:00',
-                'updated_at' => '2018-02-02 17:24:22',
-            ),
-            5 => 
-            array (
                 'id' => 6,
                 'number' => 'ជំពូកទី ៣ ',
                 'title' => 'សិទ្ធិកាន់កាប់ ',
@@ -95,7 +84,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            6 => 
+            5 => 
             array (
                 'id' => 7,
                 'number' => 'ជំពូកទី ៤ ',
@@ -108,7 +97,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            7 => 
+            6 => 
             array (
                 'id' => 8,
                 'number' => 'ជំពូកទី ៥ ',
@@ -121,7 +110,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            8 => 
+            7 => 
             array (
                 'id' => 9,
                 'number' => 'ជំពូកទី ៦ ',
@@ -134,7 +123,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            9 => 
+            8 => 
             array (
                 'id' => 10,
                 'number' => 'ជំពូកទី ៧ ',
@@ -147,7 +136,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            10 => 
+            9 => 
             array (
                 'id' => 11,
                 'number' => 'ជំពូកទី ៨ ',
@@ -160,7 +149,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            11 => 
+            10 => 
             array (
                 'id' => 12,
                 'number' => 'ជំពូកទី ៩ ',
@@ -173,7 +162,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            12 => 
+            11 => 
             array (
                 'id' => 13,
                 'number' => 'ជំពូកទី ១ ',
@@ -186,7 +175,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            13 => 
+            12 => 
             array (
                 'id' => 14,
                 'number' => 'ជំពូកទី ២ ',
@@ -199,7 +188,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            14 => 
+            13 => 
             array (
                 'id' => 15,
                 'number' => 'ជំពូកទី ៣ ',
@@ -212,7 +201,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            15 => 
+            14 => 
             array (
                 'id' => 16,
                 'number' => 'ជំពូកទី ៤ ',
@@ -225,7 +214,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            16 => 
+            15 => 
             array (
                 'id' => 17,
                 'number' => 'ជំពូកទី ៥ ',
@@ -238,7 +227,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            17 => 
+            16 => 
             array (
                 'id' => 18,
                 'number' => 'ជំពូកទី ៦ ',
@@ -251,7 +240,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            18 => 
+            17 => 
             array (
                 'id' => 19,
                 'number' => 'ជំពូកទី ៧ ',
@@ -264,7 +253,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            19 => 
+            18 => 
             array (
                 'id' => 20,
                 'number' => 'ជំពូកទី ៨ ',
@@ -277,7 +266,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            20 => 
+            19 => 
             array (
                 'id' => 21,
                 'number' => 'ជំពូកទី ៩ ',
@@ -290,7 +279,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            21 => 
+            20 => 
             array (
                 'id' => 22,
                 'number' => 'ជំពូកទី ១ ',
@@ -303,7 +292,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            22 => 
+            21 => 
             array (
                 'id' => 23,
                 'number' => 'ជំពូកទី ២ ',
@@ -316,7 +305,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            23 => 
+            22 => 
             array (
                 'id' => 24,
                 'number' => 'ជំពូកទី ៣ ',
@@ -329,7 +318,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            24 => 
+            23 => 
             array (
                 'id' => 25,
                 'number' => 'ជំពូកទី ៤ ',
@@ -342,7 +331,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            25 => 
+            24 => 
             array (
                 'id' => 26,
                 'number' => 'ជំពូកទី ៥ ',
@@ -355,7 +344,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            26 => 
+            25 => 
             array (
                 'id' => 27,
                 'number' => 'ជំពូកទី ៦ ',
@@ -368,7 +357,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            27 => 
+            26 => 
             array (
                 'id' => 28,
                 'number' => 'ជំពូកទី ៧ ',
@@ -381,7 +370,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            28 => 
+            27 => 
             array (
                 'id' => 29,
                 'number' => 'ជំពូកទី ៨ ',
@@ -394,7 +383,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            29 => 
+            28 => 
             array (
                 'id' => 30,
                 'number' => 'ជំពូកទី ៩ ',
@@ -407,7 +396,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            30 => 
+            29 => 
             array (
                 'id' => 31,
                 'number' => 'ជំពូកទី ១០ ',
@@ -420,7 +409,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            31 => 
+            30 => 
             array (
                 'id' => 32,
                 'number' => 'ជំពូកទី ១១ ',
@@ -433,7 +422,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            32 => 
+            31 => 
             array (
                 'id' => 33,
                 'number' => 'ជំពូកទី ១២ ',
@@ -446,7 +435,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            33 => 
+            32 => 
             array (
                 'id' => 34,
                 'number' => 'ជំពូកទី ១៣ ',
@@ -459,7 +448,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            34 => 
+            33 => 
             array (
                 'id' => 35,
                 'number' => 'ជំពូកទី ១៤ ',
@@ -472,7 +461,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            35 => 
+            34 => 
             array (
                 'id' => 36,
                 'number' => 'ជំពូកទី ១៥ ',
@@ -485,7 +474,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            36 => 
+            35 => 
             array (
                 'id' => 37,
                 'number' => 'ជំពូកទី ១៦ ',
@@ -498,7 +487,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            37 => 
+            36 => 
             array (
                 'id' => 38,
                 'number' => 'ជំពូកទី ១ ',
@@ -511,7 +500,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            38 => 
+            37 => 
             array (
                 'id' => 39,
                 'number' => 'ជំពូកទី ២ ',
@@ -524,7 +513,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            39 => 
+            38 => 
             array (
                 'id' => 40,
                 'number' => 'ជំពូកទី ៣ ',
@@ -537,7 +526,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            40 => 
+            39 => 
             array (
                 'id' => 41,
                 'number' => 'ជំពូកទី ៤ ',
@@ -550,7 +539,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            41 => 
+            40 => 
             array (
                 'id' => 42,
                 'number' => 'ជំពូកទី ៥ ',
@@ -563,7 +552,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            42 => 
+            41 => 
             array (
                 'id' => 43,
                 'number' => 'ជំពូកទី ៦ ',
@@ -576,7 +565,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            43 => 
+            42 => 
             array (
                 'id' => 44,
                 'number' => 'ជំពូកទី ៧ ',
@@ -589,7 +578,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            44 => 
+            43 => 
             array (
                 'id' => 45,
                 'number' => 'ជំពូកទី ៨ ',
@@ -602,7 +591,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            45 => 
+            44 => 
             array (
                 'id' => 46,
                 'number' => 'ជំពូកទី ១ ',
@@ -615,7 +604,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            46 => 
+            45 => 
             array (
                 'id' => 47,
                 'number' => 'ជំពូកទី ២ ',
@@ -628,7 +617,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            47 => 
+            46 => 
             array (
                 'id' => 48,
                 'number' => 'ជំពូកទី ៣ ',
@@ -641,7 +630,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            48 => 
+            47 => 
             array (
                 'id' => 49,
                 'number' => 'ជំពូកទី ៤ ',
@@ -654,7 +643,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            49 => 
+            48 => 
             array (
                 'id' => 50,
                 'number' => 'ជំពូកទី ៥ ',
@@ -667,7 +656,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            50 => 
+            49 => 
             array (
                 'id' => 51,
                 'number' => 'ជំពូកទី ៦ ',
@@ -680,7 +669,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            51 => 
+            50 => 
             array (
                 'id' => 52,
                 'number' => 'ជំពូកទី ៧ ',
@@ -693,7 +682,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            52 => 
+            51 => 
             array (
                 'id' => 53,
                 'number' => 'ជំពូកទី ៨ ',
@@ -706,7 +695,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            53 => 
+            52 => 
             array (
                 'id' => 54,
                 'number' => 'ជំពូកទី ១ ',
@@ -719,7 +708,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            54 => 
+            53 => 
             array (
                 'id' => 55,
                 'number' => 'ជំពូកទី ២ ',
@@ -732,7 +721,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            55 => 
+            54 => 
             array (
                 'id' => 56,
                 'number' => 'ជំពូកទី ៣ ',
@@ -745,7 +734,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            56 => 
+            55 => 
             array (
                 'id' => 57,
                 'number' => 'ជំពូកទី ៤ ',
@@ -758,7 +747,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            57 => 
+            56 => 
             array (
                 'id' => 58,
                 'number' => 'ជំពូកទី ៥ ',
@@ -771,7 +760,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            58 => 
+            57 => 
             array (
                 'id' => 59,
                 'number' => 'ជំពូកទី ៦ ',
@@ -784,7 +773,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            59 => 
+            58 => 
             array (
                 'id' => 60,
                 'number' => 'ជំពូកទី ៧ ',
@@ -797,7 +786,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            60 => 
+            59 => 
             array (
                 'id' => 61,
                 'number' => 'ជំពូកទី ៨ ',
@@ -810,7 +799,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            61 => 
+            60 => 
             array (
                 'id' => 62,
                 'number' => 'ជំពូកទោល',
@@ -823,7 +812,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            62 => 
+            61 => 
             array (
                 'id' => 63,
                 'number' => 'ជំពូកទី ១ ',
@@ -836,7 +825,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            63 => 
+            62 => 
             array (
                 'id' => 64,
                 'number' => 'ជំពូកទី ២ ',
@@ -849,7 +838,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            64 => 
+            63 => 
             array (
                 'id' => 65,
                 'number' => 'ជំពូកទី ៣ ',
@@ -862,7 +851,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            65 => 
+            64 => 
             array (
                 'id' => 66,
                 'number' => 'ជំពូកទី ៤ ',
@@ -875,7 +864,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            66 => 
+            65 => 
             array (
                 'id' => 67,
                 'number' => 'ជំពូកទី ៥ ',
@@ -888,7 +877,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            67 => 
+            66 => 
             array (
                 'id' => 68,
                 'number' => 'ជំពូកទី ១ ',
@@ -901,7 +890,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            68 => 
+            67 => 
             array (
                 'id' => 69,
                 'number' => 'ជំពូកទី ២ ',
@@ -914,7 +903,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            69 => 
+            68 => 
             array (
                 'id' => 70,
                 'number' => 'ជំពូកទី ៣ ',
@@ -927,7 +916,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            70 => 
+            69 => 
             array (
                 'id' => 71,
                 'number' => 'ជំពូកទី ៤ ',
@@ -940,7 +929,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            71 => 
+            70 => 
             array (
                 'id' => 72,
                 'number' => 'ជំពូកទី ៥ ',
@@ -953,7 +942,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            72 => 
+            71 => 
             array (
                 'id' => 73,
                 'number' => 'ជំពូកទី ៦ ',
@@ -966,7 +955,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            73 => 
+            72 => 
             array (
                 'id' => 74,
                 'number' => 'ជំពូកទី ៧ ',
@@ -979,7 +968,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            74 => 
+            73 => 
             array (
                 'id' => 75,
                 'number' => 'ជំពូកទី ៨ ',
@@ -992,7 +981,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            75 => 
+            74 => 
             array (
                 'id' => 76,
                 'number' => 'ជំពូកទី ៩ ',
@@ -1005,7 +994,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            76 => 
+            75 => 
             array (
                 'id' => 77,
                 'number' => 'ជំពូកទី ១ ',
@@ -1018,7 +1007,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            77 => 
+            76 => 
             array (
                 'id' => 78,
                 'number' => 'ជំពូកទី ២ ',
@@ -1031,7 +1020,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            78 => 
+            77 => 
             array (
                 'id' => 79,
                 'number' => 'ជំពូកទី ៣ ',
@@ -1044,7 +1033,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            79 => 
+            78 => 
             array (
                 'id' => 80,
                 'number' => 'ជំពូកទី ៤ ',
@@ -1057,7 +1046,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            80 => 
+            79 => 
             array (
                 'id' => 81,
                 'number' => 'ជំពូកទី ១ ',
@@ -1070,7 +1059,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            81 => 
+            80 => 
             array (
                 'id' => 82,
                 'number' => 'ជំពូកទី ២ ',
@@ -1083,7 +1072,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            82 => 
+            81 => 
             array (
                 'id' => 83,
                 'number' => 'ជំពូកទី ៣ ',
@@ -1096,7 +1085,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            83 => 
+            82 => 
             array (
                 'id' => 84,
                 'number' => 'ជំពូកទី ៤ ',
@@ -1109,7 +1098,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            84 => 
+            83 => 
             array (
                 'id' => 85,
                 'number' => 'ជំពូកទី ១ ',
@@ -1122,7 +1111,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            85 => 
+            84 => 
             array (
                 'id' => 86,
                 'number' => 'ជំពូកទី ២ ',
@@ -1135,7 +1124,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            86 => 
+            85 => 
             array (
                 'id' => 87,
                 'number' => 'ជំពូកទី ៣ ',
@@ -1148,7 +1137,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            87 => 
+            86 => 
             array (
                 'id' => 88,
                 'number' => 'ជំពូកទោល',
@@ -1161,7 +1150,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            88 => 
+            87 => 
             array (
                 'id' => 89,
                 'number' => 'ជំពូកទី ១ ',
@@ -1174,7 +1163,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            89 => 
+            88 => 
             array (
                 'id' => 90,
                 'number' => 'ជំពូកទី ២ ',
@@ -1187,7 +1176,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            90 => 
+            89 => 
             array (
                 'id' => 91,
                 'number' => 'ជំពូកទី ៣ ',
@@ -1200,7 +1189,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            91 => 
+            90 => 
             array (
                 'id' => 92,
                 'number' => 'ជំពូកទី ១ ',
@@ -1213,7 +1202,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            92 => 
+            91 => 
             array (
                 'id' => 93,
                 'number' => 'ជំពូកទី ២ ',
@@ -1226,7 +1215,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            93 => 
+            92 => 
             array (
                 'id' => 94,
                 'number' => 'ជំពូកទី ៣ ',
@@ -1239,7 +1228,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            94 => 
+            93 => 
             array (
                 'id' => 95,
                 'number' => 'ជំពូកទី ៤ ',
@@ -1252,7 +1241,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            95 => 
+            94 => 
             array (
                 'id' => 96,
                 'number' => 'ជំពូកទី ១ ',
@@ -1265,7 +1254,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            96 => 
+            95 => 
             array (
                 'id' => 97,
                 'number' => 'ជំពូកទី ២ ',
@@ -1278,7 +1267,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            97 => 
+            96 => 
             array (
                 'id' => 98,
                 'number' => 'ជំពូកទី ៣ ',
@@ -1286,6 +1275,19 @@ class ChaptersTableSeeder extends Seeder
                 'book_id' => 3,
                 'kunty_id' => 19,
                 'matika_id' => 3,
+                'created_by' => 0,
+                'updated_by' => 0,
+                'created_at' => '2015-06-16 00:00:00',
+                'updated_at' => '2015-06-16 00:00:00',
+            ),
+            97 => 
+            array (
+                'id' => 142,
+                'number' => 'ជំពូកទី ២ ',
+                'title' => 'មន្រ្ដីនគរបាលយុត្ដិធម៌ ',
+                'book_id' => 4,
+                'kunty_id' => 26,
+                'matika_id' => 19,
                 'created_by' => 0,
                 'updated_by' => 0,
                 'created_at' => '2015-06-16 00:00:00',
@@ -1852,19 +1854,6 @@ class ChaptersTableSeeder extends Seeder
             ),
             141 => 
             array (
-                'id' => 142,
-                'number' => 'ជំពូកទី ២ ',
-                'title' => 'មន្រ្ដីនគរបាលយុត្ដិធម៌ ',
-                'book_id' => 4,
-                'kunty_id' => 26,
-                'matika_id' => 19,
-                'created_by' => 0,
-                'updated_by' => 0,
-                'created_at' => '2015-06-16 00:00:00',
-                'updated_at' => '2015-06-16 00:00:00',
-            ),
-            142 => 
-            array (
                 'id' => 143,
                 'number' => 'ជំពូកទី ៣ ',
                 'title' => 'ភ្នាក់ងារនគរបាលយុត្ដិធម៌ ',
@@ -1876,7 +1865,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            143 => 
+            142 => 
             array (
                 'id' => 144,
                 'number' => 'ជំពូកទី ៤ ',
@@ -1889,7 +1878,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            144 => 
+            143 => 
             array (
                 'id' => 145,
                 'number' => 'ជំពូកទី ៥ ',
@@ -1902,7 +1891,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            145 => 
+            144 => 
             array (
                 'id' => 146,
                 'number' => 'ជំពូកទី ១ ',
@@ -1915,7 +1904,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            146 => 
+            145 => 
             array (
                 'id' => 147,
                 'number' => 'ជំពូកទី ២ ',
@@ -1928,7 +1917,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            147 => 
+            146 => 
             array (
                 'id' => 148,
                 'number' => 'ជំពូកទី ៣ ',
@@ -1941,7 +1930,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            148 => 
+            147 => 
             array (
                 'id' => 149,
                 'number' => 'ជំពូកទី ៤ ',
@@ -1954,7 +1943,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            149 => 
+            148 => 
             array (
                 'id' => 150,
                 'number' => 'ជំពូកទី ៥ ',
@@ -1967,7 +1956,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            150 => 
+            149 => 
             array (
                 'id' => 151,
                 'number' => 'ជំពូកទី ១ ',
@@ -1980,7 +1969,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            151 => 
+            150 => 
             array (
                 'id' => 152,
                 'number' => 'ជំពូកទី ២ ',
@@ -1993,7 +1982,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            152 => 
+            151 => 
             array (
                 'id' => 153,
                 'number' => 'ជំពូកទី ៣ ',
@@ -2006,7 +1995,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            153 => 
+            152 => 
             array (
                 'id' => 154,
                 'number' => 'ជំពូកទី ៤ ',
@@ -2019,7 +2008,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            154 => 
+            153 => 
             array (
                 'id' => 155,
                 'number' => 'ជំពូកទី ៥ ',
@@ -2032,7 +2021,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            155 => 
+            154 => 
             array (
                 'id' => 156,
                 'number' => 'ជំពូកទី ៦ ',
@@ -2045,7 +2034,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            156 => 
+            155 => 
             array (
                 'id' => 157,
                 'number' => 'ជំពូកទី ១ ',
@@ -2058,7 +2047,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            157 => 
+            156 => 
             array (
                 'id' => 158,
                 'number' => 'ជំពូកទី ២ ',
@@ -2071,7 +2060,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            158 => 
+            157 => 
             array (
                 'id' => 159,
                 'number' => 'ជំពូកទី ៣ ',
@@ -2084,7 +2073,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            159 => 
+            158 => 
             array (
                 'id' => 160,
                 'number' => 'ជំពូកទី ៤ ',
@@ -2097,7 +2086,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            160 => 
+            159 => 
             array (
                 'id' => 161,
                 'number' => 'ជំពូកទី ៥ ',
@@ -2110,7 +2099,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            161 => 
+            160 => 
             array (
                 'id' => 162,
                 'number' => 'ជំពូកទី ១ ',
@@ -2123,7 +2112,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            162 => 
+            161 => 
             array (
                 'id' => 163,
                 'number' => 'ជំពូកទី ២ ',
@@ -2136,7 +2125,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            163 => 
+            162 => 
             array (
                 'id' => 164,
                 'number' => 'ជំពូកទី ៣ ',
@@ -2149,7 +2138,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            164 => 
+            163 => 
             array (
                 'id' => 165,
                 'number' => 'ជំពូកទី ៤ ',
@@ -2162,7 +2151,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            165 => 
+            164 => 
             array (
                 'id' => 166,
                 'number' => 'ជំពូកទី ១ ',
@@ -2175,7 +2164,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            166 => 
+            165 => 
             array (
                 'id' => 167,
                 'number' => 'ជំពូកទី ២ ',
@@ -2188,7 +2177,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            167 => 
+            166 => 
             array (
                 'id' => 168,
                 'number' => 'ជំពូកទី ៣ ',
@@ -2201,7 +2190,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            168 => 
+            167 => 
             array (
                 'id' => 169,
                 'number' => 'ជំពូកទី ៤ ',
@@ -2214,7 +2203,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            169 => 
+            168 => 
             array (
                 'id' => 170,
                 'number' => 'ជំពូកទី ៥ ',
@@ -2227,7 +2216,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            170 => 
+            169 => 
             array (
                 'id' => 171,
                 'number' => 'ជំពូកទី ១ ',
@@ -2240,7 +2229,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            171 => 
+            170 => 
             array (
                 'id' => 172,
                 'number' => 'ជំពូកទី ២ ',
@@ -2253,7 +2242,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            172 => 
+            171 => 
             array (
                 'id' => 173,
                 'number' => 'ជំពូកទី ១ ',
@@ -2266,7 +2255,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            173 => 
+            172 => 
             array (
                 'id' => 174,
                 'number' => 'ជំពូកទី ២ ',
@@ -2279,7 +2268,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            174 => 
+            173 => 
             array (
                 'id' => 175,
                 'number' => 'ជំពូកទី ១ ',
@@ -2292,7 +2281,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            175 => 
+            174 => 
             array (
                 'id' => 176,
                 'number' => 'ជំពូកទី ២ ',
@@ -2305,7 +2294,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            176 => 
+            175 => 
             array (
                 'id' => 177,
                 'number' => 'ជំពូកទី ៣ ',
@@ -2318,7 +2307,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            177 => 
+            176 => 
             array (
                 'id' => 178,
                 'number' => 'ជំពូកទី ៤ ',
@@ -2331,7 +2320,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            178 => 
+            177 => 
             array (
                 'id' => 179,
                 'number' => 'ជំពូកទី ៥ ',
@@ -2344,7 +2333,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            179 => 
+            178 => 
             array (
                 'id' => 180,
                 'number' => 'ជំពូកទី ១ ',
@@ -2357,7 +2346,7 @@ class ChaptersTableSeeder extends Seeder
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
             ),
-            180 => 
+            179 => 
             array (
                 'id' => 181,
                 'number' => 'ជំពូកទី ២ ',
@@ -2369,6 +2358,19 @@ class ChaptersTableSeeder extends Seeder
                 'updated_by' => 0,
                 'created_at' => '2015-06-16 00:00:00',
                 'updated_at' => '2015-06-16 00:00:00',
+            ),
+            180 => 
+            array (
+                'id' => 5,
+                'number' => 'ជំពូកទី ២',
+                'title' => 'កម្មសិទ្ធិ',
+                'book_id' => 1,
+                'kunty_id' => 3,
+                'matika_id' => 0,
+                'created_by' => 3,
+                'updated_by' => 3,
+                'created_at' => '2015-06-16 00:00:00',
+                'updated_at' => '2018-02-02 17:24:22',
             ),
         ));
         

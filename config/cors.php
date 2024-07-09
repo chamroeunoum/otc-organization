@@ -32,11 +32,11 @@ return [
 
     'allowed_origins' => [ 
         '*' ,
-        env("ADMIN_URL", "http://127.0.0.1:3000" ) ,
-        env("CLIENT_URL", "http://127.0.0.1:3001" ),
-        env("MEETING_URL", "http://127.0.0.1:3002" ),
-        env("ATTENDANT_URL", "http://127.0.0.1:3003" ),
-        env("LAW_URL", "http://127.0.0.1:3004" )
+        // env("ADMIN_URL", "http://127.0.0.1:3000" ) ,
+        // env("CLIENT_URL", "http://127.0.0.1:3001" ),
+        // env("MEETING_URL", "http://127.0.0.1:3002" ),
+        // env("ATTENDANT_URL", "http://127.0.0.1:3003" ),
+        // env("LAW_URL", "http://127.0.0.1:3004" )
      ], 
 
     'allowed_origins_patterns' => [],
