@@ -81,9 +81,8 @@ class Matra extends Model
         return $this->belongsToMany( \App\Models\User::class , 'favorite_matras' , 'matra_id' , 'user_id' );
     }
 
-
     public function folders(){
-        return $this->hasManyThrough(\App\Models\Law\Book\Folder::class,'folder_matras','matra_id','folder_id');
+        return $this->belongsToMany(\App\Models\Law\Book\Folder::class,'matras_folder','matra_id','folder_id');
     }
     /*
     |--------------------------------------------------------------------------

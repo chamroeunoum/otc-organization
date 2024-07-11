@@ -43,12 +43,18 @@ class Folder extends Model
 	public function regulators(){
 		return $this->belongsToMany('\App\Models\Regulator\Regulator','regulator_folders','folder_id','regulator_id');
 	}
+	public function matras(){
+		return $this->belongsToMany('\App\Models\Law\Book\Matra','matras_folder','folder_id','matra_id');
+	}
+	public function matrasFolder(){
+		return $this->hasMany( \App\Models\Law\Book\FolderMatra::class ,'folder_id' , 'id' );
+	}
 	public function files(){
 		return $this->belongsToMany('\App\Models\File\File','file_folders','folder_id','file_id');
 	}
 	public function user(){
-    return $this->belongsTo('\App\Models\User','user_id','id');
-  }
+    	return $this->belongsTo('\App\Models\User','user_id','id');
+  	}
 	/*
 	|--------------------------------------------------------------------------
 	| SCOPES

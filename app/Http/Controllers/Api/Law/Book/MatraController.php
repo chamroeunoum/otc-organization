@@ -117,7 +117,9 @@ class MatraController extends Controller
             "part" => ['id', 'number', 'title'],
             "section" => ['id', 'number', 'title'],
             'author' => ['id', 'firstname', 'lastname' ,'username'] ,
-            'editor' => ['id', 'firstname', 'lastname', 'username']
+            'editor' => ['id', 'firstname', 'lastname', 'username'] ,
+            'folders' => ['id', 'name', 'accessibility' , 'user_id' ] ,
+            'favorites' => [ 'id' , 'firstname' , 'lastname' ]
         ]);
         $builder = $crud->getListBuilder();
         
@@ -215,25 +217,30 @@ class MatraController extends Controller
     /** Updating the archive */
     public function read(Request $request)
     {
-        if (($user = $request->user()) !== null) {
-            $crud = new CrudController(new RecordModel(), $request, ['id', 'number', 'title', 'meaning', 'book_id', 'regulator' ,  'kunty_id', 'kunty', 'matika_id', 'matika', 'chapter_id', 'chapter', 'part_id', 'part', 'section_id', 'section', 'created_by', 'author', 'updated_by', 'editor']);
-            if (($record = $crud->read()) !== false) {
-                $record = $crud->formatRecord($record);
-                return response()->json([
-                    'record' => $record,
-                    'ok' => true ,
-                    'message' => __("crud.read.success")
-                ]);
-            }
+        $crud = new CrudController(new RecordModel(), $request, ['id', 'number', 'title', 'meaning', 'book_id', 'regulator' ,  'kunty_id', 'kunty', 'matika_id', 'matika', 'chapter_id', 'chapter', 'part_id', 'part', 'section_id', 'section', 'created_by', 'author', 'updated_by', 'editor']);
+        if (($record = $crud->read()) !== false) {
+            $record->book;
+            $record->kunty;
+            $record->matika;
+            $record->chapter;
+            $record->part;
+            $record->section;
+            $record->author;
+            $record->editor;
+            $record->folders;
+            $record->favorites;
+            $record->section;
+            // $record = $crud->formatRecord($record);
             return response()->json([
-                'ok' => false ,
-                'message' => __("crud.read.failed")
+                'record' => $record,
+                'ok' => true ,
+                'message' => __("crud.read.success")
             ]);
         }
         return response()->json([
             'ok' => false ,
-            'message' => __("crud.auth.failed")
-        ], 401);
+            'message' => __("crud.read.failed")
+        ]);
     }
     /** Reading an archive */
     public function delete(Request $request)
@@ -476,14 +483,16 @@ class MatraController extends Controller
             $crud = new CrudController(new RecordModel(), $request, ['id', 'number','title', 'meaning' , 'book_id', 'kunty_id', 'matika_id', 'chapter_id' , 'part_id', 'section_id' , 'created_by' , 'updated_by' , 'active' ]);
             $crud->setRelationshipFunctions([
                 /** relationship name => [ array of fields name to be selected ] */
-                "book" => ['id','number','title','objective','year'] ,
+                "book" => ['id','title','description'] ,
                 "kunty" => ['id', 'number', 'title'],
                 "matika" => ['id', 'number', 'title'],
                 "chapter" => ['id', 'number', 'title'],
                 "part" => ['id', 'number', 'title'],
                 "section" => ['id', 'number', 'title'],
                 'author' => ['id', 'firstname', 'lastname' ,'username'] ,
-                'editor' => ['id', 'firstname', 'lastname', 'username']
+                'editor' => ['id', 'firstname', 'lastname', 'username'] ,
+                'folders' => ['id', 'name', 'accessibility' , 'user_id' ] ,
+                'favorites' => [ 'id' , 'firstname' , 'lastname' ]
             ]);
             $builder = $crud->getListBuilder();
 
@@ -613,7 +622,9 @@ class MatraController extends Controller
             "part" => ['id', 'number', 'title'],
             "section" => ['id', 'number', 'title'],
             'author' => ['id', 'firstname', 'lastname' ,'username'] ,
-            'editor' => ['id', 'firstname', 'lastname', 'username']
+            'editor' => ['id', 'firstname', 'lastname', 'username'] ,
+            'folders' => ['id', 'name', 'accessibility' , 'user_id' ] ,
+            'favorites' => [ 'id' , 'firstname' , 'lastname' ]
         ]);
         $builder = $crud->getListBuilder();
 

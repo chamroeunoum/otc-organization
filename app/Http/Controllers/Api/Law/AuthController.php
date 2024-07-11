@@ -78,8 +78,8 @@ class AuthController extends Controller
             'lastname' => $request->lastname,
             'name' => $request->lastname . ' ' . $request->firstname ,
             'phone' => $request->phone??"" ,
-            'username' => $request->email??"",
-            'email' => $request->email??"",
+            'username' => strtolower( $request->email??"" ),
+            'email' => strtolower( $request->email??"" ),
             'active' => 1 , // Unactive user
             'password' => bcrypt($request->password),
             'activation_token' => strtoupper( Str::random(6) )
@@ -142,6 +142,7 @@ class AuthController extends Controller
         ]);
 
         $credentials = request(['email', 'password']);
+        $credentials['email'] = strtolower( $credentials['email'] );
         $credentials['deleted_at'] = null;
 
         if(!Auth::attempt($credentials)){

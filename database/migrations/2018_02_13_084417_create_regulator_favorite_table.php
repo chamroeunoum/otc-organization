@@ -2,9 +2,10 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateRegulatorFavoritesTable extends Migration {
-
+return new class extends Migration
+{
 	/**
 	 * Run the migrations.
 	 *
@@ -12,7 +13,7 @@ class CreateRegulatorFavoritesTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('regulator_favorites', function(Blueprint $table)
+		Schema::create('regulator_favorite', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->integer('user_id')->unsigned();
@@ -33,4 +34,4 @@ class CreateRegulatorFavoritesTable extends Migration {
 		Schema::drop('regulator_favorites');
 	}
 
-}
+};

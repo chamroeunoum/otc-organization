@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateRegulatorFoldersTable extends Migration {
+return new class extends Migration
+{
 
 	/**
 	 * Run the migrations.
@@ -12,13 +13,11 @@ class CreateRegulatorFoldersTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('regulator_folders', function(Blueprint $table)
+		Schema::create('matras_folder', function(Blueprint $table)
 		{
-			$table->increments('id');
-			$table->integer('regulator_id')->unsigned();
-			$table->integer('folder_id')->unsigned();
+			$table->integer('folder_id');
+			$table->integer('matra_id');
 			$table->timestamps();
-			$table->softDeletes();
 		});
 	}
 
@@ -30,7 +29,7 @@ class CreateRegulatorFoldersTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('regulator_folders');
+		Schema::drop('matras_folder');
 	}
 
-}
+};
