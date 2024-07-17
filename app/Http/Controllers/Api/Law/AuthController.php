@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Notifications\client\SignupActivate;
+use App\Notifications\Client\SignupActivate;
 use Illuminate\Support\Str;
 use Avatar;
 use Illuminate\Http\File;
