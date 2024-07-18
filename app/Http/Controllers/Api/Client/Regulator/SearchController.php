@@ -278,7 +278,7 @@ class SearchController extends Controller
                 \App\Models\Log\Log::regulator([
                     'system' => 'client' ,
                     'user_id' => $user->id ,
-                    'regulator_id' => $document->id
+                    'regulator_id' => $regulator->id
                 ]);
             }
 
