@@ -47,7 +47,7 @@ class RegulatorController extends Controller
         $signatures = isset( $request->signatures ) ? array_filter( explode(',',$request->signatures) , function($signature){ return intval( $signature ) ;}) : false ;
         $types = isset( $request->types ) && strlen( $request->types ) > 0 
             ? (
-                array_filter( explode(',',$types) , function($type){ return intval( $type ) ;})
+                array_filter( explode(',',$request->types) , function($type){ return intval( $type ) ;})
             )
             : false ;
         
