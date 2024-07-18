@@ -184,6 +184,7 @@ class RegulatorController extends Controller
         $responseData = $crud->pagination(true, $builder);
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
+        $responseData['server'] = $_SERVER ;
         return response()->json($responseData, 200);
     }
     /**
@@ -382,15 +383,12 @@ class RegulatorController extends Controller
             $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
         
             /**   Log the access of the user */
-            //   $user_id= Auth::user()->id;
-            //   $current_date = date('Y-m-d H:i:s');
-            //   DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
-            $user = \Auth::user();
+            $user = \Auth::user() != null ? \Auth::user() : auth('api')->user() ;
             if( $user != null ){
                 \App\Models\Log\Log::regulator([
-                    'system' => 'admin' ,
+                    'system' => 'client' ,
                     'user_id' => $user->id ,
-                    'regulator_id' => $document->id
+                    'regulator_id' => $regulator->id
                 ]);
             }
 
