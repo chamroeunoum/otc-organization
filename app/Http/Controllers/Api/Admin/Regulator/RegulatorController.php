@@ -50,49 +50,46 @@ class RegulatorController extends Controller
                 array_filter( explode(',',$request->types) , function($type){ return intval( $type ) ;})
             )
             : false ;
-        
-        
-        /**
-         * Check roles
-         */
-        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core_service')->where( 'name' , 'super' )->pluck('id')->toArray() ) ) ){
-            
-        }else{
-            $types = $types != false ? array_filter( $types , function($type){ return intval( $type ) != 4 ;}) : false ;
-        }
-
 
         $queryString = [
-            // "where" => [
-            //     // 'default' => [
-            //     //     [
-            //     //         'field' => 'created_by' ,
-            //     //         'value' => $user->id
-            //     //     ]
-            //     // ],
-            //     // 'in' => [
-            //     //     [
-            //     //         'field' => 'type' ,
-            //     //         'value' => isset( $request->type ) && $request->type !== null ? [$request->type] : false
-            //     //     ]
-            //     // ] ,
-            //     // 'not' => [
-            //     //     [
-            //     //         'field' => 'type' ,
-            //     //         'value' => [4]
-            //     //     ]
-            //     // ] ,
-            //     // 'like' => [
-            //     //     [
-            //     //         'field' => 'fid' ,
-            //     //         'value' => $fid === false ? "" : $fid
-            //     //     ],
-            //     //     [
-            //     //         'field' => 'year' ,
-            //     //         'value' => $date === false ? "" : $date
-            //     //     ]
-            //     // ] ,
-            // ] ,
+            "where" => [
+                // 'default' => [
+                //     [
+                //         'field' => 'created_by' ,
+                //         'value' => $user->id
+                //     ]
+                // ],
+                'in' => [
+                    [
+                        'field' => 'active' ,
+                        'value' => 1
+                    ] ,
+                    [
+                        'field' => 'publish' ,
+                        'value' => 1
+                    ] ,
+                    [
+                        'field' => 'accessibility' ,
+                        'value' => [ 1,2,3,4 ]
+                    ]
+                ] ,
+                // 'not' => [
+                //     [
+                //         'field' => 'type' ,
+                //         'value' => [4]
+                //     ]
+                // ] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'fid' ,
+                //         'value' => $fid === false ? "" : $fid
+                //     ],
+                //     [
+                //         'field' => 'year' ,
+                //         'value' => $date === false ? "" : $date
+                //     ]
+                // ] ,
+            ] ,
             "pivots" => [
                 $types ?
                 [
