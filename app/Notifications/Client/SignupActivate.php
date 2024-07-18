@@ -53,6 +53,7 @@ class SignupActivate extends Notification
          * Use the 6 digits code to activate account
          */
         return (new MailMessage)
+        ->from('onetechcambodia@gmail.com')
         ->subject('បញ្ជាក់អំពីការចុះឈ្មោះ')
         ->greeting("សួស្ដី, " . $notifiable->lastname . ' ' . $notifiable->firstname )
         ->line("ខាងក្រោមជា លេខកូត ដែលអ្នកនិងត្រូវការដើម្បីបញ្ជាក់អំពីការចុះឈ្មោះរបស់អ្នកជាមួយ អសយដ្ឋានអេឡិចត្រូនិច មួយនេះ។")

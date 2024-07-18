@@ -45,7 +45,16 @@ class RegulatorController extends Controller
 
         $organizations = isset( $request->organizations ) ? array_filter( explode(',',$request->organizations) , function($organization){ return intval( $organization );} ) : false ;
         $signatures = isset( $request->signatures ) ? array_filter( explode(',',$request->signatures) , function($signature){ return intval( $signature ) ;}) : false ;
-        $types = isset( $request->types ) ? array_filter( explode(',',$request->types) , function($type){ return intval( $type ) ;}) : false ;
+        $types = false ;
+        
+        /**
+         * Check roles
+         */
+        if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core_service')->where( 'name' , 'super' )->pluck('id')->toArray() ) ) ){
+            $types = isset( $request->types ) ? array_filter( explode(',',$request->types) , function($type){ return intval( $type ) ;}) : false ;
+        }else{
+            $types = isset( $request->types ) ? array_filter( explode(',',$request->types) , function($type){ return intval( $type ) != 4 ;}) : false ;
+        }
 
 
         $queryString = [
