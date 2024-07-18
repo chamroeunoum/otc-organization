@@ -391,7 +391,8 @@ class SearchController extends Controller
                         'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $regulator->pdf ) ,
                         "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                         "filename" => $filename,
-                        "ok" => true 
+                        "ok" => true , 
+                        'user' => \Auth::user() != null ? \Auth::user() : auth('api')->user()
                     ],200);
                 }else{
                     return response()->json([
