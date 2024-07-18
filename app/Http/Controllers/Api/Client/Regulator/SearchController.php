@@ -273,13 +273,13 @@ class SearchController extends Controller
             $filename = str_replace('/' , '-', $regulator->fid) . "." . 'pdf' ;
             
             /**   Log the access of the user */
-            if( \Auth::user() !== null ){
+            $user = \Auth::user();
+            if( $user != null ){
                 \App\Models\Log\Log::regulator([
-                    'user_id' => \Auth::user()->id ,
-                    'regulator_id' => $regulator->id
+                    'system' => 'client' ,
+                    'user_id' => $user->id ,
+                    'regulator_id' => $document->id
                 ]);
-                // $current_date = date('Y-m-d H:i:s');
-                // DB::insert('insert into regulator_view_logs (user_id, regulator_id, date) values (?,?,?)', [\Auth::user()->id, $regulator->id, $current_date]);
             }
 
             // if(is_file($path)) {

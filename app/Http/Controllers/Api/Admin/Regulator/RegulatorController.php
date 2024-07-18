@@ -389,7 +389,7 @@ class RegulatorController extends Controller
             if( $user != null ){
                 \App\Models\Log\Log::regulator([
                     'system' => 'admin' ,
-                    'user_id' => $user()->id ,
+                    'user_id' => $user->id ,
                     'regulator_id' => $document->id
                 ]);
             }
