@@ -234,6 +234,17 @@ class SearchController extends Controller
                 : false
             ) ;
         if( $regulator ) {
+            
+            /**   Log the access of the user */
+            $user = \Auth::user();
+            if( $user != null ){
+                \App\Models\Log\Log::regulator([
+                    'system' => 'client' ,
+                    'user_id' => $user->id ,
+                    'regulator_id' => $regulator->id
+                ]);
+            }
+
             /**
              * Check whether the regulator a public (accessibility = 2 ) or global type (accessibility = 4)
              */
@@ -271,16 +282,6 @@ class SearchController extends Controller
 
             $ext = pathinfo($path);
             $filename = str_replace('/' , '-', $regulator->fid) . "." . 'pdf' ;
-            
-            /**   Log the access of the user */
-            $user = \Auth::user();
-            if( $user != null ){
-                \App\Models\Log\Log::regulator([
-                    'system' => 'client' ,
-                    'user_id' => $user->id ,
-                    'regulator_id' => $regulator->id
-                ]);
-            }
 
             // if(is_file($path)) {
             if(file_exists($path)) {
