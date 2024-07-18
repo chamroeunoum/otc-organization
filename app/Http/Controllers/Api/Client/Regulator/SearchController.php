@@ -236,13 +236,7 @@ class SearchController extends Controller
         if( $regulator ) {
             
             /**   Log the access of the user */
-            $user = \Auth::user() != null 
-                ? \Auth::user() 
-                : ( 
-                    $request->user() != null 
-                        ? \Auth::guard('api')->user()
-                        : null 
-                ) ;
+            $user = \Auth::user() != null ? \Auth::user() : auth('api')->user() ;
             if( $user != null ){
                 \App\Models\Log\Log::regulator([
                     'system' => 'client' ,
@@ -391,8 +385,7 @@ class SearchController extends Controller
                         'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $regulator->pdf ) ,
                         "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
                         "filename" => $filename,
-                        "ok" => true , 
-                        'user' => \Auth::user() != null ? \Auth::user() : auth('api')->user()
+                        "ok" => true
                     ],200);
                 }else{
                     return response()->json([
