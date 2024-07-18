@@ -385,6 +385,14 @@ class RegulatorController extends Controller
             //   $user_id= Auth::user()->id;
             //   $current_date = date('Y-m-d H:i:s');
             //   DB::insert('insert into document_view_logs (user_id, document_id, date) values (?,?,?)', [$user_id, $id, $current_date]);
+            $user = \Auth::user();
+            if( $user != null ){
+                \App\Models\Log\Log::regulator([
+                    'system' => 'admin' ,
+                    'user_id' => $user()->id ,
+                    'regulator_id' => $document->id
+                ]);
+            }
 
             if(file_exists( $pathPdf ) && is_file($pathPdf)) {
                 $pdfWatermark = storage_path('data') . '/watermarkfiles/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf );
