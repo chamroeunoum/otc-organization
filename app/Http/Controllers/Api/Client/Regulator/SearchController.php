@@ -236,7 +236,13 @@ class SearchController extends Controller
         if( $regulator ) {
             
             /**   Log the access of the user */
-            $user = \Auth::user();
+            $user = \Auth::user() != null 
+                ? \Auth::user() 
+                : ( 
+                    $request->user() != null 
+                        ? $request->user() 
+                        : null 
+                ) ;
             if( $user != null ){
                 \App\Models\Log\Log::regulator([
                     'system' => 'client' ,
