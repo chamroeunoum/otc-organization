@@ -240,7 +240,7 @@ class SearchController extends Controller
                 ? \Auth::user() 
                 : ( 
                     $request->user() != null 
-                        ? $request->user() 
+                        ? \Auth::guard('api')->user()
                         : null 
                 ) ;
             if( $user != null ){
