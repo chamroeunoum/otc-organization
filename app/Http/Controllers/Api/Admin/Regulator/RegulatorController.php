@@ -58,7 +58,7 @@ class RegulatorController extends Controller
         if( empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('tag','core_service')->where( 'name' , 'super' )->pluck('id')->toArray() ) ) ){
             
         }else{
-            $types = $types != false ? array_filter( explode(',',$types) , function($type){ return intval( $type ) != 4 ;}) : false ;
+            $types = $types != false ? array_filter( $types , function($type){ return intval( $type ) != 4 ;}) : false ;
         }
 
 
