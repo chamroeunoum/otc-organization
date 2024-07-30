@@ -28,15 +28,15 @@ class Log extends Model
             $data['func'] ,
             $data['desp'] ,
             \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
-            $_SERVER['HTTP_ORIGIN'] ,
-            $_SERVER['HTTP_SEC_CH_UA_MOBILE'] ,
-            $_SERVER['HTTP_SEC_CH_UA_PLATFORM'] ,
-            $_SERVER['HTTP_USER_AGENT'] ,
-            $_SERVER['HTTP_X_FORWARDED_FOR'] ,
-            $_SERVER['REQUEST_URI'] ,
-            $_SERVER['QUERY_STRING'] ,
-            $_SERVER['REMOTE_ADDR'] ,
-            $_SERVER['REQUEST_TIME_FLOAT']
+            $_SERVER['HTTP_ORIGIN']??'' ,
+            $_SERVER['HTTP_SEC_CH_UA_MOBILE']??'' ,
+            $_SERVER['HTTP_SEC_CH_UA_PLATFORM']??'' ,
+            $_SERVER['HTTP_USER_AGENT']??'' ,
+            $_SERVER['HTTP_X_FORWARDED_FOR']??'' ,
+            $_SERVER['REQUEST_URI']??'' ,
+            $_SERVER['QUERY_STRING']??'' ,
+            $_SERVER['REMOTE_ADDR']??'' ,
+            $_SERVER['REQUEST_TIME_FLOAT']??''
         ];
         $handle = false ;
         if( !file_exists( $logDirectory . '/' . $todayLog ) ){
