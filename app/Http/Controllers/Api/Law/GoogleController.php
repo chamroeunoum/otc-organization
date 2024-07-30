@@ -78,7 +78,8 @@ class GoogleController extends Controller
             ->orWhere(function($query) use($request, $email){
                 $query->where('email', $email)
                 ->whereNotNull('email');
-            })->onlyTrashed()
+            })
+            ->whereNotNull("deleted_at")
             ->first() ) !== null) {
             /**
              * Check roles
@@ -133,7 +134,7 @@ class GoogleController extends Controller
 
         /** Check member with his/her email or phone */
         if( $user->person == null ){
-            if( $user->people_id > 0 && ( $person = \App\Models\People\People::where( 'id' , $user->people_id )->onlyTrashed()->first() ) != null ){
+            if( $user->people_id > 0 && ( $person = \App\Models\People\People::where( 'id' , $user->people_id )->whereNotNull('deleted_at')->first() ) != null ){
                 $person->restore();
                 $person->update([
                     'firstname' => $user->firstname ,

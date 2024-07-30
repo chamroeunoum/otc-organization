@@ -81,7 +81,7 @@ class TelegramController extends Controller
                 $query->where('email', $email)
                 ->whereNotNull('email');
             })
-            ->onlyTrashed()
+            ->whereNotNull('deleted_at')
             ->first() ) !== null) {
             /**
              * Check roles
@@ -143,7 +143,7 @@ class TelegramController extends Controller
 
         /** Check member with his/her email or phone */
         if( $user->person == null ){
-            if( $user->people_id > 0 && ( $person = \App\Models\People\People::onlyTrashed()->where( 'id', $user->people_id )->first() ) != null ){
+            if( $user->people_id > 0 && ( $person = \App\Models\People\People::where( 'id', $user->people_id )->whereNotNull('deleted_at')->first() ) != null ){
                 $person->restore();
                 $person->update([
                     'firstname' => $request->first_name ,
