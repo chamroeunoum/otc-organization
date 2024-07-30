@@ -20,7 +20,7 @@ class Log extends Model
     ] ;
     public static function access($data=[]){
         $logDirectory = storage_path() . '/logs/access' ;
-        $todayLog = 'regulator-'.\Carbon\Carbon::now()->format('Ymd').'.csv';
+        $todayLog = \Carbon\Carbon::now()->format('Ymd').'.csv';
         $fields = [
             $data['system'] ,
             $data['user_id'] ,
@@ -53,7 +53,7 @@ class Log extends Model
      */
     public static function matra($data=[]){
         $logDirectory = storage_path() . '/logs/matras' ;
-        $todayLog = 'access-'.\Carbon\Carbon::now()->format('Ymd').'.csv';
+        $todayLog = \Carbon\Carbon::now()->format('Ymd').'.csv';
         $fields = [
             $data['system'] ,
             $data['user_id'] ,
@@ -75,7 +75,7 @@ class Log extends Model
      */
     public static function regulator($data=[]){
         $logDirectory = storage_path() . '/logs/regulators' ;
-        $todayLog = 'access-'.\Carbon\Carbon::now()->format('Ymd').'.csv';
+        $todayLog = \Carbon\Carbon::now()->format('Ymd').'.csv';
         $fields = [
             $data['system'] ,
             $data['user_id'] ,
@@ -93,8 +93,8 @@ class Log extends Model
         fclose($handle);
     }
     public static function getRegulator(){
-        $logDirectory = storage_path() . '/logs' ;
-        $todayLog = 'regulator-'.\Carbon\Carbon::now()->format('Ymd').'.csv';
+        $logDirectory = storage_path() . '/logs/regulators' ;
+        $todayLog = \Carbon\Carbon::now()->format('Ymd').'.csv';
         if( file_exists( $logDirectory . '/' . $todayLog ) ){
             $row = 1;
             if (($handle = fopen( $logDirectory . '/' . $todayLog , "r")) !== FALSE) {
