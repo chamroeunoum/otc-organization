@@ -143,7 +143,7 @@ class TelegramController extends Controller
 
         /** Check member with his/her email or phone */
         if( $user->person == null ){
-            if( $user->people_id > 0 && ( $person = \App\Models\People\People::find( $user->people_id )->onlyTrashed()->first() ) != null ){
+            if( $user->people_id > 0 && ( $person = \App\Models\People\People::where( 'id', $user->people_id )->onlyTrashed()->first() ) != null ){
                 $person->restore();
                 $person->update([
                     'firstname' => $request->first_name ,

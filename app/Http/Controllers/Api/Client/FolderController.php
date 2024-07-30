@@ -29,6 +29,14 @@ class FolderController extends Controller
     public function index(Request $request){
         $user = Auth::user() != null ? \Auth::user() : false ;
 
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => $user->id ,
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read list folders'
+        ]); 
+
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
@@ -132,6 +140,24 @@ class FolderController extends Controller
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
 
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read public folders'
+        ]); 
+
         $queryString = [
             "where" => [
                 'default' => [
@@ -225,7 +251,23 @@ class FolderController extends Controller
      * Get Folders of a specific user which has authenticated
      */
     public function user(Request $request){
-
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read folders of a specific user'
+        ]); 
         // Create Query Builder 
         $queryBuilder = new \App\Models\Folder\Folder();
 
@@ -268,7 +310,23 @@ class FolderController extends Controller
      * And also check the folder whether it does contain the document or not
      */
     public function listFolderWithRegulatorValidation(Request $request){
-
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read folders of authenticated user'
+        ]); 
         // Create Query Builder 
         $queryBuilder = new \App\Models\Folder\Folder();
 
@@ -317,6 +375,23 @@ class FolderController extends Controller
             $folder->user ;
             $folder->regulators ;
             // User does exists
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'succeed creating folder'
+            ]); 
             return response([
                 'ok' => true ,
                 'record' => $folder ,
@@ -326,6 +401,23 @@ class FolderController extends Controller
             );
         }else{
             // User does not exists
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'failed creating folder'
+            ]); 
             return response([
                 'ok' => false ,
                 'user' => null ,
@@ -342,6 +434,23 @@ class FolderController extends Controller
             $folder->user ;
             $folder->regulators ;
             // User does exists
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'succeed updating folder'
+            ]); 
             return response([
                 'ok' => true ,
                 'record' => $folder ,
@@ -351,6 +460,23 @@ class FolderController extends Controller
             );
         }else{
             // User does not exists
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'failed updating folder'
+            ]); 
             return response([
                 'ok' => false ,
                 'user' => null ,
@@ -361,113 +487,163 @@ class FolderController extends Controller
     }
     // delete the folder 
     public function delete(Request $request){
-        if( $request->id != "" 
-         // && Auth::user() != null 
-        ){
-            $folder = \App\Models\Folder\Folder::find($request->id);
-            if( $folder != null ){
-                $record = $folder ;
-                // Check for the regulators within the folder
-                // If there is/are regulators within the folder then notify user first
-                // process delete , also delete the related document within this folder [Note: we only delete the relationship of folder and document]
-                if( $folder->regulators !== null && $folder->regulators->count() ){
-                    foreach( $folder -> regulators as $documentFolder ){
-                        $documentFolder -> delete ();
-                    }
+        
+        $folder = \App\Models\Folder\Folder::find($request->id);
+        if( $folder != null ){
+            $record = $folder ;
+            // Check for the regulators within the folder
+            // If there is/are regulators within the folder then notify user first
+            // process delete , also delete the related document within this folder [Note: we only delete the relationship of folder and document]
+            if( $folder->regulators !== null && $folder->regulators->count() ){
+                foreach( $folder -> regulators as $documentFolder ){
+                    $documentFolder -> delete ();
                 }
-                $folder->delete();
-                return response([
-                    'ok' => true ,
-                    'record' => $record ,
-                    'message' => "កម្រងឯកសារ " . $record->name . " បានលុបរួចរាល់ !" 
-                    ],
-                    200
-                );
-            }else{
-                return response([
-                    'ok' => false ,
-                    'record' => $folder ,
-                    'message' => "កម្រងឯកសារនេះមិនមានឡើយ !"
-                    ],
-                    201
-                );
             }
+            $folder->delete();
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'succeed deleting folder'
+            ]); 
+            return response([
+                'ok' => true ,
+                'record' => $record ,
+                'message' => "ថតឯកសារ " . $record->name . " បានលុបរួចរាល់ !" 
+                ],
+                200
+            );
         }else{
-            // User does not exists
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'failed deleting folder'
+            ]); 
             return response([
                 'ok' => false ,
-                'user' => null ,
-                'message' => 'សូមបញ្ជាក់កម្រងឯកសារដែលអ្នកចង់លុប !' ],
+                'record' => $folder ,
+                'message' => "ថតឯកសារនេះមិនមានឡើយ !"
+                ],
                 201
             );
         }
     }
     // Add document from folder
     public function addRegulatorToFolder(Request $request){
-        if( $request->id > 0 && $request->regulator_id > 0 
-          // && Auth::user() != null 
-        ){
-            $documentFolder = \App\Models\Regulator\RegulatorFolder::where('folder_id', $request->id )
-                ->where('regulator_id' , $request->regulator_id )->first();
-            if( $documentFolder == null ){
-                $documentFolder = new \App\Models\Regulator\RegulatorFolder();
-                $documentFolder -> folder_id = $request->id ;
-                $documentFolder -> regulator_id = $request->regulator_id ;
-                // $documentFolder -> created_by = $documentFolder -> updated_by = \Auth::user()->id ;
-                $documentFolder->save();
-                return response([
-                    'ok' => true ,
-                    'record' => $documentFolder ,
-                    'message' => "បានបញ្ចូលឯកសារ ចូលទៅក្នុងកម្រងឯកសារ រួចរាល់ !"
-                    ],
-                    200
-                );
-            }else{
-                return response([
-                    'ok' => true ,
-                    'record' => $documentFolder ,
-                    'message' => "ឯកសារនេះមានក្នុងកម្រងឯកសារនេះរួចរាល់ហើយ !"
-                    ],
-                    201
-                );
-            }
-        }else{
-            // User does not exists
+        $documentFolder = \App\Models\Regulator\RegulatorFolder::where('folder_id', intval( $request->id ) )
+            ->where('regulator_id' , intval( $request->regulator_id ) )->first();
+        if( $documentFolder == null ){
+            $documentFolder = new \App\Models\Regulator\RegulatorFolder();
+            $documentFolder -> folder_id = $request->id ;
+            $documentFolder -> regulator_id = $request->regulator_id ;
+            // $documentFolder -> created_by = $documentFolder -> updated_by = \Auth::user()->id ;
+            $documentFolder->save();
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'succeed adding regulator to folder'
+            ]); 
             return response([
-                'ok' => false ,
-                'record' => null ,
-                'message' => 'សូមបំពេញព័ត៌មាន អោយបានគ្រប់គ្រាន់ !' ],
+                'ok' => true ,
+                'record' => $documentFolder ,
+                'message' => "បានបញ្ចូលឯកសារ ចូលទៅក្នុងកម្រងឯកសារ រួចរាល់ !"
+                ],
+                200
+            );
+        }else{
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'failed adding regulator to folder'
+            ]); 
+            return response([
+                'ok' => true ,
+                'record' => $documentFolder ,
+                'message' => "ឯកសារនេះមានក្នុងកម្រងឯកសារនេះរួចរាល់ហើយ !"
+                ],
                 201
             );
         }
     }
     // Remove document from folder
     public function removeRegulatorFromFolder(Request $request){
-        if( $request->id > 0 && $request->regulator_id > 0 
-        // && Auth::user() != null 
-        ){
-            $documentFolder = \App\Models\Regulator\RegulatorFolder::where('folder_id', $request->id )
-                ->where('regulator_id' , $request->regulator_id )->first();
-            $message = $documentFolder !== null ? "បានដកឯកសារចេញរួចរាល់។" : "មិនមានឯកសារនេះក្នុងថតឯកសារឡើយ។" ;
-            if( $documentFolder != null ) {
-                $documentFolder->delete();
-            }
-            return response([
-                'ok' => true ,
-                'record' => $documentFolder ,
-                'message' => $message
-                ],
-                200
-            );
-        }else{
-            // User does not exists
-            return response([
-                'ok' => false ,
-                'record' => null ,
-                'message' => 'សូមបំពេញព័ត៌មាន អោយបានគ្រប់គ្រាន់ !' ],
-                201
-            );
+        $documentFolder = \App\Models\Regulator\RegulatorFolder::where('folder_id', intval($request->id) )
+            ->where('regulator_id' , intval($request->regulator_id) )->first();
+        $message = $documentFolder !== null ? "បានដកឯកសារចេញរួចរាល់។" : "មិនមានឯកសារនេះក្នុងថតឯកសារឡើយ។" ;
+        if( $documentFolder != null ) {
+            $documentFolder->delete();
         }
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'remove regulator from folder'
+        ]); 
+        return response([
+            'ok' => true ,
+            'record' => $documentFolder ,
+            'message' => $message
+            ],
+            200
+        );
     }
     public function checkRegulator(Request $request){
         $folder = RecordModel::find( $request->id );
@@ -499,13 +675,24 @@ class FolderController extends Controller
         }
     }
     public function read(Request $request){
-        if( !isset( $request->id ) || $request->id < 0 ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់ថតឯកសារ។'
-            ],201);
-        }
-        $regulator = RecordModel::find($request->id);
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read folder'
+        ]); 
+        $regulator = RecordModel::find( intval( $request->id ) );
         if( $regulator == null ){
             return response()->json([
                 'ok' => false ,
@@ -524,23 +711,35 @@ class FolderController extends Controller
      */
     public function regulators(Request $request){
         $user = Auth::user();
-
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => $user->id ,
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read regulators of a folder'
+        ]); 
         /**
          * Geting all the regulators of the folder
          */
-        if( !isset( $request->folder_id ) || $request->folder_id <= 0 ){
+        // if( !isset( $request->folder_id ) || $request->folder_id <= 0 ){
+        //     return response()->json([
+        //         'ok' => false ,
+        //         'message' => 'សូមបញ្ចាក់លេខសម្គាល់របស់ថតឯកសារ។'
+        //     ],350);
+        // }
+        $folder = RecordModel::find( intval( $request->folder_id ) );
+        if( $folder == null ){
             return response()->json([
                 'ok' => false ,
-                'message' => 'សូមបញ្ចាក់លេខសម្គាល់របស់ថតឯកសារ។'
-            ],350);
+                'message' => 'មិនមានថតឯកសារនេះឡើយ'
+            ],403);
         }
-
-        $regulatorIds = RecordModel::find($request->folder_id)->regulators->pluck('id')->all();
+        $regulatorIds = $folder->regulators->pluck('id')->all();
         if( count( $regulatorIds ) <= 0 ) {
             return response()->json([
                 'ok' => false ,
                 'message' => 'ថតឯកសារនេះមិនមានឯកសារឡើយ។'
-            ],350);
+            ],403);
         }
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
@@ -670,18 +869,29 @@ class FolderController extends Controller
         return response()->json($responseData, 200);
     }
     public function accessibility(Request $request){
-        if( !isset( $request->id ) || $request->id < 0 ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ថតឯកសារ។'
-            ],422);
-        }
-        $record = RecordModel::find($request->id);
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'update the accessibility of the folder'
+        ]); 
+        $record = RecordModel::find( intval( $request->id ) );
         if( $record == null ){
             return response()->json([
                 'ok' => false ,
                 'message' => 'ថតឯកសារដែលអ្នកត្រូវការមិនមានឡើយ។'
-            ],423);
+            ],403);
         }
         $result = in_array( intVal( $request->mode ) , [ 0 , 1 , 2 , 4 ] ) != false ? $record->update(['accessibility'=> intVal( $request->mode ) ] ) : false ;
         return response()->json([

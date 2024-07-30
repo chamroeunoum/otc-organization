@@ -36,6 +36,23 @@ class RegulatorController extends Controller
      * Listing function
      */
     public function index(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read list regulators'
+        ]); 
         $user = \Auth::user() != null ? \Auth::user() : false ;
 
         /** Format from query string */
@@ -158,6 +175,23 @@ class RegulatorController extends Controller
      * Listing function
      */
     public function child(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read child regulators of a regulator'
+        ]); 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
@@ -283,7 +317,23 @@ class RegulatorController extends Controller
      * Listing document by its type within a specific ministry
      */
     public function byTypeWithinOrganization($id){
-
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read regulator within the organization by types'
+        ]); 
         // Create Query Builder 
         $documentIds = \App\Models\Regulator\RegulatorOrganization::where('ministry_id',$id)->first()->getRegulators();
         $queryBuilder = new Regulator();
@@ -338,6 +388,23 @@ class RegulatorController extends Controller
      */
     public function pdf(Request $request)
     {
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read pdf file of a regulator'
+        ]); 
         $document = RecordModel::findOrFail($request->id);
         if($document) {
             $path = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ;
@@ -415,6 +482,23 @@ class RegulatorController extends Controller
         }
     }
     public function upload(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'upload pdf file of regulator'
+        ]); 
         $user = \Auth::user();
         if( $user ){
             $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
@@ -655,6 +739,23 @@ class RegulatorController extends Controller
      * Add reader(s) of the specific document
      */
     public function addReaders(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'add reader to regulator'
+        ]); 
         $regulator = \App\Models\Regulator\Regulator::find($request->document_id);
         if( $regulator != null ){
             return response()->json([
@@ -674,6 +775,23 @@ class RegulatorController extends Controller
      * Remove reader(s) of the specific document
      */
     public function removeReaders(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'remove reader of the regulator'
+        ]); 
         $regulator = \App\Models\Regulator\Regulator::find($request->document_id);
         if( $regulator != null ){
             return response()->json([

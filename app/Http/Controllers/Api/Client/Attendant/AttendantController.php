@@ -27,6 +27,23 @@ class AttendantController extends Controller
      * Listing function
      */
     public function index(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'reading attendant'
+        ]); 
         $user = \Auth::user() != null ? \Auth::user() : false ;
 
         /** Format from query string */
@@ -189,6 +206,23 @@ class AttendantController extends Controller
      * Checkin with timeslot
      */
     public function systemCheckin(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'checkin from within system'
+        ]); 
         $user = \Auth::user();
         
         if( $user == null ){
@@ -255,6 +289,23 @@ class AttendantController extends Controller
      * Checkout with timeslot
      */
     public function systemCheckout(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'checkout from within system'
+        ]); 
         $user = \Auth::user();
         
         if( $user == null ){
@@ -338,7 +389,23 @@ class AttendantController extends Controller
      * 
      */
     public function systemCheckAttendant(Request $request){
-
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'check attendant from within system'
+        ]); 
         $user = \Auth::user();
 
         if( $user == null ){

@@ -30,6 +30,23 @@ class SearchController extends Controller
      * Listing function
      */
     public function index(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'search regulators'
+        ]); 
         $user = \Auth::user() != null ? \Auth::user() : false ;
 
         /** Format from query string */
@@ -169,7 +186,6 @@ class SearchController extends Controller
      * Listing regulator by its type within a specific ministry
      */
     public function byTypeWithinOrganization($id){
-
         // Create Query Builder 
         $regulatorIds = \App\Models\Regulator\RegulatorOrganization::where('organization_id',$id)->first()->getRegulators();
         $queryBuilder = new Regulator();
@@ -224,6 +240,23 @@ class SearchController extends Controller
      */
     public function pdf(Request $request)
     {
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read pdf file of regulator'
+        ]); 
         $regulatorId = isset( $request->id ) && intval( $request->id ) > 0 ? intval($request->id) : false ;
         $regulatorSerial = isset( $request->serial ) && is_string( $request->serial ) && strlen( $request->serial ) > 0 ? $request->serial : false ;
         $regulator = $regulatorId 
@@ -427,6 +460,23 @@ class SearchController extends Controller
      */
     public function sharedPdf(Request $request)
     {
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'share regulator\'s pdf file'
+        ]); 
         $regulatorSerial = isset( $request->serial ) && is_string( $request->serial ) ? $request->serial : false ;
         $regulator = $regulatorSerial 
             ? RecordModel::where('pdf','like','%' . $regulatorSerial . '.pdf%')->first()

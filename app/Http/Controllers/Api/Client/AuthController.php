@@ -77,6 +77,14 @@ class AuthController extends Controller
 
         $user->notify(new SignupActivate($user));
 
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => $user->id ,
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'Signup new account'
+        ]); 
+
         return response()->json([
             'ok' => true ,
             'record' => $user ,
@@ -106,15 +114,48 @@ class AuthController extends Controller
         $credentials['deleted_at'] = null;
 
         if(!Auth::attempt($credentials)){
-            if( \App\Models\User::where('email', $request->email)->first() != null ){
+            if( ( $user = \App\Models\User::where('email', $request->email)->first() ) != null ){
                 /**
                  * Account does exist but the password might miss type
                  */
+                \App\Models\Log\Log::access([
+                    'system' => 'client' ,
+                    'user_id' => \Auth::user() != null 
+                        ? \Auth::user()->id
+                        : (
+                            auth('api')->user() 
+                                ? auth('api')->user()->id
+                                : (
+                                    $request->user() != null
+                                        ? $request->user()->id 
+                                        : 0
+                                )
+                        ),
+                    'class' => self::class ,
+                    'func' => __FUNCTION__ ,
+                    'desp' => 'wrong password'
+                ]); 
                 return response()->json([
-                    'user' => \App\Models\User::where('email', $request->email)->first() ,
                     'message' => 'សូមពិនិត្យពាក្យសម្ងាត់របស់អ្នក !'
                 ], 401);
             }else{
+                \App\Models\Log\Log::access([
+                    'system' => 'client' ,
+                    'user_id' => \Auth::user() != null 
+                        ? \Auth::user()->id
+                        : (
+                            auth('api')->user() 
+                                ? auth('api')->user()->id
+                                : (
+                                    $request->user() != null
+                                        ? $request->user()->id 
+                                        : 0
+                                )
+                        ),
+                    'class' => self::class ,
+                    'func' => __FUNCTION__ ,
+                    'desp' => 'information miss matched'
+                ]);
                 /**
                  * Account does exist but the password might miss type
                  */
@@ -128,7 +169,7 @@ class AuthController extends Controller
          * Retrieve account
          */
         $user = $request->user();
-
+        
         /**
          * Update some information to keep track the user authentiation
          */
@@ -156,9 +197,26 @@ class AuthController extends Controller
             /**
             * Account has been disabled
             */
-           return response()->json([
-               'message' => 'គណនីនេះត្រូវបានបិទជាបណ្ដោះអាសន្ន។'
-           ], 403);
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'account has disabled'
+            ]);
+            return response()->json([
+                'message' => 'គណនីនេះត្រូវបានបិទជាបណ្ដោះអាសន្ន។'
+            ], 403);
         }
         /**
          * Check roles
@@ -172,8 +230,25 @@ class AuthController extends Controller
             /**
              * User seem does not have any right to login into backend / core service
              */
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'account role is not allowed'
+            ]);
+            
             return response()->json([
-                'user' => $user ,
                 'message' => "គណនីនេះមិនមានសិទ្ធិគ្រប់គ្រាន់។"
             ],403);
         }
@@ -198,6 +273,14 @@ class AuthController extends Controller
             $user->person->countesies;
         }
 
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => $user->id ,
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'login - succeed'
+        ]);
+
         return response()->json([
             'ok' => true ,
             'upload_max_filesize' => ini_get("upload_max_filesize") ,
@@ -220,10 +303,24 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $user = \Auth::user() != null 
+            ? \Auth::user() 
+            : (
+                auth('api')->user() 
+                    ? auth('api')->user() 
+                    : $request->user()
+            );
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => $user->id ,
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'Failed to activate new account'
+        ]);
         /**
          * Update some information to keep track the user authentiation
          */
-        $request->user()->update(
+        $user->update(
             [
                 'last_logout' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
                 'ip' => // if user from the share internet   
@@ -238,7 +335,8 @@ class AuthController extends Controller
                     )
             ]
         );
-        $request->user()->token()->revoke();
+        $user->token()->revoke();
+        // $request->user()->token()->revoke();
         return response()->json([
             'message' => 'អ្នកបានចាកចេញដោយជោគជ័យ !'
         ]);
@@ -257,7 +355,24 @@ class AuthController extends Controller
     public function signupActivate(Request $request)
     {
         $user = User::where('activation_token', $request->token)->first();
-        if (!$user) {
+        if( $user == null ){
+            \App\Models\Log\Log::access([
+                'system' => 'client' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'Failed to activate new account'
+            ]);
             return response()->json([
                 'message' => 'កូតបញ្ជាក់គណនីនេះមិនត្រឹមត្រូវឡើយ !'
             ], 404);
@@ -265,6 +380,13 @@ class AuthController extends Controller
         $user->active = true;
         $user->activation_token = '';
         $user->save();
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => $user->id ,
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'Activate new account successcully'
+        ]);
         return response()->json(
             [
                 'message' => 'តំណើរចុះឈ្មោះបានបញ្ចប់ដោយជោគជ័យ! សូមចូលប្រើប្រាស់។' ,

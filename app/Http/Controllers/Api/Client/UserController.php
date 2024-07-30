@@ -29,6 +29,23 @@ class UserController extends Controller
      * Listing function
      */
     public function index(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read accounts'
+        ]); 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
@@ -116,174 +133,25 @@ class UserController extends Controller
         $responseData['ok'] = true ;
         return response()->json($responseData, 200);
     }
-    /**
-     * Create an account
-     */
-    public function store(Request $request){
-        $user = \App\Models\User::where('email',$request->email)->first() ;
-        if( $user ){
-            // អ្នកប្រើប្រាស់បានចុះឈ្មោះរួចរាល់ហើយ
-            return response([
-                'user' => $user ,
-                'message' => 'គណនី '.$user->name.' មានក្នុងប្រព័ន្ធរួចហើយ ។' . (
-                    $user->active ? " ហើយកំពុងបើកដំណើរការជាធម្មតា !" : " កំពុងត្រូវបានបិទដំណើរការ !"
-                )],201
-            );
-        }else{
-            // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
-            $user = new \App\Models\User([
-                'firstname' => $request->firstname,
-                'lastname' => $request->lastname,
-                'email' => $request->email,
-                'active' => $request->active == true || $request->active == 1 ? 1 : 0 ,
-                'password' => bcrypt($request->password)
-            ]);
-            $user->save();
-            if( $user ){
-                
-                return response()->json([
-                    'user' => \App\Models\User::find( $user->id ) ,
-                    'message' => 'គណនីបង្កើតបានជោគជ័យ !'
-                ], 200);
-
-            }else {
-                return response()->json([
-                    'user' => null ,
-                    'message' => 'បរាជ័យក្នុងការបង្កើតគណនី !'
-                ], 201);
-            }
-        }
-    }
-    /**
-     * Create an account
-     */
-    public function update(Request $request){
-        $user = isset( $request->id ) && $request->id > 0 ? \App\Models\User::find($request->id) : (
-            isset( $request->email ) && $request->email != "" ? \App\Models\User::where('email',$request->email)->first() : null
-        );
-        if( $user ){
-            // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
-            $user->firstname = $request->firstname ;
-            $user->lastname = $request->lastname;
-            $user->email = $request->email ;
-            $user->active = $request->active == true || $request->active == 1 ? 1 : 0 ;
-            $user->save();    
-            return response()->json([
-                'user' => $user ,
-                'message' => 'កែប្រែព័ត៌មានរួចរាល់ !' ,
-                'ok' => true
-            ], 200);
-        }else{
-            // អ្នកប្រើប្រាស់មិនមាន
-            return response([
-                'user' => null ,
-                'message' => 'គណនីដែលអ្នកចង់កែប្រែព័ត៌មាន មិនមានឡើយ។' ,
-                'ok' => false
-                ], 201);
-        }
-    }
-    /**
-     * Active function of the account
-     */
-    public function active(Request $request){
-        $user = \App\Models\User::find($request->id) ;
-        if( $user ){
-            $user->active = $request->active ;
-            $user->save();
-            // User does exists
-            return response([
-                'user' => $user ,
-                'ok' => true ,
-                'message' => 'គណនី '.$user->name.' បានបើកដោយជោគជ័យ !' 
-                ],
-                200
-            );
-        }else{
-            // User does not exists
-            return response([
-                'user' => null ,
-                'ok' => false ,
-                'message' => 'សូមទោស គណនីនេះមិនមានទេ !' 
-                ],
-                201
-            );
-        }
-    }
-    /**
-     * Unactive function of the account
-     */
-    public function unactive(Request $request){
-        $user = \App\Models\User::find($request->id) ;
-        if( $user ){
-            $user->active = 0 ;
-            $user->save();
-            // User does exists
-            return response([
-                'ok' => true ,
-                'user' => $user ,
-                'message' => 'គណនី '.$user->name.' បានបិទដោយជោគជ័យ !' 
-                ],
-                200
-            );
-        }else{
-            // User does not exists
-            return response([
-                'user' => null ,
-                'ok' => false ,
-                'message' => 'សូមទោស គណនីនេះមិនមានទេ !' ],
-                201
-            );
-        }
-    }
-    /**
-     * Function delete an account
-     */
-    public function destroy(Request $request){
-        $user = \App\Models\User::find($request->id) ;
-        if( $user ){
-            $user->active = 0 ;
-            $user->deleted_at = \Carbon\Carbon::now() ;
-            $user->save();
-            // User does exists
-            return response([
-                'ok' => true ,
-                'user' => $user ,
-                'message' => 'គណនី '.$user->name.' បានលុបដោយជោគជ័យ !' ,
-                'ok' => true 
-                ],
-                200
-            );
-        }else{
-            // User does not exists
-            return response([
-                'ok' => false ,
-                'user' => null ,
-                'message' => 'សូមទោស គណនីនេះមិនមានទេ !' ],
-                201
-            );
-        }
-    }
-    /**
-     * Function Restore an account from SoftDeletes
-     */
-    public function restore(Request $request){
-        if( $user = \App\Models\User::restore($request->id) ){
-            return response([
-                'user' => $user ,
-                'ok' => true ,
-                'message' => 'គណនី '.$user->name.' បានយកត្រឡប់មិវិញដោយជោគជ័យ !'
-                ],200
-            );
-        }
-        return response([
-                'user' => null ,
-                'ok' => false ,
-                'message' => 'មិនមានគណនីនេះឡើយ !'
-            ],201
-        );
-    }
 
     public function forgotPassword(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'request reset password'
+        ]); 
         if( $request->email != "" ){
             $user = \App\Models\User::where('email',$request->email )->first();
             if ($user) {
@@ -310,6 +178,23 @@ class UserController extends Controller
         ], 422);
     }
     public function checkConfirmationCode(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'check the confirmation code of resetting password'
+        ]); 
         if( $request->email != "" && $request->code != "" ){
             $user = \App\Models\User::where( 'email',$request->email )->where('forgot_password_token', $request->code )->first();
             if ($user) {
@@ -333,7 +218,23 @@ class UserController extends Controller
         ], 422);
     }
     public function passwordReset(Request $request){
-        
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'reset password'
+        ]); 
         $record = \App\Models\User::where('email',$request->email)->first();
         if( $record ){
             $record->password = Hash::make($request->password);
@@ -353,6 +254,23 @@ class UserController extends Controller
         // 'password' => bcrypt($request->password),
     }
     public function passwordChange(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'change password from profile'
+        ]); 
         $user = \Auth::user();
         if( $user ){
             if( !isset( $request->password ) || strlen( $request->password ) <= 0 ){
@@ -381,6 +299,23 @@ class UserController extends Controller
      * Check the username
      */
     public function checkUsername(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'change username'
+        ]); 
         if( isset( $request->username ) && $request->username != "" ){
             if( ($user = \App\Models\User::where('username',strtolower( $request->username ) )->first() ) !== null ){
                 // Username does exists
@@ -415,6 +350,23 @@ class UserController extends Controller
      * Check the phone
      */
     public function checkPhone(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'change phone'
+        ]); 
         if( isset( $request->phone ) && $request->phone != "" ){
             if( ($user = \App\Models\User::where('phone',$request->phone)->first() ) !== null ){
                 // Username does exists
@@ -449,6 +401,23 @@ class UserController extends Controller
      * Check the email
      */
     public function checkEmail(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'check email'
+        ]); 
         if( isset( $request->email ) && $request->email != "" ){
             if( ($user = \App\Models\User::where('email',strtolower( $request->email ) )->first() ) !== null ){
                 // Username does exists
@@ -480,6 +449,23 @@ class UserController extends Controller
         }
     }
     public function upload(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'client' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'updating profile picture'
+        ]); 
         $user = \Auth::user();
         if( $user ){
             if( isset( $_FILES['files']['tmp_name'] ) && $_FILES['files']['tmp_name'] != "" ) {
