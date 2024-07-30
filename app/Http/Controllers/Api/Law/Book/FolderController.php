@@ -27,6 +27,23 @@ class FolderController extends Controller
      * Listing function
      */
     public function index(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read folders'
+        ]); 
         $user = Auth::user() != null ? \Auth::user() : null ;
         if( $user == null ){
             return response()->json([
@@ -230,7 +247,23 @@ class FolderController extends Controller
      * Get Folders of a specific user which has authenticated
      */
     public function user(Request $request){
-
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read folders of a user'
+        ]); 
         // Check the user
         $user = \Auth::user();
         if( $user == null ){
@@ -269,6 +302,23 @@ class FolderController extends Controller
     }
     // Save the folder 
     public function create(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'create folder'
+        ]); 
         if( $request->name != "" 
         // && Auth::user() != null 
         ){
@@ -325,6 +375,23 @@ class FolderController extends Controller
     }
     // delete the folder 
     public function delete(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'delete folder'
+        ]); 
         if( $request->id != "" 
          // && Auth::user() != null 
         ){
@@ -366,6 +433,23 @@ class FolderController extends Controller
     }
     // Add document from folder
     public function toggleMatra(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'add matra or remove it from a folder'
+        ]); 
         $folder = intval( $request->folder_id ) > 0 ? RecordModel::find( $request->folder_id ) : null ;
         if( $folder == null ){
             return response()->json([
@@ -413,6 +497,23 @@ class FolderController extends Controller
      * Listing regulators of the folder
      */
     public function matras(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read matras of a folder'
+        ]); 
         $folder = RecordModel::find( $request->folder_id );
         if( $folder == null ){
             return response()->json([
@@ -538,6 +639,23 @@ class FolderController extends Controller
         return response()->json($responseData, 200);
     }
     public function accessibility(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'update accessibility of a folder'
+        ]); 
         $folder = RecordModel::find( $request->folder_id );
         if( $folder == null ){
             return response()->json([

@@ -21,7 +21,23 @@ class BookController extends Controller
     }
     /** Get a list of Archives */
     public function index(Request $request){
-
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read list books'
+        ]); 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
@@ -328,6 +344,23 @@ class BookController extends Controller
     /** Get matras of the Regulator */
     public function matras(Request $request)
     {
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read matras of a book'
+        ]); 
         // if (($user = $request->user()) !== null) {
             $this->selectedFields[] = 'pdfs' ;
             $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
@@ -462,6 +495,23 @@ class BookController extends Controller
         // ], 401);
     }
     public function content(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read content of a book'
+        ]); 
         // if (($user = $request->user()) !== null) {
             $book = RecordModel::select(['id','title','description'])->where('id',$request->id)->first();
             if ( $book !== null ) {

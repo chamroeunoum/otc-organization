@@ -15,6 +15,23 @@ class FavoriteMatraController extends Controller
         $this->selectedFields = ['id', 'user_id', 'matra_id'] ;
     }
     public function index(){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read favorited'
+        ]); 
         $user = \Auth::user();
         if( $user == null ) return response()->json( [
             'ok' => false ,
@@ -117,6 +134,23 @@ class FavoriteMatraController extends Controller
         return response()->json($responseData);
     }
     public function getFavoriteIds(){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'get favorited by its ids'
+        ]); 
         $user = \Auth::user();
         if( $user == null ) return response()->json( [
             'ok' => false ,

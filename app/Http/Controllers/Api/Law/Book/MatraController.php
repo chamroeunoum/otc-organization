@@ -12,6 +12,23 @@ class MatraController extends Controller
 {
     /** Get a list of matras */
     public function index(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read list matras'
+        ]); 
         /** Format from query string */
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 10 ;
@@ -421,6 +438,23 @@ class MatraController extends Controller
      * Get matras of a regulator
      */
     public function ofBook(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read list matras of a book'
+        ]); 
         if( $request->book_id > 0 ){
             /** Format from query string */
             $book_id = isset( $request->book_id ) && $request->book_id >0 ? $request->book_id : false ;
@@ -512,6 +546,23 @@ class MatraController extends Controller
      * User Favorited Matras
      */
     public function ofUser(Request $request){
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'read favorited matras of a user'
+        ]); 
         $user = \Auth::user();
         if( $user == null ) return response()->json( [
             'ok' => false ,

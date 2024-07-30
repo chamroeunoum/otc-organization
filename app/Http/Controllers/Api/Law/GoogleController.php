@@ -164,7 +164,7 @@ class GoogleController extends Controller
         /** Create user profile picture */
         if ( $user->avatar_url == null || strlen(trim($user->avatar_url))<1 || 
             (
-                strlen(trim($user->avatar_url))>0 && !Storage::disk(env("FILESYSTEM_DRIVER","public"))->exists($user->avatar_url)
+                strlen(trim($user->avatar_url))>0 && !Storage::disk("public")->exists($user->avatar_url)
             )
         ) {
             $profile_picture = null;
@@ -178,7 +178,7 @@ class GoogleController extends Controller
             if( !Storage::disk('public')->exists( $path ) ){
                 if( Storage::makeDirectory( $path ) ){
                     $uniqeName = md5( $user->name );
-                    Storage::disk(env("FILESYSTEM_DRIVER","public"))->put( $path . '/'.$uniqeName.'.png', (string) $profile_picture, "public");
+                    Storage::disk("public")->put( $path . '/'.$uniqeName.'.png', (string) $profile_picture, "public");
                     $user->avatar_url = $path . '/'.$uniqeName.'.png';
                     $user->save();
                 }

@@ -11,6 +11,9 @@ class Log extends Model
         'regulator' => [
             'system', 'user_id' , 'regulator_id' , 'datetime'
         ],
+        'matra' => [
+            'system', 'user_id' , 'matra_id' , 'datetime'
+        ],
         'access' => [
             'system', 'user_id' , 'class' , 'func' , 'desp' , 'datetime' , 'http_origin' , 'http_sec_ch_ua_mobile' , 'http_sec_ch_ua_platform' , 'http_user_agent' , 'http_x_forwarded_for' , 'request_uri' , 'remote_addr' , 'request_time_float'
         ]
@@ -45,6 +48,31 @@ class Log extends Model
         fputcsv($handle, $fields);
         fclose($handle);
     }
+    /** 
+     * Regulators
+     */
+    public static function matra($data=[]){
+        $logDirectory = storage_path() . '/logs/matras' ;
+        $todayLog = 'access-'.\Carbon\Carbon::now()->format('Ymd').'.csv';
+        $fields = [
+            $data['system'] ,
+            $data['user_id'] ,
+            $data['matra_id'] ,
+            \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+        ];
+        $handle = false ;
+        if( !file_exists( $logDirectory . '/' . $todayLog ) ){
+            $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
+            fputcsv($handle, self::$columns['matra'] , ',' );
+        }else{
+            $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
+        }
+        fputcsv($handle, $fields);
+        fclose($handle);
+    }
+    /** 
+     * Regulators
+     */
     public static function regulator($data=[]){
         $logDirectory = storage_path() . '/logs/regulators' ;
         $todayLog = 'access-'.\Carbon\Carbon::now()->format('Ymd').'.csv';
