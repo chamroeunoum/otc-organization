@@ -7,7 +7,7 @@ use Carbon\Carbon;
 
 class Log extends Model
 {
-    protected static $columns = [ 
+    protected const COLUMNS = [ 
         'regulator' => [
             'system', 'user_id' , 'regulator_id' , 'datetime'
         ],
@@ -15,7 +15,7 @@ class Log extends Model
             'system', 'user_id' , 'matra_id' , 'datetime'
         ],
         'access' => [
-            'system', 'user_id' , 'class' , 'func' , 'desp' , 'datetime' , 'http_origin' , 'http_sec_ch_ua_mobile' , 'http_sec_ch_ua_platform' , 'http_user_agent' , 'http_x_forwarded_for' , 'request_uri' , 'remote_addr' , 'request_time_float'
+            'system', 'user_id' , 'class' , 'func' , 'desp' , 'datetime' , 'http_origin' , 'http_sec_ch_ua_mobile' , 'http_sec_ch_ua_platform' , 'http_user_agent' , 'http_x_forwarded_for' , 'request_uri' , 'query_string' , 'remote_addr' , 'request_time_float'
         ]
     ] ;
     public static function access($data=[]){
@@ -28,20 +28,20 @@ class Log extends Model
             $data['func'] ,
             $data['desp'] ,
             \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
-            $_SERVER['HTTP_ORIGIN']??'' ,
-            $_SERVER['HTTP_SEC_CH_UA_MOBILE']??'' ,
-            $_SERVER['HTTP_SEC_CH_UA_PLATFORM']??'' ,
-            $_SERVER['HTTP_USER_AGENT']??'' ,
-            $_SERVER['HTTP_X_FORWARDED_FOR']??'' ,
-            $_SERVER['REQUEST_URI']??'' ,
-            $_SERVER['QUERY_STRING']??'' ,
-            $_SERVER['REMOTE_ADDR']??'' ,
-            $_SERVER['REQUEST_TIME_FLOAT']??''
+            isset( $_SERVER['HTTP_ORIGIN'] ) ? $_SERVER['HTTP_ORIGIN'] : "" ,
+            isset( $_SERVER['HTTP_SEC_CH_UA_MOBILE'] ) ? $_SERVER['HTTP_SEC_CH_UA_MOBILE'] : "" ,
+            isset( $_SERVER['HTTP_SEC_CH_UA_PLATFORM'] ) ? $_SERVER['HTTP_SEC_CH_UA_PLATFORM'] : "" ,
+            isset( $_SERVER['HTTP_USER_AGENT'] ) ? $_SERVER['HTTP_USER_AGENT'] : "" ,
+            isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : "" ,
+            isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : "" ,
+            isset( $_SERVER['QUERY_STRING'] ) ? $_SERVER['QUERY_STRING'] : "" ,
+            isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : "" ,
+            isset( $_SERVER['REQUEST_TIME_FLOAT'] ) ? $_SERVER['REQUEST_TIME_FLOAT'] : ""
         ];
         $handle = false ;
         if( !file_exists( $logDirectory . '/' . $todayLog ) ){
             $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
-            fputcsv($handle, self::$columns['access'] , ',' );
+            fputcsv($handle, self::COLUMNS['access'] , ',' );
         }else{
             $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
         }
@@ -58,18 +58,15 @@ class Log extends Model
         $handle = false ;
 
         if( file_exists( $logDirectory . '/' . $todayLog ) ){
-            $rows = [] ;
+            $rows = collect([]) ;
             if (($handle = fopen( $logDirectory . '/' . $todayLog , "r")) !== FALSE) {
                 $rowIndex = $dataIndex = 0 ;
                 while (($data = fgetcsv( $handle , 1000 , ",")) !== FALSE) {
                     if( ( $numberOfColumns = count($data) ) > 0 && $rowIndex < $perPage ){
-                        $rows[] = $data ;
+                        $rows->push( array_combine( self::COLUMNS['access'] , $data ) );
                         $rowIndex++;
                     }
                     $dataIndex++;
-                    // for ( $cIndex = 0 ; $cIndex < $numberOfColumns ; $cIndex++ ) {
-                    //     $data[ $cIndex ]
-                    // }
                 }
                 fclose($handle);
             }
@@ -92,7 +89,7 @@ class Log extends Model
         $handle = false ;
         if( !file_exists( $logDirectory . '/' . $todayLog ) ){
             $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
-            fputcsv($handle, self::$columns['matra'] , ',' );
+            fputcsv($handle, self::COLUMNS['matra'] , ',' );
         }else{
             $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
         }
@@ -114,36 +111,11 @@ class Log extends Model
         $handle = false ;
         if( !file_exists( $logDirectory . '/' . $todayLog ) ){
             $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
-            fputcsv($handle, self::$columns['regulator'] , ',' );
+            fputcsv($handle, self::COLUMNS['regulator'] , ',' );
         }else{
             $handle = fopen( $logDirectory . '/' . $todayLog , "a+"); 
         }
         fputcsv($handle, $fields);
         fclose($handle);
     }
-    public static function getRegulator(){
-        $logDirectory = storage_path() . '/logs/regulators' ;
-        $todayLog = \Carbon\Carbon::now()->format('Ymd').'.csv';
-        if( file_exists( $logDirectory . '/' . $todayLog ) ){
-            $row = 1;
-            if (($handle = fopen( $logDirectory . '/' . $todayLog , "r")) !== FALSE) {
-                
-                while(! feof($handle)){
-                    print_r(fgetcsv($handle));
-                }
-                fclose($handle);
-
-                // while (($data = fgetcsv($handle, 50 , ",")) !== FALSE) {
-                //     $num = count($data);
-                //     echo "<p> $num fields in line $row: <br /></p>\n";
-                //     $row++;
-                //     for ($c=0; $c < $num; $c++) {
-                //         echo $data[$c] . "<br />\n";
-                //     }
-                // }
-                // fclose($handle);
-            }
-        }
-    }
-    
 }
