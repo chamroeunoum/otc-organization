@@ -48,6 +48,35 @@ class Log extends Model
         fputcsv($handle, $fields);
         fclose($handle);
     }
+    public static function readAccess( $date = false , $page=1, $perPage=10){
+        $date = $date == false ? \Carbon\Carbon::now() : \Carbon\Carbon::parse( $date );
+        $page = intval( $page ) > 0 ? $page : 1 ;
+        $perPage = intval( $perPage ) > 0 ? $perPage : 10 ;
+
+        $logDirectory = storage_path() . '/logs/access' ;
+        $todayLog = $date->format('Ymd').'.csv';
+        $handle = false ;
+
+        if( file_exists( $logDirectory . '/' . $todayLog ) ){
+            $rows = [] ;
+            if (($handle = fopen( $logDirectory . '/' . $todayLog , "r")) !== FALSE) {
+                $rowIndex = $dataIndex = 0 ;
+                while (($data = fgetcsv( $handle , 1000 , ",")) !== FALSE) {
+                    if( ( $numberOfColumns = count($data) ) > 0 && $rowIndex < $perPage ){
+                        $rows[] = $data ;
+                        $rowIndex++;
+                    }
+                    $dataIndex++;
+                    // for ( $cIndex = 0 ; $cIndex < $numberOfColumns ; $cIndex++ ) {
+                    //     $data[ $cIndex ]
+                    // }
+                }
+                fclose($handle);
+            }
+            return $rows ;
+        }
+        return [] ;
+    }
     /** 
      * Regulators
      */

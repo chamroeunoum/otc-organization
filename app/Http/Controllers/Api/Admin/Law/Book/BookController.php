@@ -149,12 +149,15 @@ class BookController extends Controller
                 return html_entity_decode( strip_tags( $title ) );
             }
         ]);
+
         $responseData['message'] = __("crud.read.success");
         $responseData['ok'] = true ;
+
         return response()->json($responseData);
     }
     /** Create a new Regulator */
     public function store(Request $request){
+        
         if( ($user = $request->user() ) !== null ){
             /** Merge variable created_by and updated_by into request */
             $input = $request->input();
