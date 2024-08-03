@@ -38,67 +38,67 @@ class TelegramController extends Controller
             where('telegram_user_id', $request->id)
             ->whereNotNull('telegram_user_id')
             ->first();
-            
-        // // Check whether the user is already our member with the email
-        // if( $user == null ){
-        //     $user = \App\Models\User::
-        //     where('email', $email)
-        //     ->whereNotNull('email')
-        //     ->first();
-        // }
+        
+        // Check whether the user is already our member with the email
+        if( $user == null ){
+            $user = \App\Models\User::
+            where('email', $email)
+            ->whereNotNull('email')
+            ->first();
+        }
 
-        // // Check whether the user is already our member with the email
-        // if( $user == null && $request->hash != "" ){
-        //     $user = \App\Models\User::
-        //     where('telegram_user_hash', $request->hash)
-        //     ->whereNotNull('telegram_user_hash')
-        //     ->first();
-        // }
+        // Check whether the user is already our member with the email
+        if( $user == null && $request->hash != "" ){
+            $user = \App\Models\User::
+            where('telegram_user_hash', $request->hash)
+            ->whereNotNull('telegram_user_hash')
+            ->first();
+        }
 
         /**
          * Check roles
          * Check whether the admin and super admin come to visit
          * This does not allow the admin and super admin to visit
          */
-        // if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
-        //     $user = null ;
-        //     return response()->json([
-        //         'ok' => false ,
-        //         'message' => 'មិនមានសិទ្ធិប្រើប្រាស់ប្រព័ន្ធនេះឡើយ។' ,
-        //     ],403);
-        // }
+        if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
+            $user = null ;
+            return response()->json([
+                'ok' => false ,
+                'message' => 'មិនមានសិទ្ធិប្រើប្រាស់ប្រព័ន្ធនេះឡើយ។' ,
+            ],403);
+        }
 
-        // /** Just in case admin has deleted user from system with SoftDeletes */
-        // if (( $user = \App\Models\User::where(function($query) use($request, $email ){
-        //         $query->where('telegram_user_id', $request->id)
-        //         ->whereNotNull('telegram_user_id');
-        //     })
-        //     ->orWhere(function($query) use($request, $email){
-        //         $query->where('telegram_user_hash', $request->hash)
-        //         ->whereNotNull('telegram_user_hash');
-        //     })
-        //     ->orWhere(function($query) use($request, $email){
-        //         $query->where('email', $email)
-        //         ->whereNotNull('email');
-        //     })
-        //     ->whereNotNull('deleted_at')
-        //     ->first() ) !== null) {
-        //     /**
-        //      * Check roles
-        //      * Check whether the admin and super admin come to visit
-        //      * This does not allow the admin and super admin to visit
-        //      */
-        //     if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
-        //         // if the deleted account is the admin or super admin type then this operation does not allow
-        //         $user == null ;
-        //         return response()->json([
-        //             'ok' => false ,
-        //             'message' => 'មិនមានសិទ្ធិប្រើប្រាស់ប្រព័ន្ធនេះឡើយ។' ,
-        //         ],403);
-        //     }else{
-        //         $user->restore();
-        //     }
-        // }
+        /** Just in case admin has deleted user from system with SoftDeletes */
+        if (( $user = \App\Models\User::where(function($query) use($request, $email ){
+                $query->where('telegram_user_id', $request->id)
+                ->whereNotNull('telegram_user_id');
+            })
+            ->orWhere(function($query) use($request, $email){
+                $query->where('telegram_user_hash', $request->hash)
+                ->whereNotNull('telegram_user_hash');
+            })
+            ->orWhere(function($query) use($request, $email){
+                $query->where('email', $email)
+                ->whereNotNull('email');
+            })
+            ->whereNotNull('deleted_at')
+            ->first() ) !== null) {
+            /**
+             * Check roles
+             * Check whether the admin and super admin come to visit
+             * This does not allow the admin and super admin to visit
+             */
+            if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
+                // if the deleted account is the admin or super admin type then this operation does not allow
+                $user == null ;
+                return response()->json([
+                    'ok' => false ,
+                    'message' => 'មិនមានសិទ្ធិប្រើប្រាស់ប្រព័ន្ធនេះឡើយ។' ,
+                ],403);
+            }else{
+                $user->restore();
+            }
+        }
 
         if( $user != null ){
             $user
