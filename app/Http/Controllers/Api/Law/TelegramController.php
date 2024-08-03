@@ -60,13 +60,13 @@ class TelegramController extends Controller
          * Check whether the admin and super admin come to visit
          * This does not allow the admin and super admin to visit
          */
-        if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
-            $user = null ;
-            return response()->json([
-                'ok' => false ,
-                'message' => 'មិនមានសិទ្ធិប្រើប្រាស់ប្រព័ន្ធនេះឡើយ។' ,
-            ],403);
-        }
+        // if( $user != null && !empty( array_intersect( $user->roles->pluck('id')->toArray() , \App\Models\Role::where('name','super')->orWhere('name','admin')->pluck('id')->toArray() ) ) ){
+        //     $user = null ;
+        //     return response()->json([
+        //         'ok' => false ,
+        //         'message' => 'មិនមានសិទ្ធិប្រើប្រាស់ប្រព័ន្ធនេះឡើយ។' ,
+        //     ],403);
+        // }
 
         // /** Just in case admin has deleted user from system with SoftDeletes */
         // if (( $user = \App\Models\User::where(function($query) use($request, $email ){
