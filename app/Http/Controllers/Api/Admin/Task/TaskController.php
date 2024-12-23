@@ -5,13 +5,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Task\Task AS RecordModel;
 use App\Models\Task\TaskAssignment;
-use Illuminate\Http\File;
 use App\Http\Controllers\CrudController;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
-    private $selectedFields = ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'];
-    /** Get a list of Archives */
+    private $selectedFields = ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid' , 'active' , 'pdf' , 'image' ];
+    /** Get a list of Tasks */
     public function index(Request $request){
 
         $user = \Auth::user();
@@ -94,10 +95,23 @@ class TaskController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
+        $crud = new CrudController(new RecordModel(), $request, $this->selectedFields , [
+            'image' => function($record){
+                $record->image = ( strlen( $record->image ) > 0 && \Storage::disk('public')->exists( $record->image ) )
+                ? \Storage::disk('public')->url( $record->image )
+                : false ;
+                return $record->image ;
+            },
+            'pdf' => function($record){
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('task')->exists( $record->pdf ) )
+                ? true
+                : false ;
+                return $record->pdf ;
+            }
+        ] );
         $crud->setRelationshipFunctions([
             /** relationship objective => [ array of fields objective to be selected ] */
-            'creator' => ['id', 'firstname', 'lastname' ,'phone', 'avatar_url' ] ,
+            'creator' => ['id', 'firstname', 'lastname' ,'phone', 'avatar_url' , 'image' ] ,
             'assignees' => ['id', 'firstname', 'lastname' ,'phone', 'image' ] ,
             'assignors' => ['id', 'firstname', 'lastname' ,'phone', 'image' ] ,
             'ancestor' => ['id', 'objective','minutes', 'start', 'end', 'created_at','created_by','status','pid'] ,
@@ -123,8 +137,227 @@ class TaskController extends Controller
             $task['creator']['avatar_url'] = ( $task['creator']['avatar_url'] != null && $task['creator']['avatar_url'] != "" && \Storage::disk( 'public' )->exists( $task['creator']['avatar_url'] ) )
                 ? \Storage::disk('public')->url( $task['creator']['avatar_url'] ) 
                 : null ;
+            $task['creator']['image'] = ( $task['creator']['image'] != null && $task['creator']['image'] != "" && \Storage::disk( 'public' )->exists( $task['creator']['image'] ) )
+                ? \Storage::disk('public')->url( $task['creator']['image'] ) 
+                : null ;
             return $task ;
         });
+        $responseData['message'] = __("crud.read.success");
+        return response()->json($responseData, 200);
+    }
+    /** Get a list of Tasks as schedule */
+    public function schedule(Request $request){
+
+        $user = \Auth::user();
+        if( $user == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមចូលប្រើប្រាស់ជាមុនសិន។'
+            ],403);
+        }
+        /** Format from query string */
+        $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
+        $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 50 ;
+        $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
+        // $number = isset( $request->number ) && $request->number !== "" ? $request->number : false ;
+        // $type = isset( $request->type ) && $request->type !== "" ? $request->type : false ;
+        // $unit = isset( $request->unit ) && $request->unit !== "" ? $request->unit : false ;
+        // $date = isset( $request->date ) && $request->date !== "" ? $request->date : false ;
+
+
+        $queryString = [
+            "where" => [
+                'default' => [
+                    $user->hasRole('admin') || $user->hasRole('super')
+                        ? [] 
+                        : (
+                            $user->id > 0 
+                                ? [ 'field' => 'created_by' ,'value' => $user->id ]
+                                : []
+                        )
+                ],
+                // 'in' => [] ,
+                // 'not' => [] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'objective' ,
+                //         'value' => $search
+                //     ]
+                // ] ,
+            ] ,
+            // "pivots" => [
+            //     $unit ?
+            //     [
+            //         "relationship" => 'units',
+            //         "where" => [
+            //             "in" => [
+            //                 "field" => "id",
+            //                 "value" => [$request->unit]
+            //             ],
+            //         // "not"=> [
+            //         //     [
+            //         //         "field" => 'fieldobjective' ,
+            //         //         "value"=> 'value'
+            //         //     ]
+            //         // ],
+            //         // "like"=>  [
+            //         //     [
+            //         //        "field"=> 'fieldobjective' ,
+            //         //        "value"=> 'value'
+            //         //     ]
+            //         // ]
+            //         ]
+            //     ]
+            //     : []
+            // ],
+            "pagination" => [
+                'perPage' => $perPage,
+                'page' => $page
+            ],
+            "search" => $search === false ? [] : [
+                'value' => $search ,
+                'fields' => [
+                    'objective', 'start' , 'end' , 'minutes'
+                ]
+            ],
+            "order" => [
+                'field' => 'created_at' ,
+                'by' => 'desc'
+            ],
+        ];
+
+        $request->merge( $queryString );
+
+        $crud = new CrudController(new RecordModel(), $request, $this->selectedFields );
+        $builder = $crud->getListBuilder();
+        $builder->whereNull('pid')->orWhere('pid',0);
+
+        // $responseData = $crud->pagination(true, $builder);
+        $responseData['records'] = $builder->get()->map(function( $task ){
+            
+            $task->image = ( strlen( $task->image ) > 0 && \Storage::disk('public')->exists( $task->image ) )
+                ? \Storage::disk('public')->url( $task->image )
+                : false ;
+
+            $task->pdf = ( strlen( $task->pdf ) > 0 && \Storage::disk('task')->exists( $task->pdf ) )
+                ? true
+                : false ;
+
+            $task->creator = $task->creator == null 
+                ? null 
+                : [
+                    'id' => $task->creator->id ,
+                    'firstname' => $task->creator->firstname ,
+                    'lastname' => $task->creator->lastname ,
+                    'phone' => $task->creator->phone ,
+                    'email' => $task->creator->email ,
+                    'avatar_url' => strlen( $task->creator->avatar_url ) > 0 && \Storage::disk('public')->exists( $task->creator->avatar_url )
+                        ? \Storage::disk('public')->url( $task->creator->avatar_url ) 
+                        : false ,
+                    'image' => strlen( $task->creator->image ) > 0 && \Storage::disk('public')->exists( $task->creator->image )
+                        ? \Storage::disk('public')->url( $task->creator->image ) 
+                        : false
+                ];
+
+            $task->assignees = $task->assignees != null && !$task->assignees->isEmpty()
+                ? $task->assignees->map(function( $assignee ){
+                    return [
+                        'id' => $assignee->id ,
+                        'firstname' => $assignee->firstname ,
+                        'lastname' => $assignee->lastname ,
+                        'phone' => $assignee->phone ,
+                        'email' => $assignee->email ,
+                        'avatar_url' => strlen( $assignee->avatar_url ) > 0 && \Storage::disk('public')->exists( $assignee->avatar_url )
+                            ? \Storage::disk('public')->url( $assignee->avatar_url ) 
+                            : false ,
+                        'image' => strlen( $assignee->image ) > 0 && \Storage::disk('public')->exists( $assignee->image )
+                            ? \Storage::disk('public')->url( $assignee->image ) 
+                            : false
+                    ];
+                })
+                : [] ;
+
+            $task->assignors = $task->assignors != null && !$task->assignors->isEmpty()
+                ? $task->assignors->map(function( $assignor ){
+                    return [
+                        'id' => $assignor->id ,
+                        'firstname' => $assignor->firstname ,
+                        'lastname' => $assignor->lastname ,
+                        'phone' => $assignor->phone ,
+                        'email' => $assignor->email ,
+                        'avatar_url' => strlen( $assignor->avatar_url ) > 0 && \Storage::disk('public')->exists( $assignor->avatar_url )
+                            ? \Storage::disk('public')->url( $assignor->avatar_url ) 
+                            : false ,
+                        'image' => strlen( $assignor->image ) > 0 && \Storage::disk('public')->exists( $assignor->image )
+                            ? \Storage::disk('public')->url( $assignor->image ) 
+                            : false
+                    ];
+                })
+                : [] ;
+            
+            $task->ancestor = $task->ancestor == null 
+                ? null 
+                : [
+                    'id' => $task->ancestor->id ,
+                    'objective' => $task->ancestor->objective ,
+                    'minutes' => $task->ancestor->minutes ,
+                    'start' => $task->ancestor->start ,
+                    'end' => $task->ancestor->end ,
+                    'created_at' => $task->ancestor->created_at ,
+                    'creator' => $task->ancestor->creator == null
+                        ? null
+                        : [
+                            'id' => $task->ancestor->creator->id ,
+                            'firstname' => $task->ancestor->creator->firstname ,
+                            'lastname' => $task->ancestor->creator->lastname ,
+                            'phone' => $task->ancestor->creator->phone ,
+                            'email' => $task->ancestor->creator->email ,
+                            'avatar_url' => strlen( $task->ancestor->creator->avatar_url ) > 0 && \Storage::disk('public')->exists( $task->ancestor->creator->avatar_url )
+                                ? \Storage::disk('public')->url( $task->ancestor->creator->avatar_url ) 
+                                : false ,
+                            'image' => strlen( $task->ancestor->creator->image ) > 0 && \Storage::disk('public')->exists( $task->ancestor->creator->image )
+                                ? \Storage::disk('public')->url( $task->ancestor->creator->image ) 
+                                : false
+                        ] ,
+                    'status' => $task->ancestor->status ,
+                    'pid' => $task->ancestor->pid
+                ];
+
+            // $task->children = is_array( $task->children ) && !empty( $task->children )
+            //     ? $task->children->map(function( $child ){
+            //         return [
+            //             'id' => $child->id ,
+            //             'objective' => $child->objective ,
+            //             'minutes' => $child->minutes ,
+            //             'start' => $child->start ,
+            //             'end' => $child->end ,
+            //             'created_at' => $child->created_at ,
+            //             'created_by' => $child->created_by == null
+            //                 ? null
+            //                 : [
+            //                     'id' => $child->created_by->id ,
+            //                     'firstname' => $child->created_by->firstname ,
+            //                     'lastname' => $child->created_by->lastname ,
+            //                     'phone' => $child->created_by->phone ,
+            //                     'email' => $child->created_by->email ,
+            //                     'avatar_url' => strlen( $child->created_by->avatar_url ) > 0 && \Storage::disk('public')->exists( $child->created_by->avatar_url )
+            //                         ? \Storage::disk('public')->url( $child->created_by->avatar_url ) 
+            //                         : false ,
+            //                     'image' => strlen( $child->created_by->image ) > 0 && \Storage::disk('public')->exists( $child->created_by->image )
+            //                         ? \Storage::disk('public')->url( $child->created_by->image ) 
+            //                         : false
+            //                 ] ,
+            //             'status' => $child->status ,
+            //             'pid' => $child->pid
+            //         ];
+            //     })
+            //     : [] ;
+            $task->children = $task->children != null && !$task->children->isEmpty() ? $task->getChildAsTree() : [] ;
+
+            return $task ;
+        });
+
+        $responseData['ok'] = true;
         $responseData['message'] = __("crud.read.success");
         return response()->json($responseData, 200);
     }
@@ -274,10 +507,11 @@ class TaskController extends Controller
     {
         if (($user = $request->user()) !== null) {
             $crud = new CrudController(new RecordModel(), $request, $this->selectedFields);
-            if ($crud->booleanField('active', 1)) {
+            if ($crud->booleanField('active', $request->active )) {
                 $record = $crud->formatRecord($record = $crud->read());
                 return response(
                     [
+                        'ok' => true ,
                         'record' => $record,
                         'message' => 'Activated !'
                     ],
@@ -286,6 +520,7 @@ class TaskController extends Controller
             } else {
                 return response(
                     [
+                        'ok' => false ,
                         'record' => null,
                         'message' => 'There is not record matched !'
                     ],
@@ -303,10 +538,11 @@ class TaskController extends Controller
     {
         if (($user = $request->user()) !== null) {
             $crud = new CrudController(new RecordModel(), $request, $this->selectedFields);
-            if ( $crud->booleanField('active', 0) ) {
+            if ( $crud->booleanField('active', $request->active ) ) {
                 // User does exists
                 return response(
                     [
+                        'ok' => true ,
                         'record' => $record,
                         'message' => 'Deactivated !'
                     ],
@@ -315,6 +551,7 @@ class TaskController extends Controller
             } else {
                 return response(
                     [
+                        'ok' => false ,
                         'record' => null,
                         'message' => 'There is not record matched !'
                     ],
@@ -703,5 +940,131 @@ class TaskController extends Controller
             'ok' => true ,
             'message' => 'ជោគជ័យ។'
         ],200);
+    }
+    public function uploadPicture(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('public')->putFile( 'tasks/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
+                $record->image = $uniqeName ;
+                $record->save();
+                if( $record->image != null && strlen( $record->image ) > 0 && Storage::disk('public')->exists( $record->image ) ){
+                    $record->image = Storage::disk("public")->url( $record->image  );
+                    return response([
+                        'record' => $record ,
+                        'ok' => true ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $record ,
+                        'ok' => false ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'ok' => false ,
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'ok' => false ,
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    public function uploadPdf(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('task')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
+                $record->pdf = $uniqeName ;
+                $record->save();
+                if( Storage::disk('task')->exists( $record->pdf ) ){
+                    // $record->pdf = Storage::disk("position")->url( $record->pdf  );
+                    $record->pdf = true ;
+                    return response([
+                        'record' => $record ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $document ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    /**
+     * View the pdf file
+     */
+    public function pdf(Request $request)
+    {
+        $record = RecordModel::findOrFail($request->id);
+        if($record) {
+            $pathPdf = storage_path('data') . '/tasks/' . $record->pdf ;
+            $ext = pathinfo($pathPdf);
+            $filename = md5($record->id) . '.pdf';
+            if(file_exists( $pathPdf ) && is_file($pathPdf)) {
+                $pdfBase64 = base64_encode( file_get_contents( $pathPdf ) );  
+                return response([
+                    "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                    "filename" => $filename,
+                    "ok" => true 
+                ],200);
+            }else{
+                return response([
+                    'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
+                    'path' => $pathPdf
+                ],500 );
+            }
+        }
     }
 }

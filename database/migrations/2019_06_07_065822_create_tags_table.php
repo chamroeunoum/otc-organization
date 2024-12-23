@@ -22,6 +22,7 @@ class CreateTagsTable extends Migration
             $table->string('model',191)->nullable()->comment('The model of this tag, it is used to differential tag base on the model objective. And only the root tag has model');
             $table->text('cids')->nullable(true)->comment('Children IDs will be store here.');
             $table->string('image',191)->nullable(true);
+            $table->string('pdf',191)->nullable(true);
             $table->integer('record_index')->nullable()->comment('The index of the record');
             $table->integer('active')->nullable()->comment('The activation of the record');
             $table->timestamps();

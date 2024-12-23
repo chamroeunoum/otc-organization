@@ -24,6 +24,7 @@ class CreatePeopleTable extends Migration {
 			$table->string('email', 191)->nullable();
 			$table->integer('nid')->nullable();
 			$table->string('image', 191)->nullable();
+			$table->string('pdf', 191)->nullable();
 			$table->string('marry_status', 191)->nullable();
 			$table->string('father', 191)->nullable();
 			$table->string('mother', 191)->nullable();

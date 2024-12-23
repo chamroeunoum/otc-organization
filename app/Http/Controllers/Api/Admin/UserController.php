@@ -29,6 +29,8 @@ class UserController extends Controller
         'last_login' ,
         'login_count' ,
         'ip' ,
+        'image' ,
+        'pdf' ,
         'created_at'
     ];
     /**
@@ -111,7 +113,20 @@ class UserController extends Controller
 
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->selectFields);
+        $crud = new CrudController(new RecordModel(), $request, $this->selectFields , [
+            'image' => function($record){
+                $record->image = ( strlen( $record->image ) > 0 && \Storage::disk('public')->exists( $record->image ) )
+                ? \Storage::disk('public')->url( $record->image )
+                : false ;
+                return $record->image ;
+            },
+            'pdf' => function($record){
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('user')->exists( $record->pdf ) )
+                ? true
+                : false ;
+                return $record->pdf ;
+            }
+        ]);
         $crud->setRelationshipFunctions([
             /** relationship name => [ array of fields name to be selected ] */
             "person" => [ 'id','firstname' , 'lastname' , 'gender' , 'dob' , 'pob' , 'picture' , 'mobile_phone' , 'office_phone' , 'nid' , 'email' , 'marry_status' ] ,
@@ -543,6 +558,38 @@ class UserController extends Controller
         ],200);
     }
 
+    public function updatePasscode(Request $request){
+        if( !isset( $request->id ) || $request->id < 0 ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់គណនី។'
+            ],422);
+        }
+        $record = RecordModel::find($request->id);
+        if( $record == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'ស្វែងរកគណនីមិនឃើញឡើយ។'
+            ],403);
+        }
+
+        if( isset( $request->passcode ) || ( isset( $request->passcode ) && intval( $request->passcode ) < 0 ) ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'សូមបញ្ចូលលេខកូដឆ្លងកាត់អោយបានត្រឹមត្រូវ។'
+            ],403);
+        }
+
+        $record->passcode = str_pad( $request->passcode  , 6, "0", STR_PAD_LEFT) ;
+        $record->update();
+
+        return response()->json([
+            'record' => $record ,
+            'ok' => true ,
+            'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់ឯកសារ។'
+        ],200);
+    }
+
     public function checkIdentification(Request $request){
         if( !isset( $request->term ) || strlen( trim ( $request->term ) ) <= 0 ){
             return response()->json([
@@ -576,14 +623,14 @@ class UserController extends Controller
             return response()->json([
                 'ok' => false ,
                 'message' => 'ករណីផ្ទៀងផ្ទាត់ហាក់មានចំនួនច្រើន។'
-            ],403);
+            ],200);
         }
         $record = $result->first();
         if( $record == null ){
             return response()->json([
                 'ok' => false ,
                 'message' => 'មិនមានព័ត៌មានផ្ទៀងផ្ទាត់ឡើយ។'
-            ],403);
+            ],200);
         }
 
         if( $record->people_id <= 0 || $record->people_id == null ){
@@ -602,6 +649,7 @@ class UserController extends Controller
             $record->people_id = $person->id ;
             $record->save();
         }
+
 
         return response()->json([
             'record' => [
@@ -765,6 +813,132 @@ class UserController extends Controller
             return response([
                 'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
             ],403);
+        }
+    }
+    public function uploadPicture(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('public')->putFile( 'users/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
+                $record->image = $uniqeName ;
+                $record->save();
+                if( $record->image != null && strlen( $record->image ) > 0 && Storage::disk('public')->exists( $record->image ) ){
+                    $record->image = Storage::disk("public")->url( $record->image  );
+                    return response([
+                        'record' => $record ,
+                        'ok' => true ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $record ,
+                        'ok' => false ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'ok' => false ,
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'ok' => false ,
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    public function uploadPdf(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('user')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
+                $record->pdf = $uniqeName ;
+                $record->save();
+                if( Storage::disk('user')->exists( $record->pdf ) ){
+                    // $record->pdf = Storage::disk("position")->url( $record->pdf  );
+                    $record->pdf = true ;
+                    return response([
+                        'record' => $record ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $document ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    /**
+     * View the pdf file
+     */
+    public function pdf(Request $request)
+    {
+        $record = RecordModel::findOrFail($request->id);
+        if($record) {
+            $pathPdf = storage_path('data') . '/users/' . $record->pdf ;
+            $ext = pathinfo($pathPdf);
+            $filename = md5($record->id) . '.pdf';
+            if(file_exists( $pathPdf ) && is_file($pathPdf)) {
+                $pdfBase64 = base64_encode( file_get_contents( $pathPdf ) );  
+                return response([
+                    "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                    "filename" => $filename,
+                    "ok" => true 
+                ],200);
+            }else{
+                return response([
+                    'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
+                    'path' => $pathPdf
+                ],500 );
+            }
         }
     }
 }

@@ -26,15 +26,25 @@ class AuthController extends Controller
      */
     public function signup(Request $request)
     {
-        // $result = $request->validate([
-        //     'firstname' => 'required|string',
-        //     'lastname' => 'required|string',
-        //     'phone' => 'required|string|unique:users',
-        //     'email' => 'required|string|email|unique:users',
-        //     'password' => 'required|string|confirmed'
-        // ]);
 
         if( strlen( trim( $request->firstname ) ) <= 0 || strlen( trim( $request->lastname ) ) <= 0 ){
+            \App\Models\Log\Log::access([
+                'system' => 'law' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'register, not completed firstname or lastname'
+            ]); 
             return response()->json([
                 'ok' => false ,
                 'message' => "សូមបំពេញ គោត្តនាម និង នាម។"
@@ -42,12 +52,46 @@ class AuthController extends Controller
         }
 
         if( strlen( trim( $request->password ) ) <= 0 || strlen( trim( $request->password_confirmation ) ) <= 0 ){
+            \App\Models\Log\Log::access([
+                'system' => 'law' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'register, password or confirm password is empty'
+            ]); 
             return response()->json([
                 'ok' => false ,
                 'message' => "សូមបំពេញ ពាក្យសម្ងាត់ និង បញ្ចាក់ពាក្យសម្ងាត់។"
             ],422);            
         }
         if( strlen( trim( $request->password ) ) > 0 && strlen( trim( $request->password_confirmation ) ) > 0 && $request->password != $request->password_confirmation ){
+            \App\Models\Log\Log::access([
+                'system' => 'law' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'register, password and confirm password not match'
+            ]); 
             return response()->json([
                 'ok' => false ,
                 'message' => "ពាក្យសម្រាត់ និងការបញ្ជាក់ពាក្យសម្ងាត់ មិនផ្ទៀងផ្ទាត់គ្នា។"
@@ -55,6 +99,23 @@ class AuthController extends Controller
         }
 
         if( strlen( trim( $request->email ) ) <= 0 ){
+            \App\Models\Log\Log::access([
+                'system' => 'law' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'register, email does not provided'
+            ]); 
             return response()->json([
                 'ok' => false ,
                 'message' => "សូមបំពេញ អ៊ីមែលរបស់អ្នក។"
@@ -66,6 +127,23 @@ class AuthController extends Controller
          */
         $user = \App\Models\User::where('email',$request->email )->first();
         if( $user != null ){
+            \App\Models\Log\Log::access([
+                'system' => 'law' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'register, user is already exist, id:' . $user->id
+            ]); 
             // This email is already in exits
             return response()->json([
                 'ok' => false ,
@@ -115,7 +193,23 @@ class AuthController extends Controller
         }
 
         $user->notify(new SignupActivate($user));
-
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'register succeed, id:' . $user->id
+        ]); 
         return response()->json([
             'ok' => true ,
             'record' => $user ,
@@ -147,14 +241,47 @@ class AuthController extends Controller
 
         if(!Auth::attempt($credentials)){
             if( \App\Models\User::where('email', $request->email)->first() != null ){
+                \App\Models\Log\Log::access([
+                    'system' => 'law' ,
+                    'user_id' => \Auth::user() != null 
+                        ? \Auth::user()->id
+                        : (
+                            auth('api')->user() 
+                                ? auth('api')->user()->id
+                                : (
+                                    $request->user() != null
+                                        ? $request->user()->id 
+                                        : 0
+                                )
+                        ),
+                    'class' => self::class ,
+                    'func' => __FUNCTION__ ,
+                    'desp' => 'login, password is not correct'
+                ]); 
                 /**
                  * Account does exist but the password might miss type
                  */
                 return response()->json([
-                    'user' => \App\Models\User::where('email', $request->email)->first() ,
                     'message' => 'សូមពិនិត្យពាក្យសម្ងាត់របស់អ្នក !'
                 ], 401);
             }else{
+                \App\Models\Log\Log::access([
+                    'system' => 'law' ,
+                    'user_id' => \Auth::user() != null 
+                        ? \Auth::user()->id
+                        : (
+                            auth('api')->user() 
+                                ? auth('api')->user()->id
+                                : (
+                                    $request->user() != null
+                                        ? $request->user()->id 
+                                        : 0
+                                )
+                        ),
+                    'class' => self::class ,
+                    'func' => __FUNCTION__ ,
+                    'desp' => 'register, email does not exists'
+                ]); 
                 /**
                  * Account does exist but the password might miss type
                  */
@@ -193,6 +320,23 @@ class AuthController extends Controller
          * Check disability
          */
         if( $user->active <= 0 ) {
+            \App\Models\Log\Log::access([
+                'system' => 'law' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'login, user has been disabled'
+            ]); 
             /**
             * Account has been disabled
             */
@@ -211,6 +355,23 @@ class AuthController extends Controller
                 ) 
             ) 
         ){
+            \App\Models\Log\Log::access([
+                'system' => 'law' ,
+                'user_id' => \Auth::user() != null 
+                    ? \Auth::user()->id
+                    : (
+                        auth('api')->user() 
+                            ? auth('api')->user()->id
+                            : (
+                                $request->user() != null
+                                    ? $request->user()->id 
+                                    : 0
+                            )
+                    ),
+                'class' => self::class ,
+                'func' => __FUNCTION__ ,
+                'desp' => 'login, user does not the right in here'
+            ]); 
             /**
              * User seem does not have any right to login into backend / core service
              */
@@ -234,6 +395,23 @@ class AuthController extends Controller
             }
         }
 
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'login successfully'
+        ]); 
         return response()->json([
             'ok' => true ,
             'upload_max_filesize' => ini_get("upload_max_filesize") ,
@@ -275,6 +453,23 @@ class AuthController extends Controller
             ]
         );
         $request->user()->token()->revoke();
+        \App\Models\Log\Log::access([
+            'system' => 'law' ,
+            'user_id' => \Auth::user() != null 
+                ? \Auth::user()->id
+                : (
+                    auth('api')->user() 
+                        ? auth('api')->user()->id
+                        : (
+                            $request->user() != null
+                                ? $request->user()->id 
+                                : 0
+                        )
+                ),
+            'class' => self::class ,
+            'func' => __FUNCTION__ ,
+            'desp' => 'logout successfully'
+        ]); 
         return response()->json([
             'message' => 'អ្នកបានចាកចេញដោយជោគជ័យ !'
         ]);

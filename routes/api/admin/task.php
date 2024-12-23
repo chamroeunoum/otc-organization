@@ -17,6 +17,7 @@ Route::group([
      * Get all records
      */
     Route::get('',[TaskController::class,'index'])->name("taskList");
+    Route::get('schedule',[TaskController::class,'schedule'])->name("taskSchedule");
     /**
      * Get a record with id
      */
@@ -41,8 +42,11 @@ Route::group([
     /**
      * Activate, Deactivate account
      */
-    Route::put('activate',[TaskController::class,'activate'])->name('taskActivate');
-    Route::put('deactivate',[TaskController::class,'deactivate'])->name('taskDeactivate');
+    Route::put('activate',[ TaskController::class , "active" ] )->name('taskActivate');
+    Route::put('deactivate',[ TaskController::class , "unactive"] )->name('taskDeactivate');
+    Route::post('upload/picture',[TaskController::class,'uploadPicture']);
+    Route::post('upload/pdf',[TaskController::class,'uploadPdf']);
+    Route::get('pdf',[TaskController::class,'pdf']);
 
     Route::put('new',[TaskController::class,'markAsNew'])->name('taskNew');
     Route::put('start',[TaskController::class,'start'])->name('taskStart');

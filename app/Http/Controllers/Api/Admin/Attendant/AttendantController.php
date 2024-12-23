@@ -759,6 +759,39 @@ class AttendantController extends Controller
         $user = $result->first();
         $now = \Carbon\Carbon::now();
         /**
+         * Check whether the user has been assigned the timeslot or not
+         */
+        if( $user->timeslots == null || ( $user->timeslots != null && $user->timeslots->isEmpty() ) ){
+            /**
+             * Check if there is default timeslot exists
+             */
+            if( \App\Models\Attendant\Timeslot::count() <=0 ){
+                $morning = \App\Models\Attendant\Timeslot::create([
+                    'title' => 'ព្រឹក' ,
+                    'start' => '08:00' ,
+                    'end' => '12:00' ,
+                    'effective_day' => [ 1, 2, 3, 4, 5 ] ,
+                    'active' => 1 ,
+                    'rest_duration' => 0 ,
+                    'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                    'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+                ]);
+                $afternoon = \App\Models\Attendant\Timeslot::create([
+                    'title' => 'ល្ងាច' ,
+                    'start' => '13:00' ,
+                    'end' => '17:00' ,
+                    'effective_day' => [ 1, 2, 3, 4, 5 ] ,
+                    'active' => 1 ,
+                    'rest_duration' => 0 ,
+                    'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
+                    'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+                ]);
+                $user->timeslots()->sync([$morning->id, $afternoon->id]);
+            }else{
+                $user->timeslots()->sync( \App\Models\Attendant\Timeslot::limit(2)->get()->pluck('id') );
+            }
+        }
+        /**
          * Check whether the attendant has been registered once already
          */
         $attendant = $user->attendants()->where('date',$now->format('Y-m-d'))->orderBy('id','desc')->first() ;
@@ -779,7 +812,7 @@ class AttendantController extends Controller
         /**
          * Create checktime of the attendant
          */
-        $parentChecktime = $attendant->checktimes->count() > 0 
+        $lastChecktime = !$attendant->checktimes->isEmpty()
             ? $attendant->checkTimes()->orderby('id','desc')->first()
             : null ;
 
@@ -814,14 +847,25 @@ class AttendantController extends Controller
             $uniqeName = $folderName.'/'.$filename ;
         }
 
+        /**
+         * Get timeslot for the attendant checktime
+         */
+        $timeslot = $user->getPossibleTimeslot( \Carbon\Carbon::now()->format('Y-m-d') );
+        if( $timeslot == null ){
+            return response()->json([
+                'ok' => false ,
+                'message' => 'មិនមានម៉ោងពេលដែលអ្នកចូលឡើយ។'
+            ],403);
+        }
+
         $checktime = $attendant->checktimes()->create([
             'attendant_id' => $attendant->id ,
-            'timeslot_id' => 0 ,
+            'timeslot_id' => $timeslot->id ,
             'organization_id' => $organization == null ? 0 : $organization->id ,
             'checktime' => $now->format('H:i') ,
-            'check_status' => $parentChecktime == null ? "IN" : "OUT" ,
+            'check_status' => $lastChecktime == null || ( $lastChecktime != null && $lastChecktime->check_status  == 0 ) ? 1 : 0 ,
             'checktype' => 'System' ,
-            'parent_checktime_id' => $parentChecktime == null ? 0 : $parentChecktime->id ,
+            'parent_checktime_id' => $lastChecktime == null ? 0 : $lastChecktime->id ,
             'meta' => $request->meta ,
             'created_at' => $now ,
             'updated_at' => $now ,
@@ -875,7 +919,7 @@ class AttendantController extends Controller
             return response()->json([
                 'ok' => false ,
                 'message' => 'ករណីផ្ទៀងផ្ទាត់ហាក់មានចំនួនច្រើន។'
-            ],403);
+            ],200);
         }
         $user = $result->first();
         $now = \Carbon\Carbon::now();
@@ -893,7 +937,7 @@ class AttendantController extends Controller
             return response()->json([
                 'ok' => false ,
                 'message' => 'មិនទាន់បានចុះវត្តមានឡើយ។'
-            ],403);
+            ],200);
         }
         $attendant->checktimes != null ? $attendant->checktimes->each(function($checktime){
             $checktime->organization;

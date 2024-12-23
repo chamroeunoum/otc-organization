@@ -170,7 +170,12 @@ class Timeslot extends Model
             return static::orderby('start','asc')->get()->filter(function($timeslot, $key) use( $datetime ){
                 $start = \Carbon\Carbon::parse( $datetime->format("Y-m-d") . ' ' . $timeslot->start );
                 $end = \Carbon\Carbon::parse( $datetime->format("Y-m-d") . ' ' . $timeslot->end );
-                return ( $datetime->gte( $start ) && $datetime->lte( $end ) ) ;
+                return 
+                    // The datetime is smaller than the start
+                    $datetime->lte ( $start ) ||
+                    // The datetime is between the start and end
+                    ( $datetime->gt( $start ) && $datetime->lte( $end ) ) 
+                    ;
             })->first();
         }
         return null ;

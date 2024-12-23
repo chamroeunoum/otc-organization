@@ -21,8 +21,9 @@ class CreateTasksTable extends Migration
             $table->datetime('end')->nullable(true)->comment('end date of the task');
             $table->integer('created_by')->nullable(true)->comment('id of creator');
             $table->integer('active')->default(0)->comment('status of using record');
-            $table->integer('status')->default(0)->comment('0: New, 1: Start, 2: End, 4: Pending, Cancel: 8');
-            $table->text('pdfs')->nullable(true)->comment('reference files');
+            $table->integer('status')->default(0)->comment('0: New, 1: Start, 2: End, 4: Pending, Cancel: 8, Close: 16');
+            $table->text('pdf')->nullable(true)->comment('reference files');
+            $table->text('image')->nullable(true)->comment('reference files');
             $table->integer('updated_by')->nullable(true)->comment('Task editor');
             $table->integer('pid')->default(0)->comment('id of parent task');
             $table->integer('tpid')->default(0)->comment('id of parent at the top level of task');

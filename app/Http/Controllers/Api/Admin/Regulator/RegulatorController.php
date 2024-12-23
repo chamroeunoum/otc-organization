@@ -25,6 +25,7 @@ class RegulatorController extends Controller
         'objective',
         'year' ,
         'pdf' ,
+        'image' ,
         'publish' ,
         'active' ,
         'created_by' ,
@@ -59,20 +60,31 @@ class RegulatorController extends Controller
                 //         'value' => $user->id
                 //     ]
                 // ],
-                'in' => [
+                'in' => 
+                !empty( 
+                    array_intersect( 
+                        $user->roles->pluck('id')->toArray() , 
+                        [ 3 , 4 ] // Only Super and Admin
+                        // All the backend user
+                        // \App\Models\Role::where('tag','core_service')->pluck('id')->toArray() 
+                    ) 
+                ) ?
                     [
-                        'field' => 'active' ,
-                        'value' => 1
-                    ] ,
-                    [
-                        'field' => 'publish' ,
-                        'value' => 1
-                    ] ,
-                    [
-                        'field' => 'accessibility' ,
-                        'value' => [ 1,2,3,4 ]
+                        [
+                            'field' => 'active' ,
+                            'value' => 1
+                        ] ,
+                        [
+                            'field' => 'publish' ,
+                            'value' => 1
+                        ] ,
+                        [
+                            'field' => 'accessibility' ,
+                            'value' => [ 0,1,2,3,4 ]
+                        ]
                     ]
-                ] ,
+                    : []
+                ,
                 // 'not' => [
                 //     [
                 //         'field' => 'type' ,
@@ -154,13 +166,15 @@ class RegulatorController extends Controller
         $request->merge( $queryString );
 
         $crud = new CrudController(new RecordModel(), $request, $this->selectFields,[
-            /**
-             * custom the value of the field
-             */
+            'image' => function($record){
+                $record->image = ( strlen( $record->image ) > 0 && \Storage::disk('public')->exists( $record->image ) )
+                ? \Storage::disk('public')->url( $record->image )
+                : false ;
+                return $record->image ;
+            },
             'pdf' => function($record){
-                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( str_replace( [ 'regulators/' , 'documents/' ] , '' , $record->pdf ) ) )
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('regulator')->exists( $record->pdf ) )
                 ? true
-                // \Storage::disk('regulator')->url( $pdf ) 
                 : false ;
                 return $record->pdf ;
             },
@@ -369,115 +383,14 @@ class RegulatorController extends Controller
             'message' => 'អានព័ត៌មាននៃគណនីបានរួចរាល់ !' 
         ],200 );
     }
-    /**
-     * View the pdf file
-     */
-    public function pdf(Request $request)
-    {
-        $document = RecordModel::findOrFail($request->id);
-        if($document) {
-            // $record->pdf = ( $record->pdf !== "" && $record->pdf !== null && \Storage::disk('regulator')->exists( $record->pdf ) )
-            // $path = storage_path('data') . '/regulators/' . $document->pdf;
-            $pathPdf = storage_path('data') . '/regulators/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ;
-            $ext = pathinfo($pathPdf);
-            $filename = str_replace('/' , '-', $document->fid) . "." . $ext['extension'];
-        
-            /**   Log the access of the user */
-            $user = \Auth::user() != null ? \Auth::user() : auth('api')->user() ;
-            if( $user != null ){
-                \App\Models\Log\Log::regulator([
-                    'system' => 'client' ,
-                    'user_id' => $user->id ,
-                    'regulator_id' => $regulator->id
-                ]);
-            }
-
-            if(file_exists( $pathPdf ) && is_file($pathPdf)) {
-                $pdfWatermark = storage_path('data') . '/watermarkfiles/' . str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf );
-                if( copy( 
-                        $pathPdf , 
-                        $pdfWatermark
-                    )
-                ){
-
-                    // $watermarkPath = storage_path('data') . '/watermarkfiles/watermark5.png'  ;
-                    // if( file_exists( $watermarkPath ) && is_file($watermarkPath) ){
-                    //     // Check whether the pdf has once applied the watermark
-                    //     if( !file_exists ( storage_path('data') . '/watermarkfiles/' . $document->pdf ) ){
-                    //         // Specify path to the existing pdf
-                    //         $pdf = new Pdf( $pathPdf );
-
-                    //         // Specify path to image. The image must have a 96 DPI resolution.
-                    //         $watermark = new ImageWatermark( $watermarkPath );
-                            
-                    //         // Create a new watermarker
-                    //         $watermarker = new PDFWatermarker(
-                    //             $pdf, 
-                    //             $watermark
-                    //         ); 
-
-                    //         // Set the position of the watermark including optional X/Y offsets
-                    //         // $position = new Position(Position::BOTTOM_CENTER, -50, -10);
-
-                    //         // All possible positions can be found in Position::options
-                    //         // $watermarker->setPosition($position);
-
-                    //         // Place watermark behind original PDF content. Default behavior places it over the content.
-                    //         // $watermarker->setAsBackground();
-
-
-                    //         // Only Watermark specific range of pages
-                    //         // This would only watermark page 3 and 4
-                    //         // $watermarker->setPageRange(3, 4);
-                            
-                    //         // Save the new PDF to its specified location
-                    //         $watermarker->save( storage_path('data') . '/watermarkfiles/' . $document->pdf );
-                    //     }   
-
-                    //     $pdfBase64 = base64_encode( 
-                    //         file_get_contents( 
-                    //             // $pathPdf 
-                    //             storage_path('data') . '/watermarkfiles/' . $document->pdf
-                    //         ) 
-                    //     );
-                        
-                    //     return response([
-                    //         'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
-                    //         "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
-                    //         "filename" => $filename,
-                    //         "ok" => true 
-                    //     ],200);
-                    // }else{
-                    //     return response()->json([
-                    //         'message' => 'មិនមានរូបផាព Watermark។' ,
-                    //         'watermark' => $watermarkPath
-                    //     ],200);
-                    // }
-
-                    $pdfBase64 = base64_encode( file_get_contents( $pdfWatermark ) );
-                    
-                    return response([
-                        'serial' => str_replace([ 'regulators/' ,'documents/' ],'', $document->pdf ) ,
-                        "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
-                        "filename" => $filename,
-                        "ok" => true 
-                    ],200);
-                }else{
-                    return response()->json([
-                        'message' => 'មិនបញ្ហាអានអានឯកសារយោង'
-                    ],403);
-                }
-
-            }else
-            {
-                return response([
-                    'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
-                    'path' => $pathPdf
-                ],500 );
-            }
-        }
-    }
     public function upload(Request $request){
+        ini_set('upload_max_filesize', 5);
+        // file_uploads
+        // upload_max_filesize
+        // max_input_time
+        // memory_limit
+        // max_execution_time
+        // post_max_size
         $user = \Auth::user();
         if( $user ){
             $phpFileUploadErrors = [
@@ -490,17 +403,17 @@ class RegulatorController extends Controller
                 7 => 'Failed to write file to disk.',
                 8 => 'A PHP extension stopped the file upload.',
             ];
-            if( isset( $_FILES['file'] ) && $_FILES['file']['error'] > 0 ){
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
                 return response()->json([
                     'ok' => false ,
-                    'message' => $phpFileUploadErrors[ $_FILES['file']['error'] ]
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
                 ],403);
             }
-            $kbFilesize = round( filesize( $_FILES['file']['tmp_name'] ) / 1024 , 4 );
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
             $mbFilesize = round( $kbFilesize / 1024 , 4 );
             if( ( $document = \App\Models\Regulator\Regulator::find($request->id) ) !== null ){
                 list($year,$month,$day) = explode('-',$document->year);
-                $uniqeName = Storage::disk('regulator')->putFile( '' , new File( $_FILES['file']['tmp_name'] ) );
+                $uniqeName = Storage::disk('regulator')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
                 $document->pdf = $uniqeName ;
                 $document->save();
                 if( Storage::disk('regulator')->exists( $document->pdf ) ){
@@ -543,7 +456,12 @@ class RegulatorController extends Controller
          */
         
         $record = RecordModel::create([
-            'fid' => $request->fid?? ''  ,
+            'fid' => isset( $request->fid ) 
+                ? $request->fid 
+                : ( isset( $request->number ) 
+                    ? $request->number 
+                    : '' 
+                ),
             'title' => $request->title?? '' ,
             'objective' => $request->objective ,
             'year' => $request->year?? \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
@@ -675,7 +593,7 @@ class RegulatorController extends Controller
         ],200);
     }
 
-    public function destroy(Request $request){
+    public function delete(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
             return response()->json([
                 'ok' => false ,
@@ -696,7 +614,10 @@ class RegulatorController extends Controller
              * Delete all the related documents own by this regulator
              */
             if( $tempRecord->pdf !== null && $tempRecord->pdf !=="" && Storage::disk('regulator')->exists( $tempRecord->pdf ) ){
-                Storage::disk("document")->delete( $tempRecord->pdf  );
+                Storage::disk("regulator")->delete( $tempRecord->pdf  );
+            }
+            if( $tempRecord->image !== null && $tempRecord->image !=="" && Storage::disk('public')->exists( $tempRecord->image ) ){
+                Storage::disk("public")->delete( $tempRecord->image  );
             }
             return response()->json([
                 'record' => $tempRecord ,
@@ -721,7 +642,7 @@ class RegulatorController extends Controller
         });
         return view( 'oknha' , ['data' => $records] );
     }
-    public function activate(Request $request){
+    public function active(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
             return response()->json([
                 'ok' => false ,
@@ -742,7 +663,7 @@ class RegulatorController extends Controller
             'message' => 'បានបើកឯកសាររួចរាល់។'
         ],200);
     }
-    public function deactivate(Request $request){
+    public function unactive(Request $request){
         if( !isset( $request->id ) || $request->id < 0 ){
             return response()->json([
                 'ok' => false ,
@@ -859,5 +780,131 @@ class RegulatorController extends Controller
         return response()->json([
             'message' => 'មានបញ្ហាក្នុងការដកអ្នកអានឯកសារនេះ។'
         ],422);
+    }
+    public function uploadPicture(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('public')->putFile( 'regulators/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
+                $record->image = $uniqeName ;
+                $record->save();
+                if( $record->image != null && strlen( $record->image ) > 0 && Storage::disk('public')->exists( $record->image ) ){
+                    $record->image = Storage::disk("public")->url( $record->image  );
+                    return response([
+                        'record' => $record ,
+                        'ok' => true ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $record ,
+                        'ok' => false ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'ok' => false ,
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'ok' => false ,
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    public function uploadPdf(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('regulator')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
+                $record->pdf = $uniqeName ;
+                $record->save();
+                if( Storage::disk('regulator')->exists( $record->pdf ) ){
+                    // $record->pdf = Storage::disk("position")->url( $record->pdf  );
+                    $record->pdf = true ;
+                    return response([
+                        'record' => $record ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $document ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    /**
+     * View the pdf file
+     */
+    public function pdf(Request $request)
+    {
+        $record = RecordModel::findOrFail($request->id);
+        if($record) {
+            $pathPdf = storage_path('data') . '/regulators/' . $record->pdf ;
+            $ext = pathinfo($pathPdf);
+            $filename = md5($record->id) . '.pdf';
+            if(file_exists( $pathPdf ) && is_file($pathPdf)) {
+                $pdfBase64 = base64_encode( file_get_contents( $pathPdf ) );  
+                return response([
+                    "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                    "filename" => $filename,
+                    "ok" => true 
+                ],200);
+            }else{
+                return response([
+                    'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
+                    'path' => $pathPdf
+                ],500 );
+            }
+        }
     }
 }

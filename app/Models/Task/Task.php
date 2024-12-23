@@ -246,5 +246,42 @@ class Task extends Model
     public function comments(){
         return $this->hasMany( TaskComment::class , 'task_id' , 'id' );
     }
-    
+    /**
+     * Reservice function to get the tree of child relationship of all level
+     */
+    public function getChildAsTree($level=0){
+        return $this->children != null && !$this->children->isEmpty()
+            ? $this->children->map(function( $child ) use($level){
+                return [
+                    'level' => $level++ ,
+                    'id' => $child->id ,
+                    'objective' => $child->objective ,
+                    'minutes' => $child->minutes ,
+                    'start' => $child->start ,
+                    'end' => $child->end ,
+                    'created_at' => $child->created_at ,
+                    'creator' => $child->creator == null
+                        ? null
+                        : [
+                            'id' => $child->creator->id ,
+                            'firstname' => $child->creator->firstname ,
+                            'lastname' => $child->creator->lastname ,
+                            'phone' => $child->creator->phone ,
+                            'email' => $child->creator->email ,
+                            'avatar_url' => strlen( $child->creator->avatar_url ) > 0 && \Storage::disk('public')->exists( $child->creator->avatar_url )
+                                ? \Storage::disk('public')->url( $child->creator->avatar_url ) 
+                                : false ,
+                            'image' => strlen( $child->creator->image ) > 0 && \Storage::disk('public')->exists( $child->creator->image )
+                                ? \Storage::disk('public')->url( $child->creator->image ) 
+                                : false
+                        ] ,
+                    'status' => $child->status ,
+                    'pid' => $child->pid ,
+                    'children' => $child->children != null && !$child->children->isEmpty()
+                        ? $child->getChildAsTree()
+                        : [] 
+                ];
+            })
+            : [] ;
+    }
 }

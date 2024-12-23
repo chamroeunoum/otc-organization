@@ -59,4 +59,16 @@ class Position extends Tag
     public static function getInstance(){
         return static::where('model', self::class )->first();
     }
+
+    protected static function booted(): void
+    {
+        static::created(function (Position $position) {
+            $position->image = null ;
+            $position->model = self::class ;
+            $position->created_at = $position->updated_at = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+        });
+        static::updated(function (Position $position) {
+            $position->updated_at = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+        });
+    }
 }

@@ -105,6 +105,24 @@ class User extends Authenticatable
     public function userTimeslots(){
       return $this->hasMany( \App\Models\Attendant\UserTimeslot::class , 'user_id' , 'id' );
     }
+    public function getPossibleTimeslot($datetime){
+      if( strlen( $datetime ) > 0 ){
+        $datetime = \Carbon\Carbon::parse( $datetime );
+        return $this->timeslots == null
+          ? null
+          : $this->userTimeslots->filter(function($timeslot, $key) use( $datetime ){
+              $start = \Carbon\Carbon::parse( $datetime->format("Y-m-d") . ' ' . $timeslot->start );
+              $end = \Carbon\Carbon::parse( $datetime->format("Y-m-d") . ' ' . $timeslot->end );
+              return 
+                  // The datetime is smaller than the start
+                  $datetime->lte ( $start ) ||
+                  // The datetime is between the start and end
+                  ( $datetime->gt( $start ) && $datetime->lte( $end ) ) 
+                  ;
+          })->first();
+      }
+      return null ;
+    }
     public function organizationLeader()
     {
         return $this->belongsToMany('App\Models\Regulator\Tag\Organization','organization_leader','people_id','organization_id');
@@ -125,47 +143,47 @@ class User extends Authenticatable
       return $this->belongsToMany('\App\Models\Regulator\Tag\Signature','user_signatures','people_id','signature_id');
     }
     
-    public function setImageAttribute($value)
-    {
-        $attribute_name = "image";
-        $disk = "uploads";
-        $destination_path = "profiles";
+    // public function setImageAttribute($value)
+    // {
+    //     $attribute_name = "image";
+    //     $disk = "uploads";
+    //     $destination_path = "profiles";
 
-        // if the image was erased
-        if ($value==null) {
-            // delete the image from disk
-            \Storage::disk($disk)->delete($this->image);
+    //     // if the image was erased
+    //     if ($value==null) {
+    //         // delete the image from disk
+    //         \Storage::disk($disk)->delete($this->image);
 
-            // set null in the database column
-            $this->attributes[$attribute_name] = null;
-        }
+    //         // set null in the database column
+    //         $this->attributes[$attribute_name] = null;
+    //     }
 
-        // if a base64 was sent, store it in the db
-        if (starts_with($value, 'data:image'))
-        {
-            // 0. Make the image
-            $image = \Image::make($value);
-            // 1. Generate a filename.
-            $filename = md5($value.time()).'.jpg';
-            // 2. Store the image on disk.
+    //     // if a base64 was sent, store it in the db
+    //     if (starts_with($value, 'data:image'))
+    //     {
+    //         // 0. Make the image
+    //         $image = \Image::make($value);
+    //         // 1. Generate a filename.
+    //         $filename = md5($value.time()).'.jpg';
+    //         // 2. Store the image on disk.
 
-            // but delete the existing image first
-            if( !$image->filesize()){
-              $image_path = public_path().'/'.$this->image;
-              if(\File::isFile($image_path))unlink($image_path);
-              // then store the new image to the profiles folder
-              \Storage::disk($disk)->put($destination_path.'/'.$filename, $image->stream());
-              // 3. Save the path to the database
-              $this->attributes[$attribute_name] = $disk.'/'. $destination_path.'/'.$filename;
-              if($this->people_id>0){
-                $people = \App\Models\People\People::find($this->people_id);
-                $people->image = $disk.'/'. $destination_path.'/'.$filename;
-                $people->save();
-              }
-            }
+    //         // but delete the existing image first
+    //         if( !$image->filesize()){
+    //           $image_path = public_path().'/'.$this->image;
+    //           if(\File::isFile($image_path))unlink($image_path);
+    //           // then store the new image to the profiles folder
+    //           \Storage::disk($disk)->put($destination_path.'/'.$filename, $image->stream());
+    //           // 3. Save the path to the database
+    //           $this->attributes[$attribute_name] = $disk.'/'. $destination_path.'/'.$filename;
+    //           if($this->people_id>0){
+    //             $people = \App\Models\People\People::find($this->people_id);
+    //             $people->image = $disk.'/'. $destination_path.'/'.$filename;
+    //             $people->save();
+    //           }
+    //         }
 
-        }
-    }
+    //     }
+    // }
 
     public function folders(){
       return $this->hasMany('\App\Models\Folder\Folder','people_id','id');

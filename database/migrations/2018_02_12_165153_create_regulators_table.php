@@ -15,6 +15,7 @@ class CreateRegulatorsTable extends Migration {
 		Schema::create('regulators', function(Blueprint $table)
 		{
 			$table->integer('id', true);
+			$table->string('image',191)->nullable(true)->comment('Cover of the regulator');
 			$table->string('fid', 191)->nullable();
 			$table->text('title', 65535)->nullable();
 			$table->text('objective', 65535)->nullable();

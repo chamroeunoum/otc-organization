@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CrudController;
 use App\Models\Regulator\Tag\Position as RecordModel;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 
 
 class PositionController extends Controller
 {
     private $model = null ;
-    private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'record_index' , 'active' ] ;
+    private $fields = [ 'id','name','desp' , 'pid' , 'model' , 'tpid' , 'record_index' , 'active' , 'image' , 'pdf' ] ;
     private $renameFields = [
         'pid' => 'parentId'
     ];
@@ -26,46 +28,25 @@ class PositionController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? intval( $request->perPage ) : 50 ;
         $page = isset( $request->page ) && $request->page !== "" ? intval( $request->page ) : 1 ;
-        $id = isset( $request->id ) && intval( $request->id ) > 0? intval( $request->id ) : false ; // 163 គឺ រាជរដ្ឋាភិបាល
-
-        $root = $id 
-            ? RecordModel::where('id',$id)->first()
-            : RecordModel::where('model', get_class( $this->model ) )->first();
-        if( $root == null ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'ក្រសួងស្ថាប័ននេះមិនមានឡើយ។'
-            ],422);
-        }
-        $root->parentNode;
-        $root->totalChilds = $root->totalChildNodesOfAllLevels();
+        $parentNode = isset( $request->id ) && intval( $request->id ) > 0? RecordModel::find( $request->id ) : null ;
         $queryString = [
             "where" => [
-                // 'default' => [
-                //     $pid > 0 ? [
-                //         'field' => 'pid' ,
-                //         'value' => $pid
-                //     ] : [] ,
-                // ],
-                
-                // 'in' => [] ,
-
-                // 'not' => [
-                //     [
-                //         'field' => 'id' ,
-                //         'value' => 4
-                //     ]
-                // ] ,
-                'like' => [
+                'default' => [
                     [
-                        'field' => 'tpid' ,
-                        'value' => ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%"
+                        'field' => 'model' ,
+                        'value' => get_class( $this->model )
                     ],
-                    // [
-                    //     'field' => 'year' ,
-                    //     'value' => $date === false ? "" : $date
-                    // ]
-                ] ,
+                    $parentNode != null && $parentNode->id > 0 ? [
+                        'field' => 'pid' ,
+                        'value' => $parentNode->id
+                    ] : [] ,
+                ],
+                'like' => [
+                    $parentNode != null && $parentNode->id > 0 ? [
+                        'field' => 'tpid' ,
+                        'value' => ( intval( $parentNode->pid ) > 0 ? $parentNode->pid.":" : '' ) . $parentNode->id . "%"
+                    ] : []
+                ]
             ] ,
             "pagination" => [
                 'perPage' => $perPage,
@@ -84,10 +65,23 @@ class PositionController extends Controller
         ];
         $request->merge( $queryString );
 
-        $crud = new CrudController(new RecordModel(), $request, $this->fields , false , $this->renameFields , [
-            'totalChilds' => function($record){
-                return $record->totalChildNodesOfAllLevels();
+        $crud = new CrudController(new RecordModel(), $request, $this->fields , [
+            'image' => function($record){
+                $record->image = ( strlen( $record->image ) > 0 && \Storage::disk('public')->exists( $record->image ) )
+                ? \Storage::disk('public')->url( $record->image )
+                : false ;
+                return $record->image ;
             },
+            'pdf' => function($record){
+                $record->pdf = ( strlen( $record->pdf ) > 0 && \Storage::disk('position')->exists( $record->pdf ) )
+                ? true
+                : false ;
+                return $record->pdf ;
+            }
+        ] , $this->renameFields , [
+            // 'totalChilds' => function($record){
+            //     return $record->totalChildNodesOfAllLevels();
+            // },
             // 'totalStaffsOfAllLevels' => function($record){
             //     return $record->totalStaffsOfAllLevels();
             // },
@@ -97,9 +91,9 @@ class PositionController extends Controller
             // 'totalStaffs' => function($record){
             //     return $record->staffs == null ? 0 : $record->staffs->count();
             // },
-            'pid' => function($record){
-                return $record->pid;
-            }
+            // 'pid' => function($record){
+            //     return $record->pid;
+            // }
         ] );
 
         $crud->setRelationshipFunctions([
@@ -125,28 +119,8 @@ class PositionController extends Controller
         ]);
 
         $builder = $crud->getListBuilder();
-        
-        // $builder->where('tpid', "LIKE" , ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%" );
-        $root->parentId = null ;
-
-        $root->leader = $root->leader != null
-            ? $root->leader->map(function($leader){
-                $leader->organizations;
-                $leader->positions;
-                $leader->countesies;
-                return $leader ;
-            }) : [] ;
-
-        // $root->staffs = $root->staffs != null
-        // ? $root->staffs->map(function($staff){
-        //     $staff->organizations;
-        //     $staff->positions;
-        //     $staff->countesies;
-        //     return $staff ;
-        // }) : [] ;
-
+        $builder->whereNull( 'deleted_at' );
         $responseData = $crud->pagination(true , $builder );
-        $responseData['root'] = $root ;
         // $responseData['records'] = $responseData['records']->prepend( $root );
         // $responseData['records'] = $responseData['records']->map(function($organization){
         //     $org = \App\Models\Regulator\Tag\Organization::find( $organization['id'] ) ;
@@ -223,7 +197,7 @@ class PositionController extends Controller
             "order" => [
                 'field' => 'record_index' ,
                 'by' => 'asc'
-            ],
+            ]
         ];
         $request->merge( $queryString );
 
@@ -299,27 +273,30 @@ class PositionController extends Controller
         $search = isset( $request->search ) && $request->serach !== "" ? $request->search : false ;
         $perPage = isset( $request->perPage ) && $request->perPage !== "" ? $request->perPage : 1000 ;
         $page = isset( $request->page ) && $request->page !== "" ? $request->page : 1 ;
-        
-        $id = isset( $request->id ) && intval( $request->id ) > 0? intval( $request->id ) : false ; // 163 គឺ រាជរដ្ឋាភិបាល
+        $parentNode = isset( $request->id ) && intval( $request->id ) > 0? RecordModel::find( $request->id ) : null ;
 
-        $root = $id > 0 
-            ? RecordModel::where('id',$id)->first()
-            : RecordModel::where('model', get_class( $this->model ) )->first();
-        if( $root == null ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'ក្រសួងស្ថាប័ននេះមិនមានឡើយ។'
-            ],422);
-        }
+        // $root = $id > 0 
+        //     ? RecordModel::where('id',$id)->first()
+        //     : RecordModel::where('model', get_class( $this->model ) )->first();
+        // if( $root == null ){
+        //     return response()->json([
+        //         'ok' => false ,
+        //         'message' => 'តួនាទីនេះមិនមានឡើយ។'
+        //     ],422);
+        // }
 
         $queryString = [
             "where" => [
-                // 'default' => [
-                //     $pid > 0 ? [
-                //         'field' => 'pid' ,
-                //         'value' => $pid
-                //     ] : [] ,
-                // ],
+                'default' => [
+                    [
+                        'field' => 'model' ,
+                        'value' => get_class( $this->model )
+                    ],
+                    $parentNode != null && $parentNode->id > 0 ? [
+                        'field' => 'pid' ,
+                        'value' => $parentNode->id
+                    ] : [] ,
+                ],
                 
                 // 'in' => [] ,
 
@@ -329,16 +306,16 @@ class PositionController extends Controller
                 //         'value' => 4
                 //     ]
                 // ] ,
-                'like' => [
-                    [
-                        'field' => 'tpid' ,
-                        'value' => ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%"
-                    ],
-                    // [
-                    //     'field' => 'year' ,
-                    //     'value' => $date === false ? "" : $date
-                    // ]
-                ] ,
+                // 'like' => [
+                //     [
+                //         'field' => 'tpid' ,
+                //         'value' => ( intval( $root->pid ) > 0 ? $root->pid.":" : '' ) . $root->id . "%"
+                //     ],
+                //     // [
+                //     //     'field' => 'year' ,
+                //     //     'value' => $date === false ? "" : $date
+                //     // ]
+                // ] ,
             ] ,
             "pagination" => [
                 'perPage' => $perPage,
@@ -360,6 +337,7 @@ class PositionController extends Controller
         $crud = new CrudController(new RecordModel(), $request, $this->fields );
 
         $builder = $crud->getListBuilder();
+        $builder->whereNull('deleted_at');
         $responseData = $crud->pagination(true , $builder );
 
         $responseData['records'] = $responseData['records'];
@@ -393,20 +371,22 @@ class PositionController extends Controller
      */
     public function store(Request $request){
         // Get parent
-        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 489 ) ;
-        if( $parentNode == null ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'ស្ថាប័នមេ នេះមិនមានឡើយ។'
-            ],403);
-        }
+        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::where('model',get_class( $this->model ))->first() ;
         // អ្នកប្រើប្រាស់ មិនទាន់មាននៅឡើយទេ
         $record = RecordModel::create([
             'name' => $request->name,
             'desp' => $request->desp ,
-            'pid' => $parentNode->id ,
-            'tpid' => $parentNode->tpid != null && $parentNode->tpid != "" ? $parentNode->tpid .':'. $parentNode->id : $parentNode->id ,
-            'image' => null
+            'model' => get_class( $this->model ) // ,
+            // 'pid' => $parentNode != null && $parentNode->id > 0 
+            //     ? $parentNode->id 
+            //     : null ,
+            // 'tpid' => $parentNode != null && $parentNode->id > 0
+            //     ?(
+            //         $parentNode->tpid != null && $parentNode->tpid != "" 
+            //             ? $parentNode->tpid .':'. $parentNode->id 
+            //             : $parentNode->id
+            //     )
+            //     : null
         ]);
 
         if( $record ){
@@ -437,7 +417,7 @@ class PositionController extends Controller
         if( $parent == null || $child == null ){
             return response()->json([
                 'ok' => false ,
-                'message' => "សូមជ្រើសរើស អង្គភាពមេ និង អង្គភាពចំណុះ។"
+                'message' => "សូមជ្រើសរើស តួនាទី "
             ],350);
         }
         $child->pid = $parent->id ;
@@ -453,26 +433,16 @@ class PositionController extends Controller
      * Update an account
      */
     public function update(Request $request){
-        // Get parent
-        $parentNode = isset( $request->pid ) && intval( $request->pid ) > 0 ? RecordModel::find( $request->pid ) : RecordModel::find( 489 ) ;
-        if( $parentNode == null ){
-            return response()->json([
-                'ok' => false ,
-                'message' => 'ស្ថាប័នមេនេះមិនមានឡើយ។'
-            ],403);
-        }
         $record = isset( $request->id ) && intval( $request->id ) > 0 ? RecordModel::find($request->id) : null ;
         if( $record == null ){
             return response()->json([
                 'ok' => false ,
-                'message' => 'ស្ថាប័នមនេះមិនមានឡើយ។'
+                'message' => 'តួនាទីនេះមិនមានឡើយ។'
             ],403);
         }
         $updateData = [
             'name' => $request->name ,
-            'desp' => $request->desp ,
-            'pid' => $parentNode->id ,
-            'tpid' => $parentNode->tpid != null && $parentNode->tpid != "" ? $parentNode->tpid .':'. $parentNode->id : $parentNode->id ,
+            'desp' => $request->desp
         ];
         $record->update( $updateData );
         return response()->json([
@@ -835,6 +805,132 @@ class PositionController extends Controller
                 'message' => 'មានបញ្ហាពេលកំណត់ថ្នាក់ដឹកនាំសម្រាប់ក្រសួង ស្ថាប័ន។' ,
                 'ok' => false
             ], 500);
+        }
+    }
+    public function uploadPicture(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('public')->putFile( 'positions/'.$user->id , new File( $_FILES['files']['tmp_name'] ) );
+                $record->image = $uniqeName ;
+                $record->save();
+                if( $record->image != null && strlen( $record->image ) > 0 && Storage::disk('public')->exists( $record->image ) ){
+                    $record->image = Storage::disk("public")->url( $record->image  );
+                    return response([
+                        'record' => $record ,
+                        'ok' => true ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $record ,
+                        'ok' => false ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'ok' => false ,
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'ok' => false ,
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    public function uploadPdf(Request $request){
+        $user = \Auth::user();
+        if( $user ){
+            $phpFileUploadErrors = [
+                0 => 'មិនមានបញ្ហាជាមួយឯកសារឡើយ។',
+                1 => "ទំហំឯកសារធំហួសកំណត់ " . ini_get("upload_max_filesize"),
+                2 => 'ទំហំឯកសារធំហួសកំណត់នៃទំរង់បញ្ចូលទិន្នន័យ ' . ini_get('post_max_size'),
+                3 => 'The uploaded file was only partially uploaded',
+                4 => 'No file was uploaded',
+                6 => 'Missing a temporary folder',
+                7 => 'Failed to write file to disk.',
+                8 => 'A PHP extension stopped the file upload.',
+            ];
+            if( isset( $_FILES['files'] ) && $_FILES['files']['error'] > 0 ){
+                return response()->json([
+                    'ok' => false ,
+                    'message' => $phpFileUploadErrors[ $_FILES['files']['error'] ]
+                ],403);
+            }
+            $kbFilesize = round( filesize( $_FILES['files']['tmp_name'] ) / 1024 , 4 );
+            $mbFilesize = round( $kbFilesize / 1024 , 4 );
+            if( ( $record = RecordModel::find($request->id) ) !== null ){
+                $uniqeName = Storage::disk('position')->putFile( '' , new File( $_FILES['files']['tmp_name'] ) );
+                $record->pdf = $uniqeName ;
+                $record->save();
+                if( Storage::disk('position')->exists( $record->pdf ) ){
+                    // $record->pdf = Storage::disk("position")->url( $record->pdf  );
+                    $record->pdf = true ;
+                    return response([
+                        'record' => $record ,
+                        'message' => 'ជោគជ័យ។'
+                    ],200);
+                }else{
+                    return response([
+                        'record' => $document ,
+                        'message' => 'មិនមានតួនាទីដែលស្វែងរកឡើយ។'
+                    ],403);
+                }
+            }else{
+                return response([
+                    'message' => 'សូមបញ្ជាក់អំពីលេខសម្គាល់របស់តួនាទី។'
+                ],403);
+            }
+        }else{
+            return response([
+                'message' => 'សូមចូលប្រព័ន្ធជាមុនសិន។'
+            ],403);
+        }
+    }
+    /**
+     * View the pdf file
+     */
+    public function pdf(Request $request)
+    {
+        $record = RecordModel::findOrFail($request->id);
+        if($record) {
+            $pathPdf = storage_path('data') . '/positions/' . $record->pdf ;
+            $ext = pathinfo($pathPdf);
+            $filename = md5($record->id) . '.pdf';
+            if(file_exists( $pathPdf ) && is_file($pathPdf)) {
+                $pdfBase64 = base64_encode( file_get_contents( $pathPdf ) );  
+                return response([
+                    "pdf" => 'data:application/pdf;base64,' . $pdfBase64 ,
+                    "filename" => $filename,
+                    "ok" => true 
+                ],200);
+            }else{
+                return response([
+                    'message' => 'មានបញ្ហាក្នុងការអានឯកសារយោង !' ,
+                    'path' => $pathPdf
+                ],500 );
+            }
         }
     }
 }

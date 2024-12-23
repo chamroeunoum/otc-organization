@@ -22,11 +22,12 @@ use App\Http\Controllers\Api\Admin\Regulator\RegulatorController;
 use App\Http\Controllers\Api\Admin\Regulator\LegalDraftController;
 use App\Http\Controllers\Api\Admin\Regulator\RegulatorParentController;
 use App\Http\Controllers\Api\Admin\Regulator\TypeController;
+use App\Http\Controllers\Api\Admin\Regulator\SignatureController;
 use App\Http\Controllers\Api\Admin\Regulator\OrganizationController;
 use App\Http\Controllers\Api\Admin\Regulator\CountesyController;
 use App\Http\Controllers\Api\Admin\Regulator\PositionController;
-use App\Http\Controllers\Api\Admin\Regulator\SignatureController;
 use App\Http\Controllers\Api\Admin\ProfileController;
+use App\Http\Controllers\Api\Admin\Task\TaskController;
 
 use App\Http\Controllers\Api\Admin\Law\Book\BookController;
 use App\Http\Controllers\Api\Admin\Law\Book\KuntyController;
@@ -66,9 +67,13 @@ Route::group([
             Route::put('update',[UserController::class,'update']);
             Route::put('authenticated',[ProfileController::class,'updateAuthUser']);
             Route::get('{id}/read',[UserController::class,'read']);
+            Route::put('passcode',[UserController::class,'updatePasscode']);
             Route::delete('{id}/delete',[UserController::class,'destroy']);
             Route::put('activate',[UserController::class,'active']);
             Route::put('password/change',[UserController::class,'passwordChange']);
+            Route::post('upload/picture',[UserController::class,'uploadPicture']);
+            Route::post('upload/pdf',[UserController::class,'uploadPdf']);
+            Route::get('pdf',[UserController::class,'pdf']);
 
             // Use to check the account does exist or not base on the phone or email or officer_identification_number
             Route::get('checkidentification/{term}/{type}',[UserController::class,'checkIdentification']);
@@ -101,7 +106,11 @@ Route::group([
             Route::get('{id}/read',[PeopleController::class,'read']);
             Route::delete('{id}/delete',[PeopleController::class,'destroy']);
             Route::put('update_organization_code',[PeopleController::class,'updateOrganizationCode']);
-            
+            Route::put('activate',[PeopleController::class,'active']);
+            Route::put('deactivate',[PeopleController::class,'unactive']);
+            Route::post('upload/picture',[PeopleController::class,'uploadPicture']);
+            Route::post('upload/pdf',[PeopleController::class,'uploadPdf']);
+            Route::get('pdf',[PeopleController::class,'pdf']);
     });
 
     /** PEOPLE / USER INFORMATION SECTION */
@@ -167,6 +176,11 @@ Route::group([
             Route::get('{id}/people',[ OrganizationController::class , 'people']);
             Route::put('setleader',[ OrganizationController::class , 'setLeader']);
             Route::put('addstaff',[ OrganizationController::class , 'addPeopleToOrganization']);
+
+            Route::post('upload/picture',[OrganizationController::class,'uploadPicture']);
+            Route::post('upload/pdf',[OrganizationController::class,'uploadPdf']);
+            Route::get('pdf',[OrganizationController::class,'pdf']);
+
     });
     Route::group([
         'prefix' => 'organizations' ,
@@ -192,6 +206,9 @@ Route::group([
             Route::delete('{id}/delete',[PositionController::class,'destroy']);
             Route::put('activate',[PositionController::class,'active']);
             Route::put('deactivate',[PositionController::class,'unactive']);
+            Route::post('upload/picture',[PositionController::class,'uploadPicture']);
+            Route::post('upload/pdf',[PositionController::class,'uploadPdf']);
+            Route::get('pdf',[PositionController::class,'pdf']);
             /**
              * Check the unique user information
              */
@@ -203,19 +220,6 @@ Route::group([
             Route::put('addstaff',[ PositionController::class , 'addPeopleToPosition']);
     });
 
-    /** COUNTESY SECTION */
-    Route::group([
-        'prefix' => 'countesies' ,
-        'namespace' => 'Api' ,
-        'middleware' => 'auth:api'
-        ], function() {
-            Route::get('',[CountesyController::class,'index']);
-            Route::post('create',[CountesyController::class,'store']);
-            Route::put('update',[CountesyController::class,'update']);
-            Route::get('{id}/read',[CountesyController::class,'read']);
-            Route::delete('{id}/delete',[CountesyController::class,'destroy']);
-            Route::put('activate',[CountesyController::class,'active']);
-    });
 
     /** ROLE SECTION */
     Route::group([
@@ -241,14 +245,18 @@ Route::group([
             Route::get('',[RegulatorController::class,'index']);
             Route::get('child',[RegulatorController::class,'child']);
             Route::get('read',[RegulatorController::class,'read']);
-            Route::post('',[RegulatorController::class,'create']);
-            Route::put('',[RegulatorController::class,'update']);
-            Route::put('{id}/activate',[RegulatorController::class,'activate']);
-            Route::put('{id}/deactivate',[RegulatorController::class,'deactivate']);
-            Route::put('{id}/publish',[RegulatorController::class,'publish']);
-            Route::put('{id}/unpublish',[RegulatorController::class,'unpublish']);
-            Route::delete('',[RegulatorController::class,'destroy']);
+            Route::post('create',[RegulatorController::class,'create']);
+            Route::put('update',[RegulatorController::class,'update']);
+            Route::put('activate',[RegulatorController::class,'active']);
+            Route::put('deactivate',[RegulatorController::class,'unactive']);
+            Route::put('publish',[RegulatorController::class,'publish']);
+            Route::put('unpublish',[RegulatorController::class,'unpublish']);
+            Route::delete('{id}/delete',[RegulatorController::class,'delete']);
             Route::post('upload',[RegulatorController::class,'upload']);
+
+            Route::post('upload/picture',[RegulatorController::class,'uploadPicture']);
+            Route::post('upload/pdf',[RegulatorController::class,'uploadPdf']);
+            Route::get('pdf',[RegulatorController::class,'pdf']);
             
 
             // Route::get('get/regulator/years','RegulatorController@getYears');
@@ -281,6 +289,96 @@ Route::group([
                 }
             );
 
+    });
+
+    /** REGULATOR TYPE SECTION */
+    Route::group([
+        'prefix' => 'regulatortypes' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[TypeController::class,'index']);
+            Route::get('compact',[TypeController::class,'compact']);
+            Route::get('listbyparent',[TypeController::class,'listByParent']);
+            Route::post('create',[TypeController::class,'store']);
+            Route::post('addchild',[TypeController::class,'addChild']);
+            Route::put('update',[TypeController::class,'update']);
+            Route::get('{id}/read',[TypeController::class,'read']);
+            Route::delete('{id}/delete',[TypeController::class,'destroy']);
+            Route::put('activate',[TypeController::class,'active']);
+            Route::put('deactivate',[TypeController::class,'unactive']);
+            Route::post('upload/picture',[TypeController::class,'uploadPicture']);
+            Route::post('upload/pdf',[TypeController::class,'uploadPdf']);
+            Route::get('pdf',[TypeController::class,'pdf']);
+            /**
+             * Check the unique user information
+             */
+            Route::get('children',[TypeController::class,'getChildren']);
+            Route::get('regulators',[TypeController::class,'getRegulators']);
+            Route::get('staffs',[ TypeController::class , 'staffs']);
+            Route::get('{id}/people',[ TypeController::class , 'people']);
+            Route::put('setleader',[ TypeController::class , 'setLeader']);
+            Route::put('addstaff',[ TypeController::class , 'addPeopleToPosition']);
+    });
+
+    /** REGULATOR SIGNATURE SECTION */
+    Route::group([
+        'prefix' => 'regulatorsignatures' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[SignatureController::class,'index']);
+            Route::get('compact',[SignatureController::class,'compact']);
+            Route::get('listbyparent',[SignatureController::class,'listByParent']);
+            Route::post('create',[SignatureController::class,'store']);
+            Route::post('addchild',[SignatureController::class,'addChild']);
+            Route::put('update',[SignatureController::class,'update']);
+            Route::get('{id}/read',[SignatureController::class,'read']);
+            Route::delete('{id}/delete',[SignatureController::class,'destroy']);
+            Route::put('activate',[SignatureController::class,'active']);
+            Route::put('deactivate',[SignatureController::class,'unactive']);
+            Route::post('upload/picture',[SignatureController::class,'uploadPicture']);
+            Route::post('upload/pdf',[SignatureController::class,'uploadPdf']);
+            Route::get('pdf',[SignatureController::class,'pdf']);
+            /**
+             * Check the unique user information
+             */
+            Route::get('children',[SignatureController::class,'getChildren']);
+            Route::get('regulators',[SignatureController::class,'getRegulators']);
+            Route::get('staffs',[ SignatureController::class , 'staffs']);
+            Route::get('{id}/people',[ SignatureController::class , 'people']);
+            Route::put('setleader',[ SignatureController::class , 'setLeader']);
+            Route::put('addstaff',[ SignatureController::class , 'addPeopleToPosition']);
+    });
+
+    /** REGULATOR SIGNATURE SECTION */
+    Route::group([
+        'prefix' => 'countesies' ,
+        'namespace' => 'Api' ,
+        'middleware' => 'auth:api'
+        ], function() {
+            Route::get('',[CountesyController::class,'index']);
+            Route::get('compact',[CountesyController::class,'compact']);
+            Route::get('listbyparent',[CountesyController::class,'listByParent']);
+            Route::post('create',[CountesyController::class,'store']);
+            Route::post('addchild',[CountesyController::class,'addChild']);
+            Route::put('update',[CountesyController::class,'update']);
+            Route::get('{id}/read',[CountesyController::class,'read']);
+            Route::delete('{id}/delete',[CountesyController::class,'destroy']);
+            Route::put('activate',[CountesyController::class,'active']);
+            Route::put('deactivate',[CountesyController::class,'unactive']);
+            Route::post('upload/picture',[CountesyController::class,'uploadPicture']);
+            Route::post('upload/pdf',[CountesyController::class,'uploadPdf']);
+            Route::get('pdf',[CountesyController::class,'pdf']);
+            /**
+             * Check the unique user information
+             */
+            Route::get('children',[CountesyController::class,'getChildren']);
+            Route::get('regulators',[CountesyController::class,'getRegulators']);
+            Route::get('staffs',[ CountesyController::class , 'staffs']);
+            Route::get('{id}/people',[ CountesyController::class , 'people']);
+            Route::put('setleader',[ CountesyController::class , 'setLeader']);
+            Route::put('addstaff',[ CountesyController::class , 'addPeopleToPosition']);
     });
 
     /** LEGAL DRAFT SECTION */
@@ -392,127 +490,9 @@ Route::group([
     //     Route::post('/picture/upload','ProfileController@upload');
     // });
 
-    Route::group([
-        'prefix' => 'tasks',
-        'namespace' => 'tasks' ,
-        'middleware' => 'auth:api'
-    ],function(){
-        /**
-         * Methods to apply for each of the CRUD operations
-         * Create => POST
-         * Read => GET
-         * Update => PUT
-         * Delete => DELETE
-         */
-    
-        /**
-         * Get all records
-         */
-        Route::get('',"TaskController@index")->name("taskList");
-        /**
-         * Get a record with id
-         */
-        Route::get('{id}/read',"TaskController@read")->name("taskRead");
-        /**
-         * Create a record
-         */
-        Route::post('',"TaskController@create")->name("taskCreate");
-        /**
-         * Update a reccord with id
-         */
-        Route::put('',"TaskController@update")->name("taskUpdate");
-        /**
-         * Delete a record
-         */
-        Route::delete('users',"TaskController@delete")->name("taskDelete");
-    
-        /**
-         * Activate, Deactivate account
-         */
-        Route::put('activate','TaskController@activate')->name('taskActivate');
-        Route::put('deactivate','TaskController@deactivate')->name('taskDeactivate');
-    
-        Route::put('start','TaskController@startTask')->name('taskStart');
-        Route::put('end','TaskController@endTask')->name('taskEnd');
-        Route::put('pending','TaskController@pendingTask')->name('taskPending');
-        Route::put('continue','TaskController@continueTask')->name('taskContinue');
-        /**
-         * Get number of the tasks base on it status
-         */
-        Route::get('total_number_of_each_status',function(Request $request){
-            return response()->json([
-                'new' => \App\Models\Task\Task::getTotalNewTasks() ,
-                'in_progress' => \App\Models\Task\Task::getTotalInProgressTasks() ,
-                'pending' => \App\Models\Task\Task::getTotalPendingTasks() ,
-                'ended' => \App\Models\Task\Task::getTotalEndedTasks()
-            ],200);
-        });
-        Route::get('total_number_of_new',function(Request $request){
-            return \App\Models\Task\Task::getTotalNewTasks();
-        });
-        Route::get('total_number_of_in_progress',function(Request $request){
-            return \App\Models\Task\Task::getTotalInProgressTasks();
-        });
-        Route::get('total_number_of_pending',function(Request $request){
-            return \App\Models\Task\Task::getTotalPendingTasks();
-        });
-        Route::get('total_number_of_ended',function(Request $request){
-            return \App\Models\Task\Task::getTotalEndedTasks();
-        });
-        /**
-         * Get total earn
-         */
-        Route::get('total_earn',function(){
-            return \App\Models\Task\Task::getTotalEarn();
-        });
-        Route::get('total_earn_by_month_of_year/{date}',function(){
-            return \App\Models\Task\Task::getTotalEarn($date);
-        });
-        Route::get('total_earn_between/{start}/{end}',function(){
-            return \App\Models\Task\Task::getTotalEarn($start,$end);
-        });
-        /**
-         * Get total expense
-         */
-        Route::get('total_expense',function(){
-            return \App\Models\Task\Task::getTotalExpense();
-        });
-        Route::get('total_expense_by_month_of_year/{date}',function(){
-            return \App\Models\Task\Task::getTotalExpenseByMonthOfYear($date);
-        });
-        Route::get('total_expense_between/{start}/{end}',function(){
-            return \App\Models\Task\Task::getTotalExpenseBetween($start,$end);
-        });
-        /**
-         * Get total expense and earn
-         */
-        /**
-         * Total tasks, expense, earn by day
-         */
-        Route::get('total_tasks_earn_expense',function(Request $request){
-            return response()->json([
-                'new' => \App\Models\Task\Task::getTotalNewTasks() ,
-                'progress' => \App\Models\Task\Task::getTotalInProgressTasks() ,
-                'pending' => \App\Models\Task\Task::getTotalPendingTasks() ,
-                'ended' => \App\Models\Task\Task::getTotalEndedTasks() ,
-                'earn' => \App\Models\Task\Task::getTotalEarn() ,
-                'expense' => \App\Models\Task\Task::getTotalExpense()
-            ],200);
-        });
-        Route::get('total_tasks_earn_expense_by_day',function(Request $request){
-            return response()->json([
-                'new' => \App\Models\Task\Task::getNewTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
-                'progress' => \App\Models\Task\Task::getInProgressTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
-                'pending' => \App\Models\Task\Task::getPendingTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
-                'ended' => \App\Models\Task\Task::getEndedTasks()->where('created_at','like',\Carbon\Carbon::now()->format('Y-m-d')."%")->count() ,
-                'earn' => number_format( \App\Models\Task\Task::getTotalEarnBetween(\Carbon\Carbon::now()->format('Y-m-d'),\Carbon\Carbon::now()->format('Y-m-d'))->sum('total'),2,'.',',' ) ,
-                'expense' => number_format( \App\Models\Task\Task::getTotalExpenseBetween(\Carbon\Carbon::now()->format('Y-m-d'),\Carbon\Carbon::now()->format('Y-m-d'))->sum('total'),2,'.',',' )
-            ],200);
-        });
-    });
-
     require( 'admin/attendant.php' );
     require( 'admin/book.php' );
     require( 'admin/task.php' );
+    require( 'admin/timeslot.php' );
 
 });

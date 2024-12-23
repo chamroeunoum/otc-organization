@@ -49,6 +49,54 @@ return [
             'url' => env('APP_URL').'/storage/documents',
             'throw' => true ,
         ],
+        'position' => [
+            'driver' => 'local',
+            'root' => storage_path('data/positions') ,
+            'url' => env('APP_URL').'/storage/positions',
+            'throw' => true
+        ],
+        'signature' => [
+            'driver' => 'local',
+            'root' => storage_path('data/signatures') ,
+            'url' => env('APP_URL').'/storage/signatures',
+            'throw' => true
+        ],
+        'people' => [
+            'driver' => 'local',
+            'root' => storage_path('data/people') ,
+            'url' => env('APP_URL').'/storage/people',
+            'throw' => true
+        ],
+        'user' => [
+            'driver' => 'local',
+            'root' => storage_path('data/users') ,
+            'url' => env('APP_URL').'/storage/users',
+            'throw' => true
+        ],
+        'countesy' => [
+            'driver' => 'local',
+            'root' => storage_path('data/countesies') ,
+            'url' => env('APP_URL').'/storage/countesies',
+            'throw' => true
+        ],
+        'task' => [
+            'driver' => 'local',
+            'root' => storage_path('data/tasks') ,
+            'url' => env('APP_URL').'/storage/tasks',
+            'throw' => true
+        ],
+        'organization' => [
+            'driver' => 'local',
+            'root' => storage_path('data/organizations') ,
+            'url' => env('APP_URL').'/storage/organizations',
+            'throw' => true
+        ],
+        'type' => [
+            'driver' => 'local',
+            'root' => storage_path('data/types') ,
+            'url' => env('APP_URL').'/storage/types',
+            'throw' => true
+        ],
         'legaldraft' => [
             'driver' => 'local',
             'root' => storage_path('data/legaldrafts') ,
